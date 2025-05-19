@@ -1,7 +1,8 @@
 "use client"
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Facebook, Instagram, DiscIcon as Discord } from "lucide-react"
+import { Facebook, Instagram } from "lucide-react"
+import { FaDiscord } from "react-icons/fa"
 import type { Locale } from "@/i18n/config"
 import { getDictionary } from "@/i18n/config"
 
@@ -89,7 +90,7 @@ export function Footer({ lang }: FooterProps) {
                 rel="noopener noreferrer"
                 className="flex items-center text-gold-100 hover:text-gold-400 transition-colors"
               >
-                <Discord className="h-6 w-6 mr-2" />
+                <FaDiscord className="h-6 w-6 mr-2" />
                 <span>Discord</span>
               </a>
               <a

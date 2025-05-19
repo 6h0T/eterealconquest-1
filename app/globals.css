@@ -71,7 +71,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-bunker-950 text-gold-100 font-sans;
     font-family: var(--font-rowdies), system-ui, sans-serif;
   }
 

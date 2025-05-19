@@ -47,7 +47,7 @@ export default function LangLayout({ children, params }: LayoutProps) {
 
   return (
     <html lang={lang} suppressHydrationWarning>
-      <body className={`${rowdies.variable} ${tradeWinds.variable} font-sans bg-bunker-950 text-gold-100`}>
+      <body className={`${rowdies.variable} ${tradeWinds.variable}`}>
         <ThemeProvider attribute="class" defaultTheme="dark">
           <PreloaderWrapper>
             <ErrorBoundary>

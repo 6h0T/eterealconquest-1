@@ -23,14 +23,17 @@ export async function POST(req: Request) {
       .request()
       .input("email", email)
       .query(`
-        SELECT memb___id FROM MEMB_INFO WHERE mail_addr = @email
+        SELECT m.memb___id, ms.memb__id 
+        FROM MEMB_INFO m
+        INNER JOIN MEMB_STAT ms ON m.memb___id = ms.memb___id
+        WHERE m.mail_addr = @email
       `)
 
     if (result.recordset.length === 0) {
       return NextResponse.json({ success: false, error: "No se encontró ese correo" }, { status: 404 })
     }
 
-    const userId = result.recordset[0].memb___id
+    const userId = result.recordset[0].memb__id
     const token = generateToken()
 
     // Insertar el token en la base de datos
@@ -54,7 +57,7 @@ export async function POST(req: Request) {
       from: "no-reply@mu-occidental.com",
       to: email,
       subject: "Restablece tu contraseña",
-      html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><p><a href="${fullResetLink}">${fullResetLink}</a></p>`,
+      html: `<p>Hola ${userId},</p><p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><p><a href="${fullResetLink}">${fullResetLink}</a></p><p>Este enlace expira en 30 minutos.</p>`,
     })
 
     return NextResponse.json({ success: true, message: "Correo de recuperación enviado" })
