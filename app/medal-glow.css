@@ -1,0 +1,91 @@
+/* Estilos para el efecto de resplandor de las medallas */
+.medal-container {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.medal-glow {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.medal-glow::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px; /* Reducido para que coincida con el tamaño de la imagen */
+  height: 28px; /* Reducido para que coincida con el tamaño de la imagen */
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, rgba(255, 215, 0, 0.1) 70%, rgba(255, 215, 0, 0) 90%);
+  z-index: -1;
+  animation: pulse 2s infinite ease-in-out;
+}
+
+.medal-glow.first::before {
+  width: 32px; /* Ajustado al tamaño de la imagen */
+  height: 32px; /* Ajustado al tamaño de la imagen */
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.5) 0%, rgba(255, 215, 0, 0.2) 70%, rgba(255, 215, 0, 0) 90%);
+  box-shadow: 0 0 5px 2px rgba(255, 215, 0, 0.2); /* Sombra reducida */
+}
+
+.medal-glow.second::before {
+  width: 30px; /* Ajustado al tamaño de la imagen */
+  height: 30px; /* Ajustado al tamaño de la imagen */
+  background: radial-gradient(
+    circle,
+    rgba(192, 192, 192, 0.5) 0%,
+    rgba(192, 192, 192, 0.2) 70%,
+    rgba(192, 192, 192, 0) 90%
+  );
+  box-shadow: 0 0 4px 1px rgba(192, 192, 192, 0.2); /* Sombra reducida */
+}
+
+.medal-glow.third::before {
+  width: 28px; /* Ajustado al tamaño de la imagen */
+  height: 28px; /* Ajustado al tamaño de la imagen */
+  background: radial-gradient(
+    circle,
+    rgba(205, 127, 50, 0.5) 0%,
+    rgba(205, 127, 50, 0.2) 70%,
+    rgba(205, 127, 50, 0) 90%
+  );
+  box-shadow: 0 0 3px 1px rgba(205, 127, 50, 0.2); /* Sombra reducida */
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.05); /* Reducida la escala de la animación */
+  }
+  100% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Efecto de brillo sutil para el primer lugar */
+.medal-glow.first img {
+  animation: shine 3s infinite linear;
+}
+
+@keyframes shine {
+  0% {
+    filter: drop-shadow(0 0 1px rgba(255, 215, 0, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.7));
+  }
+  100% {
+    filter: drop-shadow(0 0 1px rgba(255, 215, 0, 0.5));
+  }
+}

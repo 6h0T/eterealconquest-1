@@ -1,0 +1,1155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 47 100% 50%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 47 100% 50%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-rowdies), system-ui, sans-serif;
+  }
+
+  /* Aplicar Trade Winds a encabezados */
+  h1,
+  h2,
+  h3.fancy-title {
+    font-family: var(--font-trade-winds), var(--font-rowdies), system-ui, sans-serif;
+  }
+
+  /* Clase para aplicar Trade Winds a elementos específicos */
+  .font-trade-winds {
+    font-family: var(--font-trade-winds), var(--font-rowdies), system-ui, sans-serif;
+  }
+}
+
+.gold-gradient-text {
+  @apply bg-gradient-to-b from-gold-300 to-gold-600 bg-clip-text text-transparent;
+}
+
+.fantasy-border {
+  @apply relative;
+}
+
+.fantasy-border::before {
+  content: "";
+  @apply absolute inset-0 border-2 border-gold-500/50 rounded-md -m-0.5 pointer-events-none;
+}
+
+.hero-bg {
+  background-image: linear-gradient(to bottom, rgba(17, 20, 26, 0.7), rgba(17, 20, 26, 0.9)), url("/hero-bg.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.card-hover {
+  @apply transition-all duration-300 hover:scale-105 hover:shadow-[0_0_15px_rgba(255,215,0,0.3)];
+}
+
+/* Botones con diferentes pesos de importancia */
+.button-primary {
+  @apply relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-medium transition-all rounded-md 
+bg-gradient-to-b from-gold-500 to-gold-600 text-bunker-950 hover:from-gold-400 hover:to-gold-500 
+border border-gold-300/50 shadow-md hover:shadow-lg hover:shadow-gold-500/20;
+  font-family: var(--font-trade-winds), var(--font-rowdies), system-ui, sans-serif;
+}
+
+.button-secondary {
+  @apply relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-medium transition-all rounded-md 
+bg-gradient-to-b from-gold-700 to-gold-800 text-gold-50 hover:from-gold-600 hover:to-gold-700 
+border border-gold-500/30 shadow-md hover:shadow-lg hover:shadow-gold-600/20;
+  font-family: var(--font-trade-winds), var(--font-rowdies), system-ui, sans-serif;
+}
+
+.button-tertiary {
+  @apply relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-medium transition-all rounded-md 
+bg-bunker-800 text-gold-300 hover:text-gold-200 hover:bg-bunker-700 
+border border-gold-700/30 shadow-md hover:shadow-lg hover:shadow-gold-700/10;
+  font-family: var(--font-trade-winds), var(--font-rowdies), system-ui, sans-serif;
+}
+
+.button-outline {
+  @apply relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-medium transition-all rounded-md 
+bg-transparent text-gold-400 hover:text-gold-300 hover:bg-bunker-800/50 
+border-2 border-gold-600/30 hover:border-gold-500/50;
+  font-family: var(--font-trade-winds), var(--font-rowdies), system-ui, sans-serif;
+}
+
+/* Efectos de borde para los botones */
+.button-primary::before,
+.button-secondary::before,
+.button-tertiary::before,
+.button-outline::before {
+  content: "";
+  @apply absolute inset-0 rounded-md opacity-0 transition-all duration-300;
+}
+
+.button-primary:hover::before {
+  @apply opacity-100 border-2 border-gold-300;
+}
+
+.button-secondary:hover::before {
+  @apply opacity-100 border-2 border-gold-500;
+}
+
+.button-tertiary:hover::before {
+  @apply opacity-100 border-2 border-gold-700;
+}
+
+.button-outline:hover::before {
+  @apply opacity-100 border-2 border-gold-500;
+}
+
+/* Botones con efecto glitch */
+.button-glitch,
+.button-glitch::after {
+  padding: 16px 20px;
+  font-size: 18px;
+  background: linear-gradient(45deg, transparent 5%, #ffd700 5%);
+  border: 0;
+  color: #11141a;
+  letter-spacing: 3px;
+  line-height: 1;
+  box-shadow: 6px 0px 0px #364256;
+  outline: transparent;
+  position: relative;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-trade-winds), var(--font-rowdies), system-ui, sans-serif;
+}
+
+.button-glitch::after {
+  --slice-0: inset(50% 50% 50% 50%);
+  --slice-1: inset(80% -6px 0 0);
+  --slice-2: inset(50% -6px 30% 0);
+  --slice-3: inset(10% -6px 85% 0);
+  --slice-4: inset(40% -6px 43% 0);
+  --slice-5: inset(80% -6px 5% 0);
+  content: attr(data-text);
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 3%, #364256 3%, #364256 5%, #ffd700 5%);
+  text-shadow: -3px -3px 0px #a67102, 3px 3px 0px #364256;
+  clip-path: var(--slice-0);
+}
+
+.button-glitch:hover::after {
+  animation: 1s glitch;
+  animation-timing-function: steps(2, end);
+}
+
+.button-glitch-secondary,
+.button-glitch-secondary::after {
+  background: linear-gradient(45deg, transparent 5%, #a67102 5%);
+  color: #fff;
+  box-shadow: 6px 0px 0px #11141a;
+}
+
+.button-glitch-secondary::after {
+  background: linear-gradient(45deg, transparent 3%, #11141a 3%, #11141a 5%, #a67102 5%);
+  text-shadow: -3px -3px 0px #ffd700, 3px 3px 0px #11141a;
+}
+
+.button-glitch-tertiary,
+.button-glitch-tertiary::after {
+  background: linear-gradient(45deg, transparent 5%, #364256 5%);
+  color: #ffd700;
+  box-shadow: 6px 0px 0px #ffd700;
+}
+
+.button-glitch-tertiary::after {
+  background: linear-gradient(45deg, transparent 3%, #ffd700 3%, #ffd700 5%, #364256 5%);
+  text-shadow: -3px -3px 0px #a67102, 3px 3px 0px #ffd700;
+}
+
+@keyframes glitch {
+  0% {
+    clip-path: var(--slice-1);
+    transform: translate(-20px, -10px);
+  }
+
+  10% {
+    clip-path: var(--slice-3);
+    transform: translate(10px, 10px);
+  }
+
+  20% {
+    clip-path: var(--slice-1);
+    transform: translate(-10px, 10px);
+  }
+
+  30% {
+    clip-path: var(--slice-3);
+    transform: translate(0px, 5px);
+  }
+
+  40% {
+    clip-path: var(--slice-2);
+    transform: translate(-5px, 0px);
+  }
+
+  50% {
+    clip-path: var(--slice-3);
+    transform: translate(5px, 0px);
+  }
+
+  60% {
+    clip-path: var(--slice-4);
+    transform: translate(5px, 10px);
+  }
+
+  70% {
+    clip-path: var(--slice-2);
+    transform: translate(-10px, 10px);
+  }
+
+  80% {
+    clip-path: var(--slice-5);
+    transform: translate(20px, -10px);
+  }
+
+  90% {
+    clip-path: var(--slice-1);
+    transform: translate(-10px, 0px);
+  }
+
+  100% {
+    clip-path: var(--slice-1);
+    transform: translate(0);
+  }
+}
+
+/* Nuevo estilo de botón para Registrarse */
+.button-register {
+  --black: #000000;
+  --ch-black: #141414;
+  --eer-black: #1b1b1b;
+  --night-rider: #2e2e2e;
+  --white: #ffffff;
+  --af-white: #f3f3f3;
+  --ch-white: #e1e1e1;
+  --gold-light: #ffd700;
+  --gold-dark: #a67102;
+  border-radius: 8px;
+  min-width: 140px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0px 15px;
+  border: none;
+  color: var(--gold-light);
+  position: relative;
+  cursor: pointer;
+  font-weight: 700;
+  transition-duration: .2s;
+  background-color: var(--ch-black);
+  z-index: 1;
+  font-family: var(--font-trade-winds), var(--font-rowdies), system-ui, sans-serif;
+}
+
+.button-register:before,
+.button-register:after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  border-radius: 10px;
+  background: linear-gradient(
+    45deg,
+    var(--gold-dark),
+    var(--gold-light),
+    var(--gold-dark),
+    var(--gold-light),
+    var(--gold-dark),
+    var(--gold-light),
+    var(--gold-dark),
+    var(--gold-dark)
+  );
+  background-size: 400%;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  z-index: -1;
+  animation: steam 20s linear infinite;
+}
+
+@keyframes steam {
+  0% {
+    background-position: 0 0;
+  }
+
+  50% {
+    background-position: 400% 0;
+  }
+
+  100% {
+    background-position: 0 0;
+  }
+}
+
+.button-register:after {
+  filter: blur(50px);
+}
+
+/* Estilos para el nuevo navbar */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background-color: #11141a; /* bunker-950 */
+  box-sizing: border-box;
+  box-shadow: 0 0 0px 1px rgba(255, 215, 0, 0.1);
+  padding: 0.5rem 1rem;
+  width: 100%;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  height: 64px; /* Altura fija para el navbar */
+}
+
+.navbar.scrolled {
+  background-color: #11141a; /* bunker-950 */
+  box-shadow: 0 2px 10px rgba(255, 215, 0, 0.15);
+}
+
+.navbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.navbar-logo img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.navbar-logo:hover img {
+  transform: scale(1.05);
+}
+
+/* Estilos para los radio inputs en desktop */
+.radio-inputs-desktop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.radio-inputs-desktop .radio {
+  position: relative;
+  margin: 0 0.5rem;
+}
+
+.radio-inputs-desktop .radio input {
+  display: none;
+}
+
+.radio-inputs-desktop .radio .name {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  color: #ffd700; /* gold-500 */
+  transition: all 0.15s ease-in-out;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-family: var(--font-trade-winds), var(--font-rowdies), system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.radio-inputs-desktop .radio input:checked + .name {
+  background-color: rgba(255, 215, 0, 0.1);
+  font-weight: 600;
+  color: #ffe60d; /* gold-400 */
+}
+
+/* Hover effect */
+.radio-inputs-desktop .radio:hover .name {
+  background-color: rgba(255, 215, 0, 0.05);
+}
+
+/* Animation */
+.radio-inputs-desktop .radio input:checked + .name {
+  position: relative;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
+  animation: select 0.3s ease;
+}
+
+/* Particles */
+.radio-inputs-desktop .radio input:checked + .name::before,
+.radio-inputs-desktop .radio input:checked + .name::after {
+  content: "";
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #ffd700; /* gold-500 */
+  opacity: 0;
+  animation: particles 0.5s ease forwards;
+}
+
+.radio-inputs-desktop .radio input:checked + .name::before {
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.radio-inputs-desktop .radio input:checked + .name::after {
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.language-selector {
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: #ffd700; /* gold-500 */
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.15s ease-in-out;
+  font-family: var(--font-trade-winds), var(--font-rowdies), system-ui, sans-serif;
+}
+
+.language-selector:hover {
+  background-color: rgba(255, 215, 0, 0.05);
+}
+
+/* Estilos para móvil */
+.mobile-menu-button {
+  display: none;
+  background: none;
+  border: none;
+  color: #ffd700; /* gold-500 */
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 64px; /* Altura del navbar */
+  left: 0;
+  right: 0;
+  background-color: #11141a; /* bunker-950 */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 40;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+
+.mobile-menu.open {
+  transform: translateY(0);
+}
+
+.mobile-menu-items {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-menu-item {
+  padding: 0.75rem 1rem;
+  color: #ffd700; /* gold-500 */
+  text-decoration: none;
+  border-radius: 0.5rem;
+  transition: all 0.15s ease;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-trade-winds), var(--font-rowdies), system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.mobile-menu-item.active {
+  background-color: rgba(255, 215, 0, 0.1);
+  font-weight: 600;
+  color: #ffe60d; /* gold-400 */
+}
+
+.mobile-menu-item:hover {
+  background-color: rgba(255, 215, 0, 0.05);
+}
+
+.mobile-menu-buttons {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+@media (max-width: 1024px) {
+  .radio-inputs-desktop {
+    display: none;
+  }
+
+  .mobile-menu-button {
+    display: block;
+  }
+
+  .mobile-menu {
+    display: block;
+  }
+
+  .navbar-logo {
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-logo img {
+    height: 30px; /* Tamaño más pequeño para móviles */
+  }
+}
+
+/* From Uiverse.io by kennyotsu-monochromia - Modificado con colores dorados */
+.button {
+  --black: #000000;
+  --ch-black: #141414;
+  --eer-black: #1b1b1b;
+  --night-rider: #2e2e2e;
+  --gold-light: #ffd700;
+  --gold-medium: #d19e00;
+  --gold-dark: #a67102;
+  font-family: var(--font-trade-winds), var(--font-rowdies), system-ui, sans-serif;
+  border-radius: 8px;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 20px;
+  border: none;
+  color: var(--gold-light);
+  position: relative;
+  cursor: pointer;
+  font-weight: 700;
+  transition-duration: .2s;
+  background-color: var(--ch-black);
+  text-align: center;
+}
+
+.button:before,
+.button:after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  border-radius: 10px;
+  background: linear-gradient(
+    45deg,
+    var(--ch-black),
+    var(--eer-black),
+    var(--night-rider),
+    var(--gold-light),
+    var(--night-rider),
+    var(--eer-black),
+    var(--ch-black),
+    var(--ch-black)
+  );
+  background-size: 400%;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  z-index: -1;
+  animation: steam 20s linear infinite;
+}
+
+.button:after {
+  filter: blur(50px);
+}
+
+/* Scroll suave para anclas */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+  }
+}
+
+.animate-glow {
+  animation: glow 3s ease-in-out infinite;
+}
+
+/* Añadir al final del archivo */
+
+/* Efecto glow para las noticias destacadas */
+@keyframes news-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+  }
+}
+
+.animate-glow {
+  animation: news-glow 3s ease-in-out infinite;
+}
+
+.scale-130 {
+  transform: scale(1.3);
+}
+
+.scale-80 {
+  transform: scale(0.8);
+}
+
+/* Estilos para mejorar la separación entre secciones */
+.section-divider {
+  position: relative;
+  width: 100%;
+  height: 65px;
+  margin: 0;
+  padding: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  overflow: visible;
+  background: transparent !important;
+  margin-top: -32.5px;
+  margin-bottom: -32.5px;
+}
+
+/* Remove or comment out the section-divider-reduced class as it's no longer needed */
+/* .section-divider-reduced {
+  margin-bottom: -45px;
+} */
+
+/* Update the section styles to ensure proper spacing */
+section {
+  position: relative;
+  padding: 4rem 0;
+  margin: 0;
+  z-index: 1;
+  overflow: visible;
+  background: transparent !important;
+}
+
+/* Ensure sections don't have extra margins between them */
+section + section {
+  margin-top: 0;
+}
+
+/* From Uiverse.io by elijahgummer */
+.golden-button {
+  touch-action: manipulation;
+  display: inline-block;
+  outline: none;
+  font-family: var(--font-trade-winds), var(--font-rowdies), system-ui, sans-serif;
+  font-size: 1em;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 0.3em;
+  height: 2.75em;
+  line-height: 2.5em;
+  text-transform: uppercase;
+  padding: 0 1em;
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(110, 80, 20, 0.4),
+    inset 0 -2px 5px 1px rgba(139, 66, 8, 1),
+    inset 0 -1px 1px 3px rgba(250, 227, 133, 1);
+  background-image: linear-gradient(160deg, #a54e07, #b47e11, #fef1a2, #bc881b, #a54e07);
+  border: 1px solid #a55d07;
+  color: rgb(120, 50, 5);
+  text-shadow: 0 2px 2px rgba(250, 227, 133, 1);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-size: 100% 100%;
+  background-position: center;
+}
+
+.golden-button:focus,
+.golden-button:hover {
+  background-size: 150% 150%;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23), inset 0 -2px 5px 1px #b17d10, inset 0 -1px
+    1px 3px rgba(250, 227, 133, 1);
+  border: 1px solid rgba(165, 93, 7, 0.6);
+  color: rgba(120, 50, 5, 0.8);
+}
+
+.golden-button:active {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(110, 80, 20, 0.4), inset 0 -2px 5px 1px #b17d10, inset 0
+    -1px 1px 3px rgba(250, 227, 133, 1);
+}
+
+/* Estilos para el video del hero */
+#hero-section {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background-color: #11141a; /* Color de fondo mientras se carga el video */
+}
+
+#hero-section iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vw;
+  height: 100vh;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+@media (min-aspect-ratio: 16 / 9) {
+  #hero-section iframe {
+    /* altura según la relación de aspecto */
+    height: 56.25vw;
+  }
+}
+
+@media (max-aspect-ratio: 16 / 9) {
+  #hero-section iframe {
+    /* ancho según la relación de aspecto */
+    width: 177.78vh;
+  }
+}
+
+/* Estilos para el video de Vimeo en el hero */
+.vimeo-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background-color: #11141a; /* Color de fondo mientras se carga el video */
+}
+
+.vimeo-wrapper iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 150%; /* Aumentado para asegurar que cubre toda la pantalla */
+  min-height: 150%; /* Aumentado para asegurar que cubre toda la pantalla */
+  width: auto;
+  height: auto;
+}
+
+/* Mejorar la visibilidad del contenido sobre el video */
+section .container {
+  position: relative;
+  z-index: 20;
+}
+
+/* Actualizar los estilos para asegurar que los divisores estén por encima */
+
+/* Nuevo estilo para el divisor de sección con imagen */
+.section-divider img {
+  width: 100%;
+  max-width: 2400px;
+  height: auto;
+  object-fit: contain;
+  display: block; /* Asegura que no haya espacio extra debajo de la imagen */
+  background: transparent !important;
+}
+
+/* Ajustes para las secciones */
+section {
+  position: relative;
+  min-height: 400px; /* Altura mínima para secciones */
+  margin: 0;
+  z-index: 1;
+  overflow: visible;
+  background: transparent !important;
+}
+
+/* Asegurarse de que los fondos de las secciones tengan un z-index bajo */
+section > div:first-child {
+  z-index: 0;
+}
+
+/* Ajuste específico para la primera sección después del hero */
+#info-section {
+  position: relative;
+  padding-top: 4rem;
+  z-index: 1;
+}
+
+/* Asegurarse de que todas las secciones tengan un z-index adecuado */
+section {
+  background-color: transparent !important; /* Hacer que el fondo sea transparente */
+  position: relative;
+  z-index: 1; /* Asegurar que esté por debajo del divisor */
+}
+
+/* Estilos para el efecto de choque de energías doradas */
+.energy-clash-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #11141a;
+}
+
+.energy-panel {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+}
+
+.energy-panel-left {
+  left: 0;
+  background: linear-gradient(to right, rgba(255, 215, 0, 0.6), rgba(255, 215, 0, 0));
+  clip-path: polygon(0 0, 100% 0, 80% 100%, 0% 100%);
+}
+
+.energy-panel-right {
+  right: 0;
+  background: linear-gradient(to left, rgba(255, 215, 0, 0.6), rgba(255, 215, 0, 0));
+  clip-path: polygon(20% 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+.energy-flash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 215, 0, 0.7);
+  opacity: 0;
+}
+
+.class-name {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 5rem;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  z-index: 10;
+}
+
+/* Estilos responsivos para el layout horizontal */
+@media (max-width: 768px) {
+  .class-content-layout {
+    flex-direction: column;
+  }
+
+  .class-image-container,
+  .class-info-container {
+    width: 100%;
+  }
+
+  .class-image-container {
+    height: 40vh;
+    margin-bottom: 2rem;
+  }
+}
+
+/* Estilo específico para botones de descarga */
+.download-button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  min-height: 70px;
+  font-family: var(--font-trade-winds), var(--font-rowdies), system-ui, sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+  background: linear-gradient(to bottom, #ffd700, #d19e00);
+  color: #11141a;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  width: 100%;
+  letter-spacing: 0.5px;
+}
+
+.download-button:hover {
+  background: linear-gradient(to bottom, #ffe60d, #ffd700);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.download-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.download-button .button-title {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.download-button .button-subtitle {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  font-style: italic;
+  line-height: 1;
+}
+
+/* Añadir estilos para mejorar las tarjetas en la página de descargas */
+.card-download {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 215, 0, 0.3);
+  background-color: rgba(17, 20, 26, 0.9);
+}
+
+/* Estilos específicos para la página de descargas */
+.pt-20.pb-16.relative.overflow-visible {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden !important;
+}
+
+.pt-20.pb-16.relative.overflow-visible > .container {
+  position: relative;
+  z-index: 20;
+}
+
+/* Mejorar el estilo del iframe de Vimeo para que cubra todo */
+.pt-20.pb-16.relative.overflow-visible iframe[src*="player.vimeo.com"] {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 200% !important;
+  min-height: 200% !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+/* Añadir estilos específicos para las pestañas al final del archivo */
+
+/* Estilos personalizados para las pestañas del panel de usuario */
+.user-panel-tabs .tabs-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  overflow: hidden;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin-bottom: 2rem;
+  border: none;
+}
+
+.user-panel-tabs .tab-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.user-panel-tabs .tab-trigger[data-state="active"] {
+  background-color: #ffd700;
+  color: #11141a;
+}
+
+.user-panel-tabs .tab-trigger[data-state="inactive"] {
+  background-color: #364256;
+  color: #ffd700;
+}
+
+/* Animaciones para el portal mágico */
+.animate-spin-slow {
+  animation: spin 8s linear infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+/* Gradiente radial para el portal */
+.bg-gradient-radial {
+  background-image: radial-gradient(var(--tw-gradient-stops));
+}
+
+/* Animación para las partículas */
+@keyframes float-particle {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) translateX(100px);
+    opacity: 0;
+  }
+}
+
+.animate-float-particle {
+  animation: float-particle 3s ease-out forwards;
+}
+
+/* Add this at the end of the file */
+
+/* Circular Gallery Styles */
+.circular-gallery {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: grab;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.circular-gallery:active {
+  cursor: grabbing;
+}
+
+.circular-gallery canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}

@@ -1,0 +1,21 @@
+{
+  "name": "ETEREALCONQUEST - MU Online",
+  "short_name": "ETEREALCONQUEST",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#1a365d",
+  "background_color": "#0f172a",
+  "start_url": "/en",
+  "display": "standalone",
+  "orientation": "portrait"
+}

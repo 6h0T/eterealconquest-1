@@ -1,0 +1,247 @@
+{
+  "navbar": {
+    "home": "Início",
+    "features": "Características",
+    "news": "Notícias",
+    "rankings": "Rankings",
+    "classes": "Classes",
+    "info": "Informação",
+    "download": "Baixar",
+    "signin": "Entrar",
+    "register": "Registrar",
+    "media": "Mídia"
+  },
+  "hero": {
+    "title": "Prepare-se para a nova era do MU Online",
+    "subtitle": "Próximo CBT: Nova Região Aberta 15.12.24 às 19:00 UTC",
+    "preregister": "Pré-registrar",
+    "joinDiscord": "Entrar no Discord",
+    "explore": "Explore nosso servidor"
+  },
+  "features": {
+    "title": "Características Exclusivas",
+    "fps": "60 FPS reais",
+    "skills": "Sistema de habilidades",
+    "tests": "Sistema de testes",
+    "items": "Raridade de itens",
+    "equipment": "Pontuação de equipamento",
+    "interface": "Interface moderna",
+    "buffs": "Sistema de buffs",
+    "auction": "Casa de leilões",
+    "featuresAndServer": "Características e Servidor"
+  },
+  "news": {
+    "title": "Últimas Notícias",
+    "readMore": "Ler mais",
+    "viewAll": "Ver todas as notícias",
+    "newsItems": {
+      "1": {
+        "title": "Nova região: O Vale das Sombras",
+        "description": "Explore a nova região com inimigos e recompensas exclusivas. Desafie o novo chefe de masmorra!"
+      },
+      "2": {
+        "title": "Atualização de equilíbrio de classes",
+        "description": "Fizemos ajustes em todas as classes para melhorar o equilíbrio do jogo. Confira os detalhes."
+      },
+      "3": {
+        "title": "Evento de Natal: Presentes e surpresas",
+        "description": "Celebre as festas conosco e ganhe presentes diários, eventos especiais e mais."
+      },
+      "4": {
+        "title": "Torneio PvP: A Copa do Conquistador",
+        "description": "Participe do maior torneio PvP do ano e ganhe prêmios exclusivos. Inscrições abertas!"
+      }
+    }
+  },
+  "classes": {
+    "title": "Escolha seu Destino",
+    "mainSkills": "Habilidades principais",
+    "darkWizard": {
+      "name": "Dark Wizard",
+      "description": "O Dark Wizard é um mestre da magia elemental, capaz de causar grande dano à distância. Seu principal atributo é Energia, que aumenta seu poder mágico. Embora tenha pouca defesa, sua capacidade de eliminar inimigos rapidamente o torna uma classe muito popular."
+    },
+    "darkKnight": {
+      "name": "Dark Knight",
+      "description": "O Dark Knight é um guerreiro poderoso especializado em combate corpo a corpo. Seu principal atributo é Força, que aumenta seu dano físico. Com alta defesa e pontos de vida, é ideal para jogadores que preferem estar na linha de frente da batalha."
+    },
+    "fairyElf": {
+      "name": "Fairy Elf",
+      "description": "A Fairy Elf é uma arqueira ágil com habilidades de suporte. Seu principal atributo é Agilidade, que aumenta sua precisão e velocidade de ataque. Ela pode atacar à distância e fornecer suporte ao grupo com feitiços de cura e defesa."
+    },
+    "magicGladiator": {
+      "name": "Magic Gladiator",
+      "description": "O Magic Gladiator é um híbrido que domina tanto magia quanto armas. Ele pode usar habilidades de Dark Wizard e Dark Knight, tornando-o muito versátil. Seus atributos são equilibrados, permitindo que ele se adapte a diferentes situações de combate."
+    },
+    "darkLord": {
+      "name": "Dark Lord",
+      "description": "O Dark Lord é um comandante de campo com poderosas invocações. Seu atributo único é Comando, que permite invocar criaturas e fortalecer seus aliados. É uma classe ideal para jogar em grupo e liderar batalhas."
+    },
+    "summoner": {
+      "name": "Summoner",
+      "description": "A Summoner é uma invocadora de criaturas mágicas e feitiços. Seu principal atributo é Energia, que aumenta seu poder mágico. Ela pode invocar criaturas para lutar por ela e lançar poderosos feitiços de controle e dano."
+    },
+    "rageFighter": {
+      "name": "Rage Fighter",
+      "description": "O Rage Fighter é um lutador rápido com ataques devastadores. Seus principais atributos são Força e Vitalidade. Especializado em combate corpo a corpo, ele pode realizar combos de ataques rápidos e poderosos."
+    },
+    "chooseClass": "Escolha entre sete classes únicas, cada uma com suas próprias habilidades e estilo de jogo.",
+    "abilitiesRework": "Reformulação de Habilidades"
+  },
+  "info": {
+    "title": "Informação do Servidor",
+    "expNormal": "EXP Normal",
+    "expMaster": "EXP Master",
+    "zenDrop": "Zen Drop",
+    "itemDrop": "Drop de Itens",
+    "excellent": "Itens excelentes",
+    "rare": "Raros",
+    "epic": "Épicos",
+    "legendary": "Lendários",
+    "benefits": "Benefícios chave",
+    "fps": "60 FPS reais",
+    "dungeons": "Masmorras exclusivas",
+    "pvp": "Eventos PvP",
+    "items": "Sistema de itens raros",
+    "antihack": "Antihack melhorado",
+    "serverRates": "Taxas do Servidor",
+    "low": "Baixo"
+  },
+  "cta": {
+    "title": "Comece sua Lenda",
+    "description": "Junte-se a milhares de jogadores nesta nova aventura épica",
+    "download": "Baixar Cliente",
+    "community": "Entrar na Comunidade"
+  },
+  "footer": {
+    "quickLinks": "Links rápidos",
+    "features": "Características",
+    "news": "Notícias",
+    "roadmap": "Roteiro",
+    "info": "Informação",
+    "support": "Suporte",
+    "downloads": "Downloads",
+    "rankings": "Classificações",
+    "terms": "Termos de Serviço",
+    "contact": "Contato",
+    "social": "Redes sociais",
+    "legal": "Legal",
+    "privacy": "Política de Privacidade",
+    "allRightsReserved": "Todos os direitos reservados",
+    "developedBy": "Desenvolvido por"
+  },
+  "download": {
+    "title": "Baixar",
+    "description": "Baixe o cliente ETEREALCONQUEST e comece sua aventura agora mesmo.",
+    "fullClient": "Cliente Completo",
+    "updater": "Atualizador",
+    "size": "Tamanho",
+    "version": "Versão",
+    "fullClientDesc": "Baixe o cliente completo do jogo. Inclui todos os arquivos necessários para jogar.",
+    "updaterDesc": "Se você já tem uma versão anterior instalada, pode usar o atualizador para obter a versão mais recente.",
+    "scannedAntivirus": "Escaneado com antivírus",
+    "noAdware": "Sem adware ou spyware",
+    "fastUpdate": "Atualização rápida",
+    "keepsSettings": "Mantém suas configurações",
+    "downloadFullClient": "Baixar Cliente Completo",
+    "downloadUpdater": "Baixar Atualizador"
+  },
+  "media": {
+    "title": "Mídia",
+    "description": "Explore vídeos e capturas de tela de ETEREALCONQUEST.",
+    "featuredVideo": "Vídeo em destaque",
+    "imageGallery": "Galeria de imagens",
+    "officialTrailer": "Trailer oficial",
+    "trailerDesc": "Assista ao trailer oficial de ETEREALCONQUEST e descubra um mundo de fantasia.",
+    "screenshots": "Capturas de tela",
+    "screenshotsDesc": "Explore as capturas de tela de ETEREALCONQUEST e descubra seu mundo."
+  },
+  "common": {
+    "viewMoreInfo": "Ver mais informações"
+  },
+  "soundControl": {
+    "unavailable": "Controle de som não disponível",
+    "mute": "Silenciar",
+    "unmute": "Ativar som"
+  },
+  "registro": {
+    "title": "Registro de Conta",
+    "subtitle": "Junte-se ao ETEREALCONQUEST e comece sua aventura",
+    "username": "Nome de usuário",
+    "usernamePlaceholder": "Digite seu nome de usuário",
+    "email": "Endereço de email",
+    "emailPlaceholder": "Digite seu endereço de email",
+    "password": "Senha",
+    "passwordPlaceholder": "Digite sua senha",
+    "confirmPassword": "Confirmar senha",
+    "confirmPasswordPlaceholder": "Confirme sua senha",
+    "register": "Registrar",
+    "registering": "Registrando...",
+    "success": "Registro bem-sucedido! Redirecionando...",
+    "error": "Erro no registro. Por favor, tente novamente.",
+    "usernameRequired": "Nome de usuário é obrigatório",
+    "usernameLength": "Nome de usuário deve ter pelo menos 3 caracteres",
+    "emailRequired": "Email é obrigatório",
+    "emailInvalid": "Email é inválido",
+    "passwordRequired": "Senha é obrigatória",
+    "passwordLength": "Senha deve ter pelo menos 8 caracteres",
+    "passwordMismatch": "As senhas não coincidem",
+    "passwordRequirements": "A senha deve conter pelo menos uma letra maiúscula, uma minúscula e um número",
+    "showPassword": "Mostrar senha",
+    "hidePassword": "Ocultar senha",
+    "alreadyHaveAccount": "Já tem uma conta?",
+    "login": "Entrar"
+  },
+  "login": {
+    "title": "Entrar",
+    "subtitle": "Acesse sua conta ETEREALCONQUEST",
+    "username": "Usuário ou Email",
+    "usernamePlaceholder": "Digite seu usuário ou email",
+    "password": "Senha",
+    "passwordPlaceholder": "Digite sua senha",
+    "login": "Entrar",
+    "loggingIn": "Entrando...",
+    "success": "Login bem-sucedido! Redirecionando...",
+    "error": "Usuário ou senha incorretos. Por favor, tente novamente.",
+    "usernameRequired": "Usuário ou email é obrigatório",
+    "passwordRequired": "Senha é obrigatória",
+    "forgotPassword": "Esqueceu sua senha?",
+    "noAccount": "Não tem uma conta?",
+    "register": "Registre-se",
+    "showPassword": "Mostrar senha",
+    "hidePassword": "Ocultar senha",
+    "rememberMe": "Lembrar-me"
+  },
+  "recuperacion": {
+    "title": "Recuperação de Senha",
+    "subtitle": "Digite seu email para recuperar sua conta",
+    "email": "Endereço de email",
+    "emailPlaceholder": "Digite seu endereço de email",
+    "recover": "Recuperar Senha",
+    "recovering": "Processando...",
+    "success": "Instruções enviadas! Verifique seu email.",
+    "error": "Erro ao processar solicitação. Por favor, tente novamente.",
+    "emailRequired": "Email é obrigatório",
+    "emailInvalid": "Email é inválido",
+    "backToLogin": "Voltar para Entrar",
+    "instructions": "Enviaremos um link para redefinir sua senha."
+  },
+  "donate": {
+    "title": "Doações",
+    "subtitle": "Apoie o Eternal Conquest e receba recompensas exclusivas",
+    "benefits": "Benefícios",
+    "benefit1": "Acesso a itens exclusivos",
+    "benefit2": "Melhore seu equipamento",
+    "benefit3": "Apoie o desenvolvimento do servidor",
+    "benefit4": "Receba WCoinC instantaneamente",
+    "rates": "Taxas de Conversão",
+    "formTitle": "Fazer uma Doação",
+    "formSubtitle": "Preencha o formulário para fazer sua doação",
+    "accountName": "Nome da Conta",
+    "enterAccount": "Digite o nome da sua conta",
+    "accountNameHelp": "Digite o nome exato da sua conta no jogo",
+    "selectAmount": "Selecione um Valor",
+    "amountHelp": "Você receberá WCoinC de acordo com a taxa de conversão",
+    "paypalInfo": "Ao clicar em 'Doar com PayPal', você será redirecionado para o PayPal para concluir seu pagamento com segurança. WCoinC será creditado automaticamente em sua conta após a confirmação do pagamento.",
+    "donateButton": "Doar com PayPal"
+  }
+}

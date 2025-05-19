@@ -1,0 +1,21 @@
+/* Estilos para los divisores de secciones */
+.section-divider {
+  height: 8px;
+  background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.5), rgba(255, 215, 0, 0.1));
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.section-divider-dark {
+  height: 8px;
+  background: linear-gradient(90deg, rgba(17, 20, 26, 0.1), rgba(17, 20, 26, 0.5), rgba(17, 20, 26, 0.1));
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.section-spacer {
+  height: 40px;
+  background: transparent;
+}

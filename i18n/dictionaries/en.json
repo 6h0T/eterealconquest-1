@@ -1,0 +1,247 @@
+{
+  "navbar": {
+    "home": "Home",
+    "features": "Features",
+    "news": "News",
+    "rankings": "Rankings",
+    "classes": "Classes",
+    "info": "Information",
+    "download": "Download",
+    "signin": "Sign in",
+    "register": "Register",
+    "media": "Media"
+  },
+  "hero": {
+    "title": "Get ready for the new era of MU Online",
+    "subtitle": "Next CBT: New Open Region 15.12.24 at 19:00 UTC",
+    "preregister": "Pre-register",
+    "joinDiscord": "Join Discord",
+    "explore": "Explore our server"
+  },
+  "features": {
+    "title": "Exclusive Features",
+    "fps": "Real 60 FPS",
+    "skills": "Skills system",
+    "tests": "Tests system",
+    "items": "Item rarity",
+    "equipment": "Equipment score",
+    "interface": "Modern interface",
+    "buffs": "Buffs system",
+    "auction": "Auction house",
+    "featuresAndServer": "Features and Server"
+  },
+  "news": {
+    "title": "Latest News",
+    "readMore": "Read more",
+    "viewAll": "View all news",
+    "newsItems": {
+      "1": {
+        "title": "New region: The Shadow Valley",
+        "description": "Explore the new region with exclusive enemies and rewards. Challenge the new dungeon boss!"
+      },
+      "2": {
+        "title": "Class balance update",
+        "description": "We have made adjustments to all classes to improve game balance. Check the details."
+      },
+      "3": {
+        "title": "Christmas event: Gifts and surprises",
+        "description": "Celebrate the holidays with us and get daily gifts, special events and more."
+      },
+      "4": {
+        "title": "PvP tournament: The Conqueror's Cup",
+        "description": "Participate in the biggest PvP tournament of the year and win exclusive prizes. Registrations open!"
+      }
+    }
+  },
+  "classes": {
+    "title": "Choose your Destiny",
+    "mainSkills": "Main Skills",
+    "darkWizard": {
+      "name": "Dark Wizard",
+      "description": "The Dark Wizard is a master of elemental magic, capable of causing great damage at a distance. His main attribute is Energy, which increases his magical power. Although he has little defense, his ability to eliminate enemies quickly makes him a very popular class."
+    },
+    "darkKnight": {
+      "name": "Dark Knight",
+      "description": "The Dark Knight is a powerful warrior specialized in melee combat. His main attribute is Strength, which increases his physical damage. With high defense and hit points, it is ideal for players who prefer to be on the front line of battle."
+    },
+    "fairyElf": {
+      "name": "Fairy Elf",
+      "description": "The Fairy Elf is an agile archer with support skills. Her main attribute is Agility, which increases her accuracy and attack speed. She can attack at a distance and provide group support with healing and defense spells."
+    },
+    "magicGladiator": {
+      "name": "Magic Gladiator",
+      "description": "The Magic Gladiator is a hybrid that masters both magic and weapons. He can use Dark Wizard and Dark Knight skills, making him very versatile. His attributes are balanced, allowing him to adapt to different combat situations."
+    },
+    "darkLord": {
+      "name": "Dark Lord",
+      "description": "The Dark Lord is a field commander with powerful summons. His unique attribute is Command, which allows him to summon creatures and strengthen his allies. It is an ideal class for group play and leading battles."
+    },
+    "summoner": {
+      "name": "Summoner",
+      "description": "The Summoner is a summoner of magical creatures and spells. Her main attribute is Energy, which increases her magical power. She can summon creatures to fight for her and cast powerful control and damage spells."
+    },
+    "rageFighter": {
+      "name": "Rage Fighter",
+      "description": "The Rage Fighter is a fast fighter with devastating attacks. His main attributes are Strength and Vitality. Specialized in melee combat, he can perform combos of fast and powerful attacks."
+    },
+    "chooseClass": "Choose from seven unique classes, each with their own skills and gameplay style.",
+    "abilitiesRework": "Abilities Rework"
+  },
+  "info": {
+    "title": "Server Information",
+    "expNormal": "Normal EXP",
+    "expMaster": "Master EXP",
+    "zenDrop": "Zen Drop",
+    "itemDrop": "Item Drop",
+    "excellent": "Excellent items",
+    "rare": "Rare",
+    "epic": "Epic",
+    "legendary": "Legendary",
+    "benefits": "Key benefits",
+    "fps": "Real 60 FPS",
+    "dungeons": "Exclusive dungeons",
+    "pvp": "PvP events",
+    "items": "Rare items system",
+    "antihack": "Enhanced antihack",
+    "serverRates": "Server Rates",
+    "low": "Low"
+  },
+  "cta": {
+    "title": "Start your Legend",
+    "description": "Join thousands of players in this new epic adventure",
+    "download": "Download Client",
+    "community": "Join the Community"
+  },
+  "footer": {
+    "quickLinks": "Quick links",
+    "features": "Features",
+    "news": "News",
+    "roadmap": "Roadmap",
+    "info": "Information",
+    "support": "Support",
+    "downloads": "Downloads",
+    "rankings": "Rankings",
+    "terms": "Terms of Service",
+    "contact": "Contact",
+    "social": "Social media",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "allRightsReserved": "All rights reserved",
+    "developedBy": "Developed by"
+  },
+  "download": {
+    "title": "Download",
+    "description": "Download the ETEREALCONQUEST client and start your adventure right now.",
+    "fullClient": "Full Client",
+    "updater": "Updater",
+    "size": "Size",
+    "version": "Version",
+    "fullClientDesc": "Download the full game client. Includes all necessary files to play.",
+    "updaterDesc": "If you already have a previous version installed, you can use the updater to get the latest version.",
+    "scannedAntivirus": "Scanned with antivirus",
+    "noAdware": "No adware or spyware",
+    "fastUpdate": "Fast update",
+    "keepsSettings": "Keeps your settings",
+    "downloadFullClient": "Download Full Client",
+    "downloadUpdater": "Download Updater"
+  },
+  "media": {
+    "title": "Media",
+    "description": "Explore videos and screenshots of ETEREALCONQUEST.",
+    "featuredVideo": "Featured Video",
+    "imageGallery": "Image Gallery",
+    "officialTrailer": "Official Trailer",
+    "trailerDesc": "Watch the official ETEREALCONQUEST trailer and discover a fantasy world.",
+    "screenshots": "Screenshots",
+    "screenshotsDesc": "Explore ETEREALCONQUEST screenshots and discover its world."
+  },
+  "common": {
+    "viewMoreInfo": "View more information"
+  },
+  "soundControl": {
+    "unavailable": "Sound control not available",
+    "mute": "Mute",
+    "unmute": "Unmute"
+  },
+  "registro": {
+    "title": "Account Registration",
+    "subtitle": "Join ETEREALCONQUEST and start your adventure",
+    "username": "Username",
+    "usernamePlaceholder": "Enter your username",
+    "email": "Email address",
+    "emailPlaceholder": "Enter your email address",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "confirmPassword": "Confirm password",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "register": "Register",
+    "registering": "Registering...",
+    "success": "Registration successful! Redirecting...",
+    "error": "Registration error. Please try again.",
+    "usernameRequired": "Username is required",
+    "usernameLength": "Username must be at least 3 characters",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Email is invalid",
+    "passwordRequired": "Password is required",
+    "passwordLength": "Password must be at least 8 characters",
+    "passwordMismatch": "Passwords do not match",
+    "passwordRequirements": "Password must contain at least one uppercase letter, one lowercase letter, and one number",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "alreadyHaveAccount": "Already have an account?",
+    "login": "Login"
+  },
+  "login": {
+    "title": "Sign In",
+    "subtitle": "Access your ETEREALCONQUEST account",
+    "username": "Username or Email",
+    "usernamePlaceholder": "Enter your username or email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "login": "Sign In",
+    "loggingIn": "Signing in...",
+    "success": "Sign in successful! Redirecting...",
+    "error": "Incorrect username or password. Please try again.",
+    "usernameRequired": "Username or email is required",
+    "passwordRequired": "Password is required",
+    "forgotPassword": "Forgot your password?",
+    "noAccount": "Don't have an account?",
+    "register": "Register",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "rememberMe": "Remember me"
+  },
+  "recuperacion": {
+    "title": "Password Recovery",
+    "subtitle": "Enter your email to recover your account",
+    "email": "Email address",
+    "emailPlaceholder": "Enter your email address",
+    "recover": "Recover Password",
+    "recovering": "Processing...",
+    "success": "Instructions sent! Check your email.",
+    "error": "Error processing request. Please try again.",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Email is invalid",
+    "backToLogin": "Back to Sign In",
+    "instructions": "We'll send you a link to reset your password."
+  },
+  "donate": {
+    "title": "Donations",
+    "subtitle": "Support Eternal Conquest and receive exclusive rewards",
+    "benefits": "Benefits",
+    "benefit1": "Access to exclusive items",
+    "benefit2": "Upgrade your equipment",
+    "benefit3": "Support server development",
+    "benefit4": "Receive WCoinC instantly",
+    "rates": "Conversion Rates",
+    "formTitle": "Make a Donation",
+    "formSubtitle": "Complete the form to make your donation",
+    "accountName": "Account Name",
+    "enterAccount": "Enter your account name",
+    "accountNameHelp": "Enter the exact name of your game account",
+    "selectAmount": "Select an Amount",
+    "amountHelp": "You will receive WCoinC according to the conversion rate",
+    "paypalInfo": "By clicking 'Donate with PayPal', you will be redirected to PayPal to complete your payment securely. WCoinC will be automatically credited to your account after payment confirmation.",
+    "donateButton": "Donate with PayPal"
+  }
+}
