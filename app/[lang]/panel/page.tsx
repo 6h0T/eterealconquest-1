@@ -166,31 +166,31 @@ export default function UserPanelPage({ params }: { params: { lang: Locale } }) 
 
         <motion.div variants={itemVariants}>
           <Tabs defaultValue="donation" className="w-full">
-            <TabsList className="grid grid-cols-4 overflow-hidden rounded-lg mb-8 shadow-lg shadow-bunker-900/50 border-0 py-2">
+            <TabsList className="h-16 items-center justify-center bg-bunker-800 grid grid-cols-4 overflow-hidden rounded-lg mb-8 shadow-lg shadow-bunker-900/50 border-0">
               <TabsTrigger
                 value="donation"
-                className="data-[state=active]:bg-gold-500 data-[state=active]:text-bunker-950 data-[state=inactive]:bg-bunker-700 flex items-center justify-center gap-2 py-4 px-4 border-0 rounded-none"
+                className="data-[state=active]:bg-gold-500 data-[state=active]:text-bunker-950 data-[state=inactive]:bg-bunker-700 flex items-center justify-center gap-2 h-full px-4 border-0 rounded-none"
               >
                 <Gift className="h-5 w-5" />
                 <span className="font-medium">{t.donation}</span>
               </TabsTrigger>
               <TabsTrigger
                 value="characters"
-                className="data-[state=active]:bg-gold-500 data-[state=active]:text-bunker-950 data-[state=inactive]:bg-bunker-700 flex items-center justify-center gap-2 py-4 px-4 border-0 rounded-none"
+                className="data-[state=active]:bg-gold-500 data-[state=active]:text-bunker-950 data-[state=inactive]:bg-bunker-700 flex items-center justify-center gap-2 h-full px-4 border-0 rounded-none"
               >
                 <Shield className="h-5 w-5" />
                 <span className="font-medium">{t.characters}</span>
               </TabsTrigger>
               <TabsTrigger
                 value="account"
-                className="data-[state=active]:bg-gold-500 data-[state=active]:text-bunker-950 data-[state=inactive]:bg-bunker-700 flex items-center justify-center gap-2 py-4 px-4 border-0 rounded-none"
+                className="data-[state=active]:bg-gold-500 data-[state=active]:text-bunker-950 data-[state=inactive]:bg-bunker-700 flex items-center justify-center gap-2 h-full px-4 border-0 rounded-none"
               >
                 <User className="h-5 w-5" />
                 <span className="font-medium">{t.account}</span>
               </TabsTrigger>
               <TabsTrigger
                 value="settings"
-                className="data-[state=active]:bg-gold-500 data-[state=active]:text-bunker-950 data-[state=inactive]:bg-bunker-700 flex items-center justify-center gap-2 py-4 px-4 border-0 rounded-none"
+                className="data-[state=active]:bg-gold-500 data-[state=active]:text-bunker-950 data-[state=inactive]:bg-bunker-700 flex items-center justify-center gap-2 h-full px-4 border-0 rounded-none"
               >
                 <Settings className="h-5 w-5" />
                 <span className="font-medium">{t.settings}</span>
