@@ -9,6 +9,15 @@ declare namespace NodeJS {
     NEXT_PUBLIC_DB_NAME: string
     NEXT_PUBLIC_DB_HOST: string
     NEXT_PUBLIC_DB_PASS: string
+    
+    // Nuevas variables sin el prefijo NEXT_PUBLIC_
+    DB_CHARACTER_NAME: string
+    DB_PORT: string
+    DB_USER: string
+    DB_NAME: string
+    DB_HOST: string
+    DB_PASS: string
+    
     NEXT_SQL_DB_NAME: string
     SQL_DB_HOST: string
     SQL_DB_NAME: string

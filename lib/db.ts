@@ -2,11 +2,11 @@
 import sql from "mssql"
 
 const config = {
-  server: process.env.NEXT_PUBLIC_DB_HOST || "177.54.146.73",
-  database: process.env.NEXT_PUBLIC_DB_NAME || "_obj",
-  user: process.env.NEXT_PUBLIC_DB_USER || "sa",
-  password: process.env.NEXT_PUBLIC_DB_PASS || "CoronaMu1234.",
-  port: Number(process.env.NEXT_PUBLIC_DB_PORT) || 1433,
+  server: process.env.SQL_DB_HOST || process.env.DB_HOST || process.env.NEXT_PUBLIC_DB_HOST || "177.54.146.73",
+  database: process.env.SQL_DB_NAME || process.env.DB_NAME || process.env.NEXT_PUBLIC_DB_NAME || "_obj",
+  user: process.env.SQL_DB_USER || process.env.DB_USER || process.env.NEXT_PUBLIC_DB_USER || "sa",
+  password: process.env.SQL_DB_PASS || process.env.DB_PASS || process.env.NEXT_PUBLIC_DB_PASS || "CoronaMu1234.",
+  port: Number(process.env.SQL_DB_PORT || process.env.DB_PORT || process.env.NEXT_PUBLIC_DB_PORT) || 1433,
   options: {
     encrypt: false,
     trustServerCertificate: true,

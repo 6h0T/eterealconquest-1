@@ -65,7 +65,7 @@
     "react-icons": "^5.5.0",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.0",
-    "resend": "latest",
+    "resend": "^4.5.1",
     "sharp": "latest",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
@@ -75,6 +75,7 @@
     "zod": "latest"
   },
   "devDependencies": {
+    "@types/mssql": "^9.1.7",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",

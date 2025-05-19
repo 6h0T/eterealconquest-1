@@ -24,10 +24,10 @@ export async function POST(req: Request) {
 
     // Imprimir información de configuración (sin las contraseñas)
     console.log("Configuración de conexión:", {
-      host: process.env.NEXT_PUBLIC_DB_HOST || "localhost",
-      port: process.env.NEXT_PUBLIC_DB_PORT || 1433,
-      database: process.env.NEXT_PUBLIC_DB_NAME || "_obj",
-      user: process.env.NEXT_PUBLIC_DB_USER || "sa",
+      host: process.env.SQL_DB_HOST || process.env.DB_HOST || process.env.NEXT_PUBLIC_DB_HOST || "localhost",
+      port: process.env.SQL_DB_PORT || process.env.DB_PORT || process.env.NEXT_PUBLIC_DB_PORT || 1433,
+      database: process.env.SQL_DB_NAME || process.env.DB_NAME || process.env.NEXT_PUBLIC_DB_NAME || "_obj",
+      user: process.env.SQL_DB_USER || process.env.DB_USER || process.env.NEXT_PUBLIC_DB_USER || "sa",
       // No imprimir la contraseña por seguridad
     })
 
