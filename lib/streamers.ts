@@ -26,6 +26,7 @@ export interface Streamer {
   is_active: boolean
   thumbnail_url?: string | null
   description?: string | null
+  embed_url?: string | null
   created_at?: string
   updated_at?: string
 }
@@ -39,6 +40,7 @@ export interface StreamerInput {
   is_active?: boolean
   thumbnail_url?: string | null
   description?: string | null
+  embed_url?: string | null
 }
 
 // Obtener todos los streamers
@@ -156,6 +158,7 @@ export async function addStreamer(streamer: StreamerInput): Promise<Streamer> {
       is_active: streamer.is_active !== undefined ? streamer.is_active : true,
       thumbnail_url: streamer.thumbnail_url || null,
       description: streamer.description || null,
+      embed_url: streamer.embed_url || null,
     }
 
     console.log("Datos a insertar:", streamerData)

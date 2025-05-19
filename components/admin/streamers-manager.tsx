@@ -16,6 +16,7 @@ interface Streamer {
   description?: string
   created_at: string
   updated_at: string
+  embed_url: string
 }
 
 interface StreamerFormData {
@@ -26,6 +27,7 @@ interface StreamerFormData {
   is_active: boolean
   thumbnail_url?: string
   description?: string
+  embed_url: string
 }
 
 export default function StreamersManager() {
@@ -36,6 +38,7 @@ export default function StreamersManager() {
   const [editingStreamer, setEditingStreamer] = useState<Streamer | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [showPreview, setShowPreview] = useState(false)
 
   // React Hook Form
   const {
@@ -43,6 +46,7 @@ export default function StreamersManager() {
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<StreamerFormData>({
     defaultValues: {
@@ -53,8 +57,54 @@ export default function StreamersManager() {
       is_active: true,
       thumbnail_url: "",
       description: "",
+      embed_url: "",
     },
   })
+
+  // Observar cambios en la URL y la plataforma para generar automáticamente la URL de embebido
+  const watchChannelUrl = watch("channel_url")
+  const watchPlatform = watch("platform")
+
+  // Generar automáticamente la URL de embebido cuando cambia la URL o la plataforma
+  useEffect(() => {
+    if (watchChannelUrl) {
+      let embedUrl = ""
+      const currentDomain = typeof window !== 'undefined' ? window.location.hostname : 'localhost'
+
+      if (watchPlatform === "twitch") {
+        const twitchRegex = /(?:https?:\/\/)?(?:www\.)?twitch\.tv\/([a-zA-Z0-9_]+)/
+        const match = watchChannelUrl.match(twitchRegex)
+        if (match && match[1]) {
+          const username = match[1]
+          embedUrl = `https://player.twitch.tv/?channel=${username}&parent=${currentDomain}`
+        }
+      } else if (watchPlatform === "youtube") {
+        const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/
+        const youtubeShortRegex = /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([a-zA-Z0-9_-]+)/
+
+        let match = watchChannelUrl.match(youtubeRegex)
+        if (!match) {
+          match = watchChannelUrl.match(youtubeShortRegex)
+        }
+
+        if (match && match[1]) {
+          const videoId = match[1]
+          embedUrl = `https://www.youtube.com/embed/${videoId}`
+        }
+      } else if (watchPlatform === "facebook") {
+        embedUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(watchChannelUrl)}&show_text=false&width=560&height=315`
+      } else if (watchPlatform === "kick") {
+        const kickRegex = /(?:https?:\/\/)?(?:www\.)?kick\.com\/([a-zA-Z0-9_]+)/
+        const match = watchChannelUrl.match(kickRegex)
+        if (match && match[1]) {
+          const username = match[1]
+          embedUrl = `https://player.kick.com/${username}`
+        }
+      }
+
+      setValue("embed_url", embedUrl)
+    }
+  }, [watchChannelUrl, watchPlatform, setValue])
 
   // Cargar streamers
   const fetchStreamers = async () => {
@@ -112,6 +162,7 @@ export default function StreamersManager() {
     setValue("is_active", streamer.is_active)
     setValue("thumbnail_url", streamer.thumbnail_url || "")
     setValue("description", streamer.description || "")
+    setValue("embed_url", streamer.embed_url || "")
     setIsFormOpen(true)
   }
 
@@ -323,6 +374,11 @@ export default function StreamersManager() {
     }
   }
 
+  // Función para mostrar/ocultar vista previa
+  const togglePreview = () => {
+    setShowPreview(!showPreview)
+  }
+
   return (
     <div className="bg-bunker-800 rounded-lg shadow-lg p-6">
       {/* Mensajes de éxito y error */}
@@ -397,6 +453,35 @@ export default function StreamersManager() {
                 />
                 {errors.channel_url && <p className="mt-1 text-sm text-red-400">{errors.channel_url.message}</p>}
               </div>
+
+              {/* Campo oculto para embed_url */}
+              <input type="hidden" {...register("embed_url")} />
+
+              {/* Botón de vista previa */}
+              <div className="md:col-span-2">
+                <button
+                  type="button"
+                  onClick={togglePreview}
+                  className="px-4 py-2 bg-bunker-700 text-white rounded-md hover:bg-bunker-600 transition-colors"
+                >
+                  {showPreview ? "Ocultar vista previa" : "Ver vista previa"}
+                </button>
+              </div>
+
+              {/* Vista previa del stream */}
+              {showPreview && watch("embed_url") && (
+                <div className="md:col-span-2 mt-2 border border-bunker-600 rounded-md overflow-hidden">
+                  <div className="aspect-video w-full bg-black">
+                    <iframe
+                      src={watch("embed_url")}
+                      className="w-full h-full"
+                      allowFullScreen
+                      allow="autoplay; encrypted-media; picture-in-picture"
+                      referrerPolicy="origin"
+                    ></iframe>
+                  </div>
+                </div>
+              )}
 
               {/* URL de la miniatura */}
               <div className="md:col-span-2">

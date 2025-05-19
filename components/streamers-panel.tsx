@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Tv, ChevronUp, ExternalLink } from "lucide-react"
+import { Tv, ChevronUp, ExternalLink, X } from "lucide-react"
 import { Twitch, Youtube, Facebook } from "lucide-react"
 
 // Tipo para los streamers
@@ -14,6 +14,7 @@ interface Streamer {
   is_active: boolean
   thumbnail_url?: string
   description?: string
+  embed_url?: string
 }
 
 export default function StreamersPanel() {
@@ -22,6 +23,7 @@ export default function StreamersPanel() {
   const [liveCount, setLiveCount] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedStreamer, setSelectedStreamer] = useState<Streamer | null>(null)
   const panelRef = useRef<HTMLDivElement>(null)
 
   // Función para obtener los streamers
@@ -90,6 +92,58 @@ export default function StreamersPanel() {
     }
   }
 
+  // Función para generar la URL de embebido si no existe
+  const getEmbedUrl = (streamer: Streamer): string => {
+    if (streamer.embed_url) {
+      return streamer.embed_url
+    }
+
+    const currentDomain = typeof window !== 'undefined' ? window.location.hostname : 'localhost'
+    
+    if (streamer.platform === "twitch") {
+      const twitchRegex = /(?:https?:\/\/)?(?:www\.)?twitch\.tv\/([a-zA-Z0-9_]+)/
+      const match = streamer.channel_url.match(twitchRegex)
+      if (match && match[1]) {
+        const username = match[1]
+        return `https://player.twitch.tv/?channel=${username}&parent=${currentDomain}`
+      }
+    } else if (streamer.platform === "youtube") {
+      const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/
+      const youtubeShortRegex = /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([a-zA-Z0-9_-]+)/
+
+      let match = streamer.channel_url.match(youtubeRegex)
+      if (!match) {
+        match = streamer.channel_url.match(youtubeShortRegex)
+      }
+
+      if (match && match[1]) {
+        const videoId = match[1]
+        return `https://www.youtube.com/embed/${videoId}`
+      }
+    } else if (streamer.platform === "facebook") {
+      return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(streamer.channel_url)}&show_text=false&width=560&height=315`
+    } else if (streamer.platform === "kick") {
+      const kickRegex = /(?:https?:\/\/)?(?:www\.)?kick\.com\/([a-zA-Z0-9_]+)/
+      const match = streamer.channel_url.match(kickRegex)
+      if (match && match[1]) {
+        const username = match[1]
+        return `https://player.kick.com/${username}`
+      }
+    }
+
+    return ""
+  }
+
+  // Mostrar streamer seleccionado
+  const handleShowStreamer = (streamer: Streamer) => {
+    setSelectedStreamer(streamer)
+  }
+
+  // Cerrar streamer seleccionado
+  const handleCloseStreamer = () => {
+    setSelectedStreamer(null)
+  }
+
   return (
     <div ref={panelRef} className="fixed bottom-4 left-4 z-50">
       {/* Panel desplegable */}
@@ -126,15 +180,28 @@ export default function StreamersPanel() {
                         </span>
                       )}
                     </div>
-                    <a
-                      href={streamer.channel_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gold-300 hover:text-gold-100 transition-colors"
-                      aria-label={`Ver stream de ${streamer.streamer_name}`}
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
+                    <div className="flex space-x-2">
+                      {streamer.is_live && (
+                        <button
+                          onClick={() => handleShowStreamer(streamer)}
+                          className="text-gold-300 hover:text-gold-100 transition-colors"
+                          aria-label={`Ver stream de ${streamer.streamer_name}`}
+                          title="Ver stream"
+                        >
+                          <Tv className="h-4 w-4" />
+                        </button>
+                      )}
+                      <a
+                        href={streamer.channel_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gold-300 hover:text-gold-100 transition-colors"
+                        aria-label={`Ver canal de ${streamer.streamer_name}`}
+                        title="Abrir en plataforma"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </div>
                   </div>
                   {streamer.description && (
                     <p className="mt-1 text-xs text-gray-400 line-clamp-2">{streamer.description}</p>
@@ -159,6 +226,51 @@ export default function StreamersPanel() {
         <span className="font-medium text-sm">{liveCount > 0 ? `${liveCount} en vivo` : "Streamers"}</span>
         <ChevronUp className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
+
+      {/* Streamer seleccionado */}
+      {selectedStreamer && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-bunker-800 rounded-lg shadow-lg w-full max-w-4xl">
+            <div className="flex justify-between items-center p-4 border-b border-bunker-700">
+              <div className="flex items-center">
+                {getPlatformIcon(selectedStreamer.platform)}
+                <h3 className="text-lg font-medium ml-2">{selectedStreamer.streamer_name}</h3>
+              </div>
+              <div className="flex items-center space-x-2">
+                <a
+                  href={selectedStreamer.channel_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-white transition-colors"
+                  aria-label="Abrir en plataforma original"
+                  title="Abrir en plataforma original"
+                >
+                  <ExternalLink className="h-5 w-5" />
+                </a>
+                <button
+                  onClick={handleCloseStreamer}
+                  className="text-gray-400 hover:text-white transition-colors"
+                  aria-label="Cerrar"
+                  title="Cerrar"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+            <div className="p-4">
+              <div className="aspect-video w-full bg-black">
+                <iframe
+                  src={getEmbedUrl(selectedStreamer)}
+                  className="w-full h-full"
+                  allowFullScreen
+                  allow="autoplay; encrypted-media; picture-in-picture"
+                  referrerPolicy="origin"
+                ></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

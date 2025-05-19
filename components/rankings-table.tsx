@@ -458,7 +458,7 @@ export function RankingsTable({ type = "resets", lang = "es" }: RankingsTablePro
           <tr key={i} className="hover:bg-bunker-700 border-b border-gold-700/30">
             <td className="px-4 py-2">{renderPositionIndicator(i + 1)}</td>
             {renderNameCell(char.Name)}
-            <td className="px-4 py-2 text-red-400 font-medium">{char.cLevel}</td>
+            <td className="px-4 py-2">{char.cLevel}</td>
             {renderClassCell(char.Class)}
             {renderGuildCell(char.Guild)}
           </tr>

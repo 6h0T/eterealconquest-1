@@ -205,6 +205,8 @@ export function RankingsTabs() {
                           <span>{getClassName(val as number)}</span>
                         </div>
                       ) : key === "cLevel" ? (
+                        <span className={activeTab === "level" ? "text-red-400 font-medium" : ""}>{val}</span>
+                      ) : key === "PkCount" ? (
                         <span className="text-red-400 font-medium">{val}</span>
                       ) : key === "Guild" ? (
                         <span
