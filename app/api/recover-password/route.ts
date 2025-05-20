@@ -23,17 +23,16 @@ export async function POST(req: Request) {
       .request()
       .input("email", email)
       .query(`
-        SELECT m.memb___id, ms.memb__id 
-        FROM MEMB_INFO m
-        INNER JOIN MEMB_STAT ms ON m.memb___id = ms.memb___id
-        WHERE m.mail_addr = @email
+        SELECT memb___id
+        FROM MEMB_INFO
+        WHERE mail_addr = @email
       `)
 
     if (result.recordset.length === 0) {
       return NextResponse.json({ success: false, error: "No se encontró ese correo" }, { status: 404 })
     }
 
-    const userId = result.recordset[0].memb__id
+    const userId = result.recordset[0].memb___id
     const token = generateToken()
 
     // Insertar el token en la base de datos
