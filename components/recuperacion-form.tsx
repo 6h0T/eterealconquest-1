@@ -51,20 +51,52 @@ export function RecuperacionForm({ lang }: RecuperacionFormProps) {
     setError(null)
 
     try {
+      console.log("Enviando solicitud de recuperación para:", email)
+      
       const res = await fetch("/api/recover-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       })
 
-      const data = await res.json()
+      // Verificar si la respuesta es exitosa
+      if (!res.ok) {
+        let errorMessage = t.errorDefault
+        
+        try {
+          // Intentar parsear la respuesta como JSON
+          const data = await res.json()
+          errorMessage = data.error || errorMessage
+        } catch (jsonError) {
+          // Si no se puede parsear como JSON, usar el texto directo
+          try {
+            const textError = await res.text()
+            errorMessage = textError || errorMessage
+          } catch (textError) {
+            console.error("No se pudo procesar la respuesta del servidor:", textError)
+          }
+          console.error("Error al parsear respuesta JSON:", jsonError)
+        }
+        
+        throw new Error(errorMessage)
+      }
 
-      if (!res.ok) throw new Error(data.error || t.errorDefault)
+      // Si la respuesta es OK, intentar parsear el JSON
+      let data
+      try {
+        data = await res.json()
+      } catch (parseError) {
+        console.error("Error al parsear la respuesta exitosa:", parseError)
+        // Si no hay respuesta JSON, al menos sabemos que fue exitoso
+        data = { success: true, message: t.successMessage }
+      }
 
+      console.log("Respuesta del servidor:", data)
       setMessage(t.successMessage)
       setEmail("")
     } catch (err: any) {
-      setError(err.message)
+      console.error("Error en recuperación:", err)
+      setError(err.message || t.errorDefault)
     } finally {
       setLoading(false)
     }

@@ -71,21 +71,48 @@ export default function ResetPasswordForm() {
         body: JSON.stringify({ token, password }),
       })
 
-      const data = await response.json()
+      // Verificar si hay una respuesta
+      if (!response.ok) {
+        let errorMessage = "Error al restablecer la contraseña"
+        
+        try {
+          // Intentar parsear la respuesta como JSON
+          const data = await response.json()
+          errorMessage = data.error || errorMessage
+        } catch (jsonError) {
+          // Si no se puede parsear como JSON, usar el texto directo
+          try {
+            const textError = await response.text()
+            errorMessage = textError || errorMessage
+          } catch (textError) {
+            console.error("No se pudo procesar la respuesta del servidor:", textError)
+          }
+          console.error("Error al parsear respuesta JSON:", jsonError)
+        }
+        
+        throw new Error(errorMessage)
+      }
+
+      // Si la respuesta es OK, intentar parsear el JSON
+      let data
+      try {
+        data = await response.json()
+      } catch (parseError) {
+        console.error("Error al parsear la respuesta exitosa:", parseError)
+        // Si no hay respuesta JSON, al menos sabemos que fue exitoso
+        data = { success: true, message: "Contraseña restablecida correctamente" }
+      }
+
       console.log("Respuesta del servidor:", data)
 
-      if (!response.ok) {
-        setError(data.error || "Error al restablecer la contraseña")
-      } else {
-        setSuccess(data.message || "Contraseña restablecida correctamente")
-        // Redirigir al login después de 3 segundos
-        setTimeout(() => {
-          router.push("/inicio-sesion")
-        }, 3000)
-      }
-    } catch (err) {
+      setSuccess(data.message || "Contraseña restablecida correctamente")
+      // Redirigir al login después de 3 segundos
+      setTimeout(() => {
+        router.push("/inicio-sesion")
+      }, 3000)
+    } catch (err: any) {
       console.error("Error:", err)
-      setError("Error al restablecer la contraseña. Por favor, inténtelo de nuevo más tarde.")
+      setError(err.message || "Error al restablecer la contraseña. Por favor, inténtelo de nuevo más tarde.")
     } finally {
       setIsLoading(false)
     }
