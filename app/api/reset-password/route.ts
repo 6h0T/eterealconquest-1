@@ -37,55 +37,69 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Error al conectar con la base de datos" }, { status: 500 })
     }
 
-    // Buscar el token en la tabla PasswordRecovery2
+    // Buscar el token en la tabla WEBENGINE_RECOVERY_TOKENS
     let tokenResult
     try {
       tokenResult = await db
         .request()
         .input("token", token)
         .query(`
-        SELECT TOP 1 * FROM PasswordRecovery2
-        WHERE token = @token AND expires > GETDATE()
+        SELECT username, expires_at, used 
+        FROM WEBENGINE_RECOVERY_TOKENS 
+        WHERE token = @token
       `)
 
       if (tokenResult.recordset.length === 0) {
         return NextResponse.json({ success: false, error: "Token inválido o expirado" }, { status: 400 })
+      }
+      
+      const tokenData = tokenResult.recordset[0]
+      const now = new Date()
+      const expiryDate = new Date(tokenData.expires_at)
+
+      if (now > expiryDate) {
+        return NextResponse.json({ success: false, error: "Token expirado" }, { status: 400 })
+      }
+
+      if (tokenData.used) {
+        return NextResponse.json({ success: false, error: "Token ya utilizado" }, { status: 400 })
       }
     } catch (tokenError) {
       console.error("Error verifying token:", tokenError)
       return NextResponse.json({ success: false, error: "Error al verificar el token" }, { status: 500 })
     }
 
-    const user = tokenResult.recordset[0]
-    const userId = user.memb___id
+    const username = tokenResult.recordset[0].username
 
     // Actualizar la contraseña
     try {
       await db
         .request()
-        .input("userId", userId)
+        .input("username", username)
         .input("newPassword", password)
         .query(`
           UPDATE MEMB_INFO
           SET memb__pwd = @newPassword
-          WHERE memb___id = @userId
+          WHERE memb___id = @username
         `)
     } catch (updateError) {
       console.error("Error updating password:", updateError)
       return NextResponse.json({ success: false, error: "Error al actualizar la contraseña" }, { status: 500 })
     }
 
-    // Marcar el token como usado (eliminarlo)
+    // Marcar el token como usado
     try {
       await db
         .request()
         .input("token", token)
         .query(`
-        DELETE FROM PasswordRecovery2 WHERE token = @token
+        UPDATE WEBENGINE_RECOVERY_TOKENS
+        SET used = 1
+        WHERE token = @token
       `)
     } catch (deleteError) {
-      console.error("Error deleting used token:", deleteError)
-      // No interrumpimos el flujo si falla la eliminación del token
+      console.error("Error updating token status:", deleteError)
+      // No interrumpimos el flujo si falla la actualización del token
     }
 
     // Respuesta exitosa
