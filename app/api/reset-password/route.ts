@@ -20,10 +20,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Faltan datos requeridos" }, { status: 400 })
     }
 
+    console.log("[RESET PASSWORD] Procesando solicitud para token:", token.substring(0, 10) + "...")
+
     // Validar longitud mínima de contraseña
-    if (password.length < 6) {
+    if (password.length < 4) {
       return NextResponse.json(
-        { success: false, error: "La contraseña debe tener al menos 6 caracteres" },
+        { success: false, error: "La contraseña debe tener al menos 4 caracteres" },
         { status: 400 },
       )
     }
@@ -35,6 +37,22 @@ export async function POST(req: Request) {
     } catch (dbError) {
       console.error("Error connecting to database:", dbError)
       return NextResponse.json({ success: false, error: "Error al conectar con la base de datos" }, { status: 500 })
+    }
+
+    // Verificar si la tabla PasswordRecovery2 existe
+    const tableCheck = await db
+      .request()
+      .query(`
+        SELECT CASE WHEN EXISTS (
+          SELECT * FROM sysobjects WHERE name='PasswordRecovery2' AND xtype='U'
+        ) THEN 1 ELSE 0 END AS TableExists
+      `)
+    
+    const tableExists = tableCheck.recordset[0].TableExists === 1
+    
+    if (!tableExists) {
+      console.error("[RESET PASSWORD] La tabla PasswordRecovery2 no existe")
+      return NextResponse.json({ success: false, error: "Sistema de recuperación no configurado" }, { status: 500 })
     }
 
     // Buscar el token en la tabla PasswordRecovery2
@@ -49,6 +67,7 @@ export async function POST(req: Request) {
       `)
 
       if (tokenResult.recordset.length === 0) {
+        console.log("[RESET PASSWORD] Token inválido o expirado:", token.substring(0, 10) + "...")
         return NextResponse.json({ success: false, error: "Token inválido o expirado" }, { status: 400 })
       }
     } catch (tokenError) {
@@ -58,6 +77,8 @@ export async function POST(req: Request) {
 
     const user = tokenResult.recordset[0]
     const userId = user.memb___id
+
+    console.log("[RESET PASSWORD] Token válido para usuario:", userId)
 
     // Actualizar la contraseña
     try {
@@ -70,6 +91,8 @@ export async function POST(req: Request) {
           SET memb__pwd = @newPassword
           WHERE memb___id = @userId
         `)
+      
+      console.log("[RESET PASSWORD] Contraseña actualizada para usuario:", userId)
     } catch (updateError) {
       console.error("Error updating password:", updateError)
       return NextResponse.json({ success: false, error: "Error al actualizar la contraseña" }, { status: 500 })
@@ -83,6 +106,7 @@ export async function POST(req: Request) {
         .query(`
         DELETE FROM PasswordRecovery2 WHERE token = @token
       `)
+      console.log("[RESET PASSWORD] Token eliminado después de uso exitoso")
     } catch (deleteError) {
       console.error("Error deleting used token:", deleteError)
       // No interrumpimos el flujo si falla la eliminación del token
