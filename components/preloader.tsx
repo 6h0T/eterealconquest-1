@@ -64,7 +64,7 @@ export function Preloader({ onLoadingComplete }: PreloaderProps) {
         <div className="mb-12 animate-float">
           <Image
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LOGO-OFICIAL-1.2-2r5D3y3IGm2ODScjRY2hduLVEpLl7x.png"
-            alt="ETEREALCONQUEST - Mu Online"
+            alt="ETEREALCONQUEST - S6EP3"
             width={300}
             height={150}
             className="mx-auto"

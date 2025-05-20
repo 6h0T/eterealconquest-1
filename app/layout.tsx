@@ -20,7 +20,7 @@ const tradeWinds = Trade_Winds({
 })
 
 export const metadata: Metadata = {
-  title: "ETEREALCONQUEST - MU Online",
+  title: "ETEREALCONQUEST - S6EP3",
   description: "Sitio oficial de ETEREALCONQUEST, el mejor servidor de MU Online",
   icons: {
     icon: [

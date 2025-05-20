@@ -190,7 +190,7 @@ export function Navbar({ lang }: NavbarProps) {
           <Link href={`/${lang}`} className="navbar-logo">
             <img
               src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ICONO-OFICIAL-13-3gGmj2RPNX7685QOkTM5PzyDPjnwdn.png"
-              alt="ETEREALCONQUEST - Mu Online"
+              alt="ETEREALCONQUEST - S6EP3"
               width={75}
               height={75}
               className="h-16 w-auto object-contain"
