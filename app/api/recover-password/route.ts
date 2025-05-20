@@ -183,7 +183,7 @@ export async function POST(req: Request) {
             <div style="border-top: 1px solid #333333; padding-top: 20px; margin-top: 20px; font-size: 12px; color: #888888;">
               <p style="margin-bottom: 10px;">⚠️ Este enlace expirará en 30 minutos por razones de seguridad.</p>
               <p style="margin-bottom: 10px;">🔒 Si no solicitaste este cambio, puedes ignorar este mensaje. Tu cuenta permanece segura.</p>
-              <p style="margin: 0;">© ${new Date().getFullYear()} MU Occidental - Todos los derechos reservados</p>
+              <p style="margin: 0;">© ${new Date().getFullYear()} EterealConquest - Todos los derechos reservados</p>
             </div>
           </div>
         `,
@@ -210,7 +210,11 @@ export async function POST(req: Request) {
     return NextResponse.json(responseData, { status: statusCode });
   } catch (error) {
     console.error("[RECOVER PASSWORD ERROR]", error);
-    // Usamos la respuesta por defecto que configuramos al inicio
+    // Asegurarnos de que siempre devolvemos un JSON válido
+    responseData = { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Error interno del servidor" 
+    };
     return NextResponse.json(responseData, { status: statusCode });
   } finally {
     // Agregar un log final para confirmar que se procesó la solicitud

@@ -59,46 +59,27 @@ export function RecuperacionForm({ lang }: RecuperacionFormProps) {
         body: JSON.stringify({ email }),
       })
 
-      // Verificar si la respuesta es exitosa
-      if (!res.ok) {
-        let errorMessage = t.errorDefault
-        
-        try {
-          // Intentar parsear la respuesta como JSON
-          const data = await res.json()
-          errorMessage = data.error || errorMessage
-        } catch (jsonError) {
-          // Si no se puede parsear como JSON, usar el texto directo
-          try {
-            const textError = await res.text()
-            errorMessage = textError || errorMessage
-          } catch (textError) {
-            console.error("No se pudo procesar la respuesta del servidor:", textError)
-          }
-          console.error("Error al parsear respuesta JSON:", jsonError)
-        }
-        
-        throw new Error(errorMessage)
-      }
-
-      // Si la respuesta es OK, intentar parsear el JSON
-      let data
+      let data;
       try {
-        data = await res.json()
-      } catch (parseError) {
-        console.error("Error al parsear la respuesta exitosa:", parseError)
-        // Si no hay respuesta JSON, al menos sabemos que fue exitoso
-        data = { success: true, message: t.successMessage }
+        data = await res.json();
+      } catch (jsonError) {
+        console.error("Error al parsear respuesta JSON:", jsonError);
+        throw new Error(t.errorDefault);
       }
 
-      console.log("Respuesta del servidor:", data)
-      setMessage(t.successMessage)
-      setEmail("")
+      // Verificar si la respuesta es exitosa
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || t.errorDefault);
+      }
+
+      console.log("Respuesta del servidor:", data);
+      setMessage(data.message || t.successMessage);
+      setEmail("");
     } catch (err: any) {
-      console.error("Error en recuperación:", err)
-      setError(err.message || t.errorDefault)
+      console.error("Error en recuperación:", err);
+      setError(err.message || t.errorDefault);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
