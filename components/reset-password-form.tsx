@@ -21,13 +21,26 @@ export default function ResetPasswordForm() {
   const [isValidToken, setIsValidToken] = useState<boolean | null>(null)
 
   useEffect(() => {
+    // Registramos el token para depuración
+    console.log("Token recibido:", token ? token.substring(0, 10) + "..." : "no token")
+    
     if (!token) {
       setError("Token no proporcionado. Por favor, solicite un nuevo enlace de recuperación.")
       setIsValidToken(false)
       return
     }
 
+    // Validación adicional del token (opcional)
+    if (token.length < 10) {
+      setError("Token inválido. Por favor, solicite un nuevo enlace de recuperación.")
+      setIsValidToken(false)
+      return
+    }
+
     setIsValidToken(true)
+    // Reseteamos otros estados al recibir un token válido
+    setSuccess(null)
+    setError(null)
   }, [token])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,6 +61,8 @@ export default function ResetPasswordForm() {
     setIsLoading(true)
 
     try {
+      console.log("Enviando solicitud para restablecer contraseña con token:", token?.substring(0, 10) + "...")
+      
       const response = await fetch("/api/reset-password", {
         method: "POST",
         headers: {
@@ -57,6 +72,7 @@ export default function ResetPasswordForm() {
       })
 
       const data = await response.json()
+      console.log("Respuesta del servidor:", data)
 
       if (!response.ok) {
         setError(data.error || "Error al restablecer la contraseña")
@@ -123,7 +139,7 @@ export default function ResetPasswordForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              disabled={isLoading || !!success}
+              disabled={false}
               className="bg-bunker-800 border-gold-500/30 focus:border-gold-400 text-gold-100"
             />
           </div>
@@ -135,7 +151,7 @@ export default function ResetPasswordForm() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              disabled={isLoading || !!success}
+              disabled={false}
               className="bg-bunker-800 border-gold-500/30 focus:border-gold-400 text-gold-100"
             />
           </div>
@@ -144,7 +160,7 @@ export default function ResetPasswordForm() {
           <Button
             type="submit"
             className="w-full bg-gradient-to-r from-gold-600 to-gold-400 hover:from-gold-500 hover:to-gold-300 text-bunker-950 font-medium"
-            disabled={isLoading || !!success}
+            disabled={isLoading}
           >
             {isLoading ? (
               <>
