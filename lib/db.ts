@@ -4,8 +4,8 @@ import sql from "mssql"
 const config = {
   server: process.env.SQL_DB_HOST || process.env.DB_HOST || process.env.NEXT_PUBLIC_DB_HOST || "177.54.146.73",
   database: process.env.SQL_DB_NAME || process.env.DB_NAME || process.env.NEXT_PUBLIC_DB_NAME || "_obj",
-  user: process.env.SQL_DB_USER || process.env.DB_USER || process.env.NEXT_PUBLIC_DB_USER || "sa",
-  password: process.env.SQL_DB_PASS || process.env.DB_PASS || process.env.NEXT_PUBLIC_DB_PASS || "CoronaMu1234.",
+  user: process.env.SQL_DB_USER || process.env.DB_USER || process.env.NEXT_PUBLIC_DB_USER || "sa2",
+  password: process.env.SQL_DB_PASS || process.env.DB_PASS || process.env.NEXT_PUBLIC_DB_PASS || "qA83<tkA3<|6",
   port: Number(process.env.SQL_DB_PORT || process.env.DB_PORT || process.env.NEXT_PUBLIC_DB_PORT) || 1433,
   options: {
     encrypt: false,
@@ -28,7 +28,7 @@ export async function connectToDB() {
     const newPool = await sql.connect(config)
     console.log("[SERVER] Conexión exitosa a la base de datos")
     return newPool
-  } catch (error) {
+  } catch (error: any) {
     console.error("[SERVER] Database connection error:", error)
     throw new Error(`No se pudo conectar a la base de datos: ${error.message}`)
   }
@@ -51,7 +51,7 @@ export async function executeQuery(query: string, params = {}) {
     const result = await request.query(query)
 
     return result
-  } catch (error) {
+  } catch (error: any) {
     console.error("[SERVER] Error executing query:", error)
     throw error
   } finally {
