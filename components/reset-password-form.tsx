@@ -106,79 +106,90 @@ export default function ResetPasswordForm() {
 
   if (isValidToken === false) {
     return (
-      <div className="bg-bunker-900 border border-red-500 rounded-md p-6 text-center">
-        <div className="flex items-center justify-center text-red-500 mb-4">
-          <AlertCircle className="mr-2" size={24} />
-          <h2 className="text-xl font-semibold">Error de validación</h2>
-        </div>
-        <p className="mb-6 text-gray-300">{error}</p>
-        <Button 
-          onClick={() => router.push("/recuperacion")}
-          className="bg-gold-500 hover:bg-gold-600 text-black font-medium">
-          Solicitar nuevo enlace
-        </Button>
-      </div>
+      <Card className="border-red-500 bg-bunker-900/80 backdrop-blur-sm shadow-xl">
+        <CardHeader>
+          <CardTitle className="text-center text-red-500 flex items-center justify-center">
+            <AlertCircle className="mr-2" />
+            Error de validación
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-center text-gray-300">{error}</p>
+        </CardContent>
+        <CardFooter className="flex justify-center">
+          <Button 
+            onClick={() => router.push("/recuperacion")}
+            className="bg-gold-500 hover:bg-gold-600 text-black">
+            Solicitar nuevo enlace
+          </Button>
+        </CardFooter>
+      </Card>
     )
   }
 
   return (
-    <div className="bg-bunker-900 border border-gold-500/20 rounded-md p-6">
-      <h2 className="text-xl font-semibold text-gold-500 mb-2">Crear nueva contraseña</h2>
-      <p className="text-gold-100/70 mb-6">Ingrese su nueva contraseña para restablecer su cuenta</p>
-      
+    <Card className="border-gold-500/20 bg-bunker-900/80 backdrop-blur-sm shadow-xl">
+      <CardHeader>
+        <CardTitle className="text-gold-500">Crear nueva contraseña</CardTitle>
+        <CardDescription className="text-gold-100/70">Ingrese su nueva contraseña para restablecer su cuenta</CardDescription>
+      </CardHeader>
       <form onSubmit={handleSubmit}>
-        {error && (
-          <div className="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded mb-4">
-            <span>{error}</span>
-          </div>
-        )}
-        
-        {success && (
-          <div className="bg-green-900/50 border border-green-500 text-green-200 px-4 py-3 rounded mb-4 flex items-center">
-            <CheckCircle className="mr-2" />
-            <span>{success}</span>
-          </div>
-        )}
-        
-        <div className="mb-4">
-          <Label htmlFor="password" className="text-gold-300 block mb-2">Nueva contraseña</Label>
-          <Input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full bg-bunker-800 border-gold-500/30 focus:border-gold-400 text-gold-100"
-          />
-        </div>
-        
-        <div className="mb-6">
-          <Label htmlFor="confirm-password" className="text-gold-300 block mb-2">Confirmar contraseña</Label>
-          <Input
-            id="confirm-password"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            className="w-full bg-bunker-800 border-gold-500/30 focus:border-gold-400 text-gold-100"
-          />
-        </div>
-        
-        <Button
-          type="submit"
-          className="w-full bg-gold-500 hover:bg-gold-600 text-black font-medium h-12"
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Procesando...
-            </>
-          ) : (
-            "Restablecer contraseña"
+        <CardContent className="space-y-4">
+          {error && (
+            <div className="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded">
+              <span>{error}</span>
+            </div>
           )}
-        </Button>
+          
+          {success && (
+            <div className="bg-green-900/50 border border-green-500 text-green-200 px-4 py-3 rounded flex items-center">
+              <CheckCircle className="mr-2" />
+              <span>{success}</span>
+            </div>
+          )}
+          
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-gold-300">Nueva contraseña</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="bg-bunker-800 border-gold-500/30 focus:border-gold-400 text-gold-100"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="confirm-password" className="text-gold-300">Confirmar contraseña</Label>
+            <Input
+              id="confirm-password"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              className="bg-bunker-800 border-gold-500/30 focus:border-gold-400 text-gold-100"
+            />
+          </div>
+        </CardContent>
+        
+        <CardFooter>
+          <Button
+            type="submit"
+            className="w-full bg-gold-500 hover:bg-gold-600 text-black font-medium h-12"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Procesando...
+              </>
+            ) : (
+              "Restablecer contraseña"
+            )}
+          </Button>
+        </CardFooter>
       </form>
-    </div>
+    </Card>
   )
 }
