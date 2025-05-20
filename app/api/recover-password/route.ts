@@ -57,7 +57,7 @@ export async function POST(req: Request) {
       from: "no-reply@mu-occidental.com",
       to: email,
       subject: "Restablece tu contraseña",
-      html: `<p>Hola ${userId},</p><p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><p><a href="${fullResetLink}">${fullResetLink}</a></p><p>Este enlace expira en 30 minutos.</p>`,
+      html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><p><a href="${fullResetLink}">${fullResetLink}</a></p><p>Este enlace expira en 30 minutos.</p>`,
     })
 
     return NextResponse.json({ success: true, message: "Correo de recuperación enviado" })
