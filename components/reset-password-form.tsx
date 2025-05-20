@@ -166,7 +166,6 @@ export default function ResetPasswordForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              disabled={false}
               className="bg-bunker-800 border-gold-500/30 focus:border-gold-400 text-gold-100"
             />
           </div>
@@ -178,7 +177,6 @@ export default function ResetPasswordForm() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              disabled={false}
               className="bg-bunker-800 border-gold-500/30 focus:border-gold-400 text-gold-100"
             />
           </div>
