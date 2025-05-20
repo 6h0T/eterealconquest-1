@@ -58,7 +58,7 @@ export async function POST(req: Request) {
         .request()
         .input("email", email)
         .query(`
-          SELECT memb___id 
+          SELECT memb___id, mail_addr
           FROM MEMB_INFO
           WHERE mail_addr = @email
         `);
@@ -147,8 +147,46 @@ export async function POST(req: Request) {
       const emailResult = await resend.emails.send({
         from: "no-reply@mu-occidental.com",
         to: email,
-        subject: "Restablece tu contraseña",
-        html: `<p>Has solicitado restablecer tu contraseña.</p><p>Haz clic en el siguiente enlace para continuar:</p><p><a href="${fullResetLink}">${fullResetLink}</a></p><p>Este enlace expira en 30 minutos.</p><p>Si no solicitaste este cambio, ignora este mensaje.</p>`,
+        subject: "Restablece tu contraseña - MU EterealConquest",
+        html: `
+          <div style="background-color: #1a1a1a; color: #ffffff; padding: 20px; font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 8px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <h1 style="color: #ffd700; margin: 0;">EterealConquest</h1>
+              <p style="color: #cccccc; margin-top: 10px;">Recuperación de Contraseña</p>
+            </div>
+            
+            <div style="background-color: #2a2a2a; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+              <p style="margin-bottom: 15px;">Hola <strong style="color: #ffd700;">${result.recordset[0].memb___id}</strong>,</p>
+              <p style="margin-bottom: 15px;">Has solicitado restablecer tu contraseña en Eterealconquest.</p>
+              <p style="margin-bottom: 15px;">Para continuar con el proceso, haz clic en el siguiente botón:</p>
+              
+              <div style="text-align: center; margin: 25px 0;">
+                <a href="${fullResetLink}" 
+                   style="background: linear-gradient(to right, #ffd700, #ffed4a);
+                          color: #000000;
+                          text-decoration: none;
+                          padding: 12px 25px;
+                          border-radius: 5px;
+                          font-weight: bold;
+                          display: inline-block;">
+                  Restablecer Contraseña
+                </a>
+              </div>
+              
+              <p style="margin-bottom: 15px; font-size: 13px; color: #888888;">
+                Si el botón no funciona, copia y pega este enlace en tu navegador:
+                <br>
+                <a href="${fullResetLink}" style="color: #ffd700; word-break: break-all;">${fullResetLink}</a>
+              </p>
+            </div>
+            
+            <div style="border-top: 1px solid #333333; padding-top: 20px; margin-top: 20px; font-size: 12px; color: #888888;">
+              <p style="margin-bottom: 10px;">⚠️ Este enlace expirará en 30 minutos por razones de seguridad.</p>
+              <p style="margin-bottom: 10px;">🔒 Si no solicitaste este cambio, puedes ignorar este mensaje. Tu cuenta permanece segura.</p>
+              <p style="margin: 0;">© ${new Date().getFullYear()} MU Occidental - Todos los derechos reservados</p>
+            </div>
+          </div>
+        `,
       });
       
       console.log("[RECOVER PASSWORD] Correo enviado exitosamente", emailResult);
