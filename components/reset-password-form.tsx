@@ -1,14 +1,12 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { AlertCircle, CheckCircle } from "lucide-react"
+import { AlertCircle, CheckCircle, Loader2 } from "lucide-react"
 
 export default function ResetPasswordForm() {
   const router = useRouter()
@@ -79,7 +77,7 @@ export default function ResetPasswordForm() {
 
   if (isValidToken === false) {
     return (
-      <Card className="border-red-500">
+      <Card className="border-red-500 bg-bunker-900/80 backdrop-blur-sm shadow-xl">
         <CardHeader>
           <CardTitle className="text-center text-red-500 flex items-center justify-center">
             <AlertCircle className="mr-2" />
@@ -90,33 +88,35 @@ export default function ResetPasswordForm() {
           <p className="text-center">{error}</p>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <Button onClick={() => router.push("/recuperacion")}>Solicitar nuevo enlace</Button>
+          <Button onClick={() => router.push("/recuperacion")} className="bg-gold-500 hover:bg-gold-600 text-black">
+            Solicitar nuevo enlace
+          </Button>
         </CardFooter>
       </Card>
     )
   }
 
   return (
-    <Card className="border-gold-500/50">
+    <Card className="border-gold-500/20 bg-bunker-900/80 backdrop-blur-sm shadow-xl">
       <CardHeader>
         <CardTitle className="text-gold-500">Crear nueva contraseña</CardTitle>
-        <CardDescription>Ingrese su nueva contraseña para restablecer su cuenta</CardDescription>
+        <CardDescription className="text-gold-100/70">Ingrese su nueva contraseña para restablecer su cuenta</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+            <div className="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded relative">
               <span className="block sm:inline">{error}</span>
             </div>
           )}
           {success && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative flex items-center">
+            <div className="bg-green-900/50 border border-green-500 text-green-200 px-4 py-3 rounded relative flex items-center">
               <CheckCircle className="mr-2" />
               <span className="block sm:inline">{success}</span>
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="password">Nueva contraseña</Label>
+            <Label htmlFor="password" className="text-gold-100">Nueva contraseña</Label>
             <Input
               id="password"
               type="password"
@@ -124,11 +124,11 @@ export default function ResetPasswordForm() {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={isLoading || !!success}
-              className="border-bunker-300"
+              className="bg-bunker-800 border-gold-500/30 focus:border-gold-400 text-gold-100"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="confirm-password">Confirmar contraseña</Label>
+            <Label htmlFor="confirm-password" className="text-gold-100">Confirmar contraseña</Label>
             <Input
               id="confirm-password"
               type="password"
@@ -136,19 +136,19 @@ export default function ResetPasswordForm() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               disabled={isLoading || !!success}
-              className="border-bunker-300"
+              className="bg-bunker-800 border-gold-500/30 focus:border-gold-400 text-gold-100"
             />
           </div>
         </CardContent>
         <CardFooter>
           <Button
             type="submit"
-            className="w-full bg-gold-500 hover:bg-gold-600 text-black"
+            className="w-full bg-gradient-to-r from-gold-600 to-gold-400 hover:from-gold-500 hover:to-gold-300 text-bunker-950 font-medium"
             disabled={isLoading || !!success}
           >
             {isLoading ? (
               <>
-                <span className="animate-spin mr-2">⟳</span>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Procesando...
               </>
             ) : (

@@ -1,11 +1,18 @@
 export default function Loading() {
   return (
-    <div className="max-w-md mx-auto mt-20 p-6 bg-[#111] text-white rounded-xl shadow-lg">
-      <h1 className="text-2xl font-bold mb-4">Restablecer contraseña</h1>
-      <div className="animate-pulse space-y-4">
-        <div className="h-10 bg-gray-800 rounded"></div>
-        <div className="h-10 bg-gray-800 rounded"></div>
-        <div className="h-10 bg-green-800 rounded"></div>
+    <div className="pt-32 pb-8 relative overflow-hidden">
+      <div className="container mx-auto px-4">
+        <div className="max-w-md mx-auto">
+          <h1 className="text-2xl font-bold text-center mb-6 text-gold-500">Restablecer Contraseña</h1>
+          <div className="bg-bunker-900/80 backdrop-blur-sm rounded-lg shadow-xl p-6 border border-gold-500/20 animate-pulse">
+            <div className="h-6 bg-bunker-800 w-3/4 mx-auto mb-4 rounded"></div>
+            <div className="space-y-4">
+              <div className="h-10 bg-bunker-800 rounded"></div>
+              <div className="h-10 bg-bunker-800 rounded"></div>
+              <div className="h-12 bg-gold-500/30 rounded"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
