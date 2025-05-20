@@ -165,32 +165,42 @@ export default function UserPanelPage({ params }: { params: { lang: Locale } }) 
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <Tabs defaultValue="donation" className="w-full">
-            <TabsList className="h-16 items-center justify-center bg-bunker-800 grid grid-cols-4 overflow-hidden rounded-lg mb-8 shadow-lg shadow-bunker-900/50 border-0">
-              <TabsTrigger
-                value="donation"
-                className="data-[state=active]:bg-gold-500 data-[state=active]:text-bunker-950 data-[state=inactive]:bg-bunker-700 flex items-center justify-center gap-2 h-full px-4 border-0 rounded-none"
-              >
-                <Gift className="h-5 w-5" />
-                <span className="font-medium">{t.donation}</span>
-              </TabsTrigger>
+          <Tabs defaultValue="characters" className="w-full">
+            <TabsList className="h-16 items-center justify-center bg-transparent grid grid-cols-4 overflow-hidden rounded-lg mb-8 shadow-lg shadow-bunker-900/50 border border-gold-700/30 gap-2 p-2">
               <TabsTrigger
                 value="characters"
-                className="data-[state=active]:bg-gold-500 data-[state=active]:text-bunker-950 data-[state=inactive]:bg-bunker-700 flex items-center justify-center gap-2 h-full px-4 border-0 rounded-none"
+                className="relative inline-flex items-center justify-center gap-2 h-full px-4 overflow-hidden font-medium transition-all rounded-md font-trade-winds border border-gold-700/30
+                data-[state=active]:!bg-[#ffd70030] data-[state=active]:!text-gold-300 data-[state=active]:border-gold-500
+                data-[state=inactive]:bg-transparent data-[state=inactive]:text-gold-400 data-[state=inactive]:hover:bg-bunker-700/50 data-[state=inactive]:hover:text-gold-300
+                focus-visible:outline-none focus-visible:ring-0 dark:focus-visible:ring-0 dark:data-[state=active]:!bg-[#ffd70030]"
               >
                 <Shield className="h-5 w-5" />
                 <span className="font-medium">{t.characters}</span>
               </TabsTrigger>
               <TabsTrigger
                 value="account"
-                className="data-[state=active]:bg-gold-500 data-[state=active]:text-bunker-950 data-[state=inactive]:bg-bunker-700 flex items-center justify-center gap-2 h-full px-4 border-0 rounded-none"
+                className="relative inline-flex items-center justify-center gap-2 h-full px-4 overflow-hidden font-medium transition-all rounded-md font-trade-winds border border-gold-700/30
+                data-[state=active]:!bg-[#ffd70030] data-[state=active]:!text-gold-300 data-[state=active]:border-gold-500
+                data-[state=inactive]:bg-transparent data-[state=inactive]:text-gold-400 data-[state=inactive]:hover:bg-bunker-700/50 data-[state=inactive]:hover:text-gold-300
+                focus-visible:outline-none focus-visible:ring-0 dark:focus-visible:ring-0 dark:data-[state=active]:!bg-[#ffd70030]"
               >
                 <User className="h-5 w-5" />
                 <span className="font-medium">{t.account}</span>
               </TabsTrigger>
               <TabsTrigger
+                value="donation"
+                className="bg-red-600 text-white data-[state=active]:bg-red-700 data-[state=active]:text-white data-[state=inactive]:bg-red-600 flex items-center justify-center gap-2 h-full px-4 rounded-md font-trade-winds border border-red-400/30
+                focus-visible:outline-none focus-visible:ring-0"
+              >
+                <Gift className="h-5 w-5" />
+                <span className="font-medium">{t.donation}</span>
+              </TabsTrigger>
+              <TabsTrigger
                 value="settings"
-                className="data-[state=active]:bg-gold-500 data-[state=active]:text-bunker-950 data-[state=inactive]:bg-bunker-700 flex items-center justify-center gap-2 h-full px-4 border-0 rounded-none"
+                className="relative inline-flex items-center justify-center gap-2 h-full px-4 overflow-hidden font-medium transition-all rounded-md font-trade-winds border border-gold-700/30
+                data-[state=active]:!bg-[#ffd70030] data-[state=active]:!text-gold-300 data-[state=active]:border-gold-500
+                data-[state=inactive]:bg-transparent data-[state=inactive]:text-gold-400 data-[state=inactive]:hover:bg-bunker-700/50 data-[state=inactive]:hover:text-gold-300
+                focus-visible:outline-none focus-visible:ring-0 dark:focus-visible:ring-0 dark:data-[state=active]:!bg-[#ffd70030]"
               >
                 <Settings className="h-5 w-5" />
                 <span className="font-medium">{t.settings}</span>
@@ -198,16 +208,16 @@ export default function UserPanelPage({ params }: { params: { lang: Locale } }) 
             </TabsList>
 
             <div className="bg-bunker-900/30 backdrop-blur-sm p-1 rounded-xl border border-gold-700/20 shadow-xl">
-              <TabsContent value="donation" className="p-4">
-                <UserDonation username={username} lang={lang} />
-              </TabsContent>
-
               <TabsContent value="characters" className="p-4">
                 <UserCharacters username={username} lang={lang} />
               </TabsContent>
 
               <TabsContent value="account" className="p-4">
                 <UserAccountInfo username={username} lang={lang} />
+              </TabsContent>
+
+              <TabsContent value="donation" className="p-4">
+                <UserDonation username={username} lang={lang} />
               </TabsContent>
 
               <TabsContent value="settings" className="p-4">
