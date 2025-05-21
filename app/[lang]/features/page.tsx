@@ -22,70 +22,62 @@ export default function FeaturesPage({ params }: { params: { lang: Locale } }) {
 
   // Define gallery items based on language
   const getGalleryItems = () => {
-    const interfaceDescription =
-      "Se acabo Mu Online con graficos antiguos. Aquí no hay aceleración gráfica ni trucos visuales engañosos, tampoco necesitaras una PC de última generación para notar una experiencia grafica TOTALMENTE DIFERENTE! ¡Hemos optimizado el motor del juego para ofrecer una experiencia moderna y unica! Prueba Etereal Conquest y redescubre Mu Online"
-
     return [
       {
         image: `/placeholder.svg?height=800&width=600&query=fantasy game graphics engine update vertical`,
-        text:
-          lang === "es"
-            ? "Actualización de Motor Gráfico"
-            : lang === "en"
-              ? "Graphic Engine Update"
-              : "Atualização do Motor Gráfico",
-        vimeoEmbed:
-          '<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1084813301?h=a9d556bae2&autoplay=1&loop=1&background=1&app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="2025-05-06 15-30-27"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>',
-        description: interfaceDescription,
+        text: lang === "es" 
+          ? "¡Motor Gráfico Modernizado y Actualizado!" 
+          : lang === "en" 
+            ? "Modernized and Updated Graphic Engine!" 
+            : "Motor Gráfico Modernizado e Atualizado!",
+        vimeoEmbed: '<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1086489255?h=d81721ac13&badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&background=1&title=0&byline=0&portrait=0&controls=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Motor Gráfico"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>',
+        description: lang === "es" 
+          ? "Optmización grafica de ultima generación! Hemos renovado el motor gráfico para ofrecer una experiencia fluida real, una vez comiences tu aventura, disfrutaras Mu Online totalmente distintiva! 🎨 Interfaz rediseñada, efectos mejorados y un juego más moderno que nunca."
+          : lang === "en"
+            ? "State-of-the-art graphic optimization! We have renewed the graphic engine to offer a real fluid experience. Once you start your adventure, you will enjoy a completely distinctive Mu Online! 🎨 Redesigned interface, improved effects, and a more modern game than ever."
+            : "Otimização gráfica de última geração! Renovamos o motor gráfico para oferecer uma experiência fluida real. Quando você começar sua aventura, desfrutará de um Mu Online totalmente diferente! 🎨 Interface redesenhada, efeitos aprimorados e um jogo mais moderno do que nunca.",
       },
       {
-        image: `/placeholder.svg?height=800&width=600&query=fantasy game fps vertical`,
-        text: lang === "es" ? "FPS" : lang === "en" ? "FPS" : "FPS",
-        videoSrc: "/videos/transition.mp4",
-        description:
-          "Disfruta de una experiencia de juego fluida con altas tasas de FPS. Hemos optimizado el motor del juego para garantizar un rendimiento excepcional incluso en equipos modestos.",
+        image: `/placeholder.svg?height=800&width=600&query=fantasy game pvp vertical`,
+        text: lang === "es" 
+          ? "Rework de Habilidades: PvP Rediseñado" 
+          : lang === "en" 
+            ? "Skills Rework: Redesigned PvP" 
+            : "Reformulação de Habilidades: PvP Redesenhado",
+        vimeoEmbed: '<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1086489329?h=4aa0069064&badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&background=1&title=0&byline=0&portrait=0&controls=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Rework Habilidades"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>',
+        description: lang === "es" 
+          ? "El combate evoluciona. Nuevas habilidades, ajustes clave y un enfoque total en el PvP. Cada clase se siente más poderosa, estratégica y única que nunca."
+          : lang === "en"
+            ? "Combat evolves. New skills, key adjustments, and a total focus on PvP. Each class feels more powerful, strategic, and unique than ever."
+            : "O combate evolui. Novas habilidades, ajustes chave e um foco total no PvP. Cada classe se sente mais poderosa, estratégica e única do que nunca.",
       },
       {
-        image: `/placeholder.svg?height=800&width=600&query=fantasy game skills vertical`,
-        text: lang === "es" ? "Habilidades" : lang === "en" ? "Skills" : "Habilidades",
-        videoSrc: "/videos/mg-fuerza-skills.mp4",
-        description:
-          "Domina un amplio repertorio de habilidades únicas para cada clase. Personaliza tu estilo de juego y crea combinaciones devastadoras para derrotar a tus enemigos.",
+        image: `/placeholder.svg?height=800&width=600&query=fantasy game rarity system vertical`,
+        text: lang === "es" 
+          ? "SISTEMA EXCLUSIVO DE RAREZA!" 
+          : lang === "en" 
+            ? "EXCLUSIVE RARITY SYSTEM!" 
+            : "SISTEMA EXCLUSIVO DE RARIDADE!",
+        vimeoEmbed: '<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1086468398?h=59426c2367&badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&background=1&title=0&byline=0&portrait=0&controls=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Rareza-drops"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>',
+        description: lang === "es" 
+          ? "El comercio y la progresión alcanzan una nueva dimensión gracias al sistema de rareza de ítems. Cada pieza ya no solo pertenece a un tier específico, sino que ahora se clasifica según su rareza: <strong>Normal, Uncommon, Rare, Epic y Legendary</strong>. La rareza no solo define el poder, sino también el prestigio. Obtener ítems Legendarios será un símbolo de dedicación y habilidad, consolidando a su portador como un verdadero conquistador!."
+          : lang === "en"
+            ? "Trading and progression reach a new dimension thanks to the item rarity system. Each piece no longer just belongs to a specific tier, but is now classified according to its rarity: <strong>Normal, Uncommon, Rare, Epic and Legendary</strong>. Rarity not only defines power, but also prestige. Obtaining Legendary items will be a symbol of dedication and skill, establishing its bearer as a true conqueror!."
+            : "O comércio e a progressão atingem uma nova dimensão graças ao sistema de raridade de itens. Cada peça não pertence mais apenas a um tier específico, mas agora é classificada de acordo com sua raridade: <strong>Normal, Uncommon, Rare, Epic e Legendary</strong>. A raridade não define apenas o poder, mas também o prestígio. Obter itens Legendários será um símbolo de dedicação e habilidade, consolidando seu portador como um verdadeiro conquistador!.",
       },
       {
-        image: `/placeholder.svg?height=800&width=600&query=fantasy game tests vertical`,
-        text: lang === "es" ? "Pruebas" : lang === "en" ? "Tests" : "Testes",
-        videoSrc: "/videos/transition-video.mp4",
-        description:
-          "Supera desafiantes pruebas y eventos especiales para obtener recompensas exclusivas. Pon a prueba tus habilidades y demuestra tu valía en el mundo de Eternal Conquest.",
-      },
-      {
-        image: `/placeholder.svg?height=800&width=600&query=fantasy game equipment vertical`,
-        text: lang === "es" ? "Equipamiento" : lang === "en" ? "Equipment" : "Equipamento",
-        videoSrc: "/videos/new-transition.mp4",
-        description:
-          "Colecciona y mejora equipamiento legendario para potenciar a tu personaje. Cada pieza tiene atributos únicos que pueden marcar la diferencia en combate.",
-      },
-      {
-        image: `/placeholder.svg?height=800&width=600&query=fantasy game items vertical`,
-        text: lang === "es" ? "Ítems" : lang === "en" ? "Items" : "Itens",
-        videoSrc: "/videos/fondo1.mp4",
-        description:
-          "Descubre una amplia variedad de ítems especiales que te ayudarán en tu aventura. Desde pociones hasta artefactos mágicos, cada objeto tiene un propósito específico.",
-      },
-      {
-        image: `/placeholder.svg?height=800&width=600&query=fantasy game buffs vertical`,
-        text: lang === "es" ? "Buffs" : lang === "en" ? "Buffs" : "Buffs",
-        videoSrc: "/videos/rage-fighter-skills.mp4",
-        description:
-          "Potencia temporalmente tus habilidades con diversos buffs. Aprende a combinarlos estratégicamente para maximizar tu poder en situaciones críticas.",
-      },
-      {
-        image: `/placeholder.svg?height=800&width=600&query=fantasy game auction vertical`,
-        text: lang === "es" ? "Subastas" : lang === "en" ? "Auction" : "Leilões",
-        videoSrc: "/videos/fondo-cards.mp4",
-        description:
-          "Participa en el sistema de subastas para comprar y vender objetos valiosos. Una economía dinámica donde podrás hacer fortuna si sabes negociar.",
+        image: `/placeholder.svg?height=800&width=600&query=fantasy game dungeon vertical`,
+        text: lang === "es" 
+          ? "Nuevo Sistema de Dungeons" 
+          : lang === "en"
+            ? "New Dungeon System" 
+            : "Novo Sistema de Masmorras",
+        vimeoEmbed: '<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1086489296?h=2dbdaeea40&badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&background=1&title=0&byline=0&portrait=0&controls=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Dungeons"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>',
+        description: lang === "es" 
+          ? "Explora mapas exclusivos, enfréntate a poderosos bosses y obtén ítems raros. Una experiencia PvE única que solo encontrarás en MU: Etereal Conquest."
+          : lang === "en"
+            ? "Explore exclusive maps, face powerful bosses, and obtain rare items. A unique PvE experience that you will only find in MU: Etereal Conquest."
+            : "Explore mapas exclusivos, enfrente chefes poderosos e obtenha itens raros. Uma experiência PvE única que você só encontrará em MU: Etereal Conquest.",
       },
     ]
   }

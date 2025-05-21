@@ -149,11 +149,10 @@ export async function POST(req: Request) {
         to: email,
         subject: "Restablece tu contraseña - MU EterealConquest",
         html: `
-          <div style="background-color: #1a1a1a; color: #ffffff; padding: 20px; font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 8px;">
-            <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #ffd700; margin: 0;">MU EterealConquest</h1>
-              <p style="color: #cccccc; margin-top: 10px;">Recuperación de Contraseña</p>
-            </div>
+          <div style="background-color: #2a2a2a; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
+              <p>Hola <strong style="color: #ffd700;">${result.recordset[0].memb___id}</strong>,</p>
+              <p>Has solicitado restablecer tu contraseña en Eterealconquest.</p>
+              <p>Para continuar con el proceso, haz clic en el siguiente botón:</p>
             
             <div style="background-color: #2a2a2a; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
               <p style="margin-bottom: 15px;">Has solicitado restablecer tu contraseña en MU Eterealconquest.</p>

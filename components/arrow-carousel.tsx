@@ -46,6 +46,17 @@ export default function ArrowCarousel({ items }: ArrowCarouselProps) {
       videoRef.current.pause()
       videoRef.current.currentTime = 0
     }
+    
+    // Reproducir automáticamente el video cuando se abre el modal
+    if (modalOpen && videoRef.current) {
+      const playPromise = videoRef.current.play();
+      
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.error('Error al reproducir el video:', error);
+        });
+      }
+    }
   }, [modalOpen])
 
   // Function to handle next slide
@@ -214,6 +225,42 @@ export default function ArrowCarousel({ items }: ArrowCarouselProps) {
     return text
   }
 
+  // Función para obtener el contenido del modal según el item seleccionado
+  const getModalContent = (item: CarouselItem | null) => {
+    if (!item) return { title: "Característica", description: "", video: null }
+
+    // Si es el Sistema Exclusivo de Rareza (en cualquier idioma)
+    if (item.text.includes("RAREZA") || item.text.includes("RARITY") || item.text.includes("RARIDADE")) {
+      return {
+        title: item.text,
+        description: item.description || "",
+        video: item.vimeoEmbed || null
+      }
+    }
+
+    // Contenido por defecto para interfaz gráfica
+    if (item.text.toLowerCase().includes("interface") || 
+        item.text.toLowerCase().includes("interfaz") ||
+        item.text.toLowerCase().includes("motor") ||
+        item.text.toLowerCase().includes("gráfico") ||
+        item.text.toLowerCase().includes("graphic") ||
+        item.text.toLowerCase().includes("engine") ||
+        item.text.toLowerCase().includes("atualização")) {
+      return {
+        title: getTranslatedTitle(item.text),
+        description: item.description || "Se acabo Mu Online con graficos antiguos. Aquí no hay aceleración gráfica ni trucos visuales engañosos, tampoco necesitaras una PC de última generación para notar una experiencia grafica TOTALMENTE DIFERENTE! ¡Hemos optimizado el motor del juego para ofrecer una experiencia moderna y unica! Prueba Etereal Conquest y redescubre Mu Online",
+        video: item.vimeoEmbed || null
+      }
+    }
+
+    // Contenido para el resto de características
+    return {
+      title: item.text,
+      description: item.description || "",
+      video: item.videoSrc || item.vimeoEmbed || null
+    }
+  }
+
   return (
     <div className="relative w-full pt-8 pb-16">
       {/* Carousel container with perspective for 3D effect */}
@@ -380,47 +427,53 @@ export default function ArrowCarousel({ items }: ArrowCarouselProps) {
         ))}
       </div>
 
-      {/* Video Modal with Two Columns - Fixed text and video */}
+      {/* Video Modal with Two Columns - Dynamic content based on selected item */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent
           className="sm:max-w-[1100px] max-h-[95vh] bg-black/90 border-gold-600/30 text-gold-100 p-0 overflow-hidden"
           style={{ backdropFilter: "blur(8px)" }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 h-full" style={{ minHeight: "600px" }}>
-            {/* Left Column: Header and Content - Fixed text */}
-            <div className="flex flex-col justify-center h-full pr-2">
-              <DialogTitle className="text-2xl font-bold gold-gradient-text mb-6">
-                {getTranslatedTitle(selectedItem?.text || "Característica")}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 h-full" style={{ minHeight: "600px" }}>
+            {/* Left Column: Header and Content - Dynamic text */}
+            <div className="flex flex-col justify-center p-6 md:p-8 h-full">
+              <DialogTitle className="text-2xl md:text-3xl font-bold gold-gradient-text mb-6">
+                {getModalContent(selectedItem).title}
               </DialogTitle>
               <div className="prose prose-invert prose-gold max-w-none">
-                <p className="text-gold-100 leading-relaxed text-base">
-                  Se acabo Mu Online con graficos antiguos. Aquí no hay aceleración gráfica ni trucos visuales
-                  engañosos, tampoco necesitaras una PC de última generación para notar una experiencia grafica
-                  TOTALMENTE DIFERENTE! ¡Hemos optimizado el motor del juego para ofrecer una experiencia moderna y
-                  unica! Prueba Etereal Conquest y redescubre Mu Online
-                </p>
+                <div 
+                  className="text-gold-100 leading-relaxed text-base md:text-lg"
+                  dangerouslySetInnerHTML={{ __html: getModalContent(selectedItem).description }}
+                />
               </div>
             </div>
 
-            {/* Right Column: Video Only - Fixed aspect ratio */}
+            {/* Right Column: Video Only - Dynamic video content */}
             <div className="flex items-center justify-center h-full">
-              <div className="relative w-full h-full overflow-hidden rounded-lg border border-gold-500/20">
-                <div className="absolute inset-0">
-                  <iframe
-                    src="https://player.vimeo.com/video/1084813301?h=a9d556bae2&autoplay=1&loop=1&background=1&app_id=58479"
-                    frameBorder="0"
-                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "expand",
-                    }}
-                    title="2025-05-06 15-30-27"
-                  ></iframe>
-                </div>
+              <div className="w-full h-full flex items-center justify-center">
+                {getModalContent(selectedItem).video && (
+                  selectedItem?.text.includes("RAREZA") || selectedItem?.text.includes("RARITY") || selectedItem?.text.includes("RARIDADE") ? (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <div style={{width: "100%", maxWidth: "100%"}} dangerouslySetInnerHTML={{ __html: getModalContent(selectedItem).video as string }} />
+                    </div>
+                  ) : selectedItem?.vimeoEmbed ? (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <div style={{width: "100%", maxWidth: "100%"}} dangerouslySetInnerHTML={{ __html: selectedItem.vimeoEmbed }} />
+                    </div>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <video
+                        ref={videoRef}
+                        src={getModalContent(selectedItem).video as string}
+                        autoPlay
+                        playsInline
+                        loop
+                        controls
+                        className="w-full h-full object-contain"
+                        onError={(e) => console.error("Error al cargar el video:", e)}
+                      />
+                    </div>
+                  )
+                )}
               </div>
             </div>
           </div>
