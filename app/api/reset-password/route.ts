@@ -58,14 +58,14 @@ export async function POST(req: Request) {
         .request()
         .query(`
           SELECT CASE WHEN EXISTS (
-            SELECT * FROM sysobjects WHERE name='WEBENGINE_RECOVERY_TOKENS' AND xtype='U'
+            SELECT * FROM sysobjects WHERE name='PasswordRecovery2' AND xtype='U'
           ) THEN 1 ELSE 0 END AS TableExists
         `);
       
       tableExists = tableCheck.recordset[0].TableExists === 1;
       
       if (!tableExists) {
-        console.error("[RESET PASSWORD] La tabla WEBENGINE_RECOVERY_TOKENS no existe");
+        console.error("[RESET PASSWORD] La tabla PasswordRecovery2 no existe");
         responseData = { success: false, error: "Sistema de recuperación no configurado" };
         statusCode = 500;
         return NextResponse.json(responseData, { status: statusCode });
@@ -84,8 +84,8 @@ export async function POST(req: Request) {
         .request()
         .input("token", token)
         .query(`
-          SELECT TOP 1 * FROM WEBENGINE_RECOVERY_TOKENS
-          WHERE token = @token AND expires_at > GETDATE()
+          SELECT TOP 1 * FROM PasswordRecovery2
+          WHERE token = @token AND expires > GETDATE()
         `);
 
       if (tokenResult.recordset.length === 0) {
@@ -102,7 +102,7 @@ export async function POST(req: Request) {
     }
 
     const user = tokenResult.recordset[0];
-    const userId = user.username;
+    const userId = user.memb___id;
 
     console.log("[RESET PASSWORD] Token válido para usuario:", userId);
 
@@ -132,7 +132,7 @@ export async function POST(req: Request) {
         .request()
         .input("token", token)
         .query(`
-          DELETE FROM WEBENGINE_RECOVERY_TOKENS WHERE token = @token
+          DELETE FROM PasswordRecovery2 WHERE token = @token
         `);
       console.log("[RESET PASSWORD] Token eliminado después de uso exitoso");
     } catch (deleteError) {

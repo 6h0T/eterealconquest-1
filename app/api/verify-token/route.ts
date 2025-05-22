@@ -22,8 +22,8 @@ export async function GET(req: Request) {
       .request()
       .input("token", token)
       .query(`
-        SELECT TOP 1 * FROM WEBENGINE_RECOVERY_TOKENS
-        WHERE token = @token AND expires_at > GETDATE()
+        SELECT TOP 1 * FROM PasswordRecovery2
+        WHERE token = @token AND expires > GETDATE()
       `)
 
     if (tokenResult.recordset.length === 0) {
@@ -39,7 +39,7 @@ export async function GET(req: Request) {
       { 
         success: true, 
         message: "Token válido",
-        userId: tokenResult.recordset[0].username 
+        userId: tokenResult.recordset[0].memb___id 
       },
       { status: 200 }
     )
