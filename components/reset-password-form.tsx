@@ -35,9 +35,31 @@ export default function ResetPasswordForm() {
       return
     }
 
-    setIsValidToken(true)
-    setSuccess(null)
-    setError(null)
+    // Verificar el token con el servidor
+    const verifyToken = async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch(`/api/verify-token?token=${token}`)
+        const data = await response.json()
+        
+        if (data.success) {
+          setIsValidToken(true)
+          setSuccess(null)
+          setError(null)
+        } else {
+          setError(data.error || "Token inválido o expirado. Por favor, solicite un nuevo enlace.")
+          setIsValidToken(false)
+        }
+      } catch (err) {
+        console.error("Error al verificar el token:", err)
+        setError("Error al verificar el token. Por favor, solicite un nuevo enlace.")
+        setIsValidToken(false)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    verifyToken()
   }, [token])
 
   const handleSubmit = async (e: React.FormEvent) => {
