@@ -149,36 +149,31 @@ export async function POST(req: Request) {
         to: email,
         subject: "Restablece tu contraseña - MU EterealConquest",
         html: `
-          <div style="background-color: #2a2a2a; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
-              <p>Hola <strong style="color: #ffd700;">${result.recordset[0].memb___id}</strong>,</p>
-              <p>Has solicitado restablecer tu contraseña en Eterealconquest.</p>
-              <p>Para continuar con el proceso, haz clic en el siguiente botón:</p>
-            
-            <div style="background-color: #2a2a2a; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-              <p style="margin-bottom: 15px;">Has solicitado restablecer tu contraseña en MU Eterealconquest.</p>
-              <p style="margin-bottom: 15px;">Para continuar con el proceso, haz clic en el siguiente botón:</p>
+          <div style="background-color: #2a2a2a; padding: 20px; border-radius: 5px; margin-bottom: 20px; color: #ffffff;">
+            <p>Hola <strong style="color: #ffd700;">${result.recordset[0].memb___id}</strong>,</p>
+            <p>Has solicitado restablecer tu contraseña en MU Eterealconquest.</p>
+            <p>Para continuar con el proceso, haz clic en el siguiente botón:</p>
               
-              <div style="text-align: center; margin: 25px 0;">
-                <a href="${fullResetLink}" 
-                   style="background: linear-gradient(to right, #ffd700, #ffed4a);
-                          color: #000000;
-                          text-decoration: none;
-                          padding: 12px 25px;
-                          border-radius: 5px;
-                          font-weight: bold;
-                          display: inline-block;">
-                  Restablecer Contraseña
-                </a>
-              </div>
-              
-              <p style="margin-bottom: 15px; font-size: 13px; color: #888888;">
-                Si el botón no funciona, copia y pega este enlace en tu navegador:
-                <br>
-                <a href="${fullResetLink}" style="color: #ffd700; word-break: break-all;">${fullResetLink}</a>
-              </p>
+            <div style="text-align: center; margin: 25px 0;">
+              <a href="${fullResetLink}" 
+                 style="background: linear-gradient(to right, #ffd700, #ffed4a);
+                        color: #000000;
+                        text-decoration: none;
+                        padding: 12px 25px;
+                        border-radius: 5px;
+                        font-weight: bold;
+                        display: inline-block;">
+                Restablecer Contraseña
+              </a>
             </div>
+              
+            <p style="margin-bottom: 15px; font-size: 13px; color: #ffffff;">
+              Si el botón no funciona, copia y pega este enlace en tu navegador:
+              <br>
+              <a href="${fullResetLink}" style="color: #ffd700; word-break: break-all;">${fullResetLink}</a>
+            </p>
             
-            <div style="border-top: 1px solid #333333; padding-top: 20px; margin-top: 20px; font-size: 12px; color: #888888;">
+            <div style="border-top: 1px solid #333333; padding-top: 20px; margin-top: 20px; font-size: 12px; color: #ffffff;">
               <p style="margin-bottom: 10px;">⚠️ Este enlace expirará en 30 minutos por razones de seguridad.</p>
               <p style="margin-bottom: 10px;">🔒 Si no solicitaste este cambio, puedes ignorar este mensaje. Tu cuenta permanece segura.</p>
               <p style="margin: 0;">© ${new Date().getFullYear()} MU Eterealconquest - Todos los derechos reservados</p>
