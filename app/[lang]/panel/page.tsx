@@ -166,7 +166,7 @@ export default function UserPanelPage({ params }: { params: { lang: Locale } }) 
 
         <motion.div variants={itemVariants}>
           <Tabs defaultValue="characters" className="w-full">
-            <TabsList className="h-16 items-center justify-center bg-transparent grid grid-cols-4 overflow-hidden rounded-lg mb-8 shadow-lg shadow-bunker-900/50 border border-gold-700/30 gap-2 p-2">
+            <TabsList className="h-16 items-center justify-center bg-transparent grid grid-cols-3 overflow-hidden rounded-lg mb-8 shadow-lg shadow-bunker-900/50 border border-gold-700/30 gap-2 p-2">
               <TabsTrigger
                 value="characters"
                 className="relative inline-flex items-center justify-center gap-2 h-full px-4 overflow-hidden font-medium transition-all rounded-md font-trade-winds border border-gold-700/30
@@ -187,6 +187,7 @@ export default function UserPanelPage({ params }: { params: { lang: Locale } }) 
                 <User className="h-5 w-5" />
                 <span className="font-medium">{t.account}</span>
               </TabsTrigger>
+              {/* BOTÓN DE DONACIÓN OCULTO - PARA REACTIVAR ELIMINA EL COMENTARIO DE ESTA SECCIÓN 
               <TabsTrigger
                 value="donation"
                 className="bg-red-600 text-white data-[state=active]:bg-red-700 data-[state=active]:text-white data-[state=inactive]:bg-red-600 flex items-center justify-center gap-2 h-full px-4 rounded-md font-trade-winds border border-red-400/30
@@ -195,6 +196,7 @@ export default function UserPanelPage({ params }: { params: { lang: Locale } }) 
                 <Gift className="h-5 w-5" />
                 <span className="font-medium">{t.donation}</span>
               </TabsTrigger>
+              */}
               <TabsTrigger
                 value="settings"
                 className="relative inline-flex items-center justify-center gap-2 h-full px-4 overflow-hidden font-medium transition-all rounded-md font-trade-winds border border-gold-700/30
@@ -216,9 +218,11 @@ export default function UserPanelPage({ params }: { params: { lang: Locale } }) 
                 <UserAccountInfo username={username} lang={lang} />
               </TabsContent>
 
+              {/* CONTENIDO DE DONACIÓN OCULTO - PARA REACTIVAR ELIMINA EL COMENTARIO DE ESTA SECCIÓN 
               <TabsContent value="donation" className="p-4">
                 <UserDonation username={username} lang={lang} />
               </TabsContent>
+              */}
 
               <TabsContent value="settings" className="p-4">
                 <UserSettings username={username} lang={lang} />
