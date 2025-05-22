@@ -105,7 +105,7 @@ export async function POST(req: Request) {
             token NVARCHAR(100) NOT NULL,
             expires DATETIME NOT NULL,
             used BIT DEFAULT 0,
-            created_at DATETIME DEFAULT GETDATE()
+            created_at DATETIME DEFAULT GETUTCDATE()
           )
         `);
       }
@@ -123,7 +123,7 @@ export async function POST(req: Request) {
         .input("email", sql.VarChar, email)
         .input("token", sql.VarChar, token)
         .input("memb___id", sql.VarChar, userId)
-        .input("expires", sql.DateTime, new Date(Date.now() + 1000 * 60 * 30)) // 30 min
+        .input("expires", sql.DateTime, new Date(Date.now() + 1000 * 60 * 30)) // 30 min en UTC
         .query(`
           INSERT INTO PasswordRecovery2 (email, token, memb___id, expires)
           VALUES (@email, @token, @memb___id, @expires)
@@ -150,9 +150,9 @@ export async function POST(req: Request) {
         subject: "Restablece tu contraseña - MU EterealConquest",
         html: `
           <div style="background-color: #2a2a2a; padding: 20px; border-radius: 5px; margin-bottom: 20px; color: #ffffff;">
-            <p>Hola <strong style="color: #ffd700;">${result.recordset[0].memb___id}</strong>,</p>
-            <p>Has solicitado restablecer tu contraseña en MU Eterealconquest.</p>
-            <p>Para continuar con el proceso, haz clic en el siguiente botón:</p>
+            <p style="color: #ffffff;">Hola <strong style="color: #ffd700;">${result.recordset[0].memb___id}</strong>,</p>
+            <p style="color: #ffffff;">Has solicitado restablecer tu contraseña en MU Eterealconquest.</p>
+            <p style="color: #ffffff;">Para continuar con el proceso, haz clic en el siguiente botón:</p>
               
             <div style="text-align: center; margin: 25px 0;">
               <a href="${fullResetLink}" 
@@ -174,9 +174,9 @@ export async function POST(req: Request) {
             </p>
             
             <div style="border-top: 1px solid #333333; padding-top: 20px; margin-top: 20px; font-size: 12px; color: #ffffff;">
-              <p style="margin-bottom: 10px;">⚠️ Este enlace expirará en 30 minutos por razones de seguridad.</p>
-              <p style="margin-bottom: 10px;">🔒 Si no solicitaste este cambio, puedes ignorar este mensaje. Tu cuenta permanece segura.</p>
-              <p style="margin: 0;">© ${new Date().getFullYear()} MU Eterealconquest - Todos los derechos reservados</p>
+              <p style="margin-bottom: 10px; color: #ffffff;">⚠️ Este enlace expirará en 30 minutos por razones de seguridad.</p>
+              <p style="margin-bottom: 10px; color: #ffffff;">🔒 Si no solicitaste este cambio, puedes ignorar este mensaje. Tu cuenta permanece segura.</p>
+              <p style="margin: 0; color: #ffffff;">© ${new Date().getFullYear()} MU Eterealconquest - Todos los derechos reservados</p>
             </div>
           </div>
         `,

@@ -7,6 +7,6 @@ BEGIN
         token NVARCHAR(100) NOT NULL,
         expires_at DATETIME NOT NULL,
         used BIT DEFAULT 0,
-        created_at DATETIME DEFAULT GETDATE()
+        created_at DATETIME DEFAULT GETUTCDATE()
     )
 END
