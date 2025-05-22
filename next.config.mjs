@@ -6,9 +6,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  images: {
-    unoptimized: true,
-  },
   // Desactivar optimizaciones que podrían causar problemas
   reactStrictMode: false,
   // Asegurarse de que las rutas de admin funcionen correctamente
@@ -22,7 +19,8 @@ const nextConfig = {
   },
   // Permitir imágenes de cualquier dominio
   images: {
-    domains: ['localhost', 'v0.blob.com', 'hebbkx1anhila5yf.public.blob.vercel-storage.com'],
+    domains: ['localhost', 'v0.blob.com', 'hebbkx1anhila5yf.public.blob.vercel-storage.com', 'i.imgur.com'],
+    unoptimized: true,
   },
 }
 

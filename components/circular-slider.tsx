@@ -657,8 +657,11 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
               animate="animate"
               exit="exit"
             >
-              <div className="relative w-full h-full flex items-center justify-center">
-                <div className="relative w-[85%] h-[85%]">
+              <div 
+                className="relative w-full h-full flex items-center justify-center"
+                style={{ transform: 'translateX(10%)' }}
+              >
+                <div className="relative w-[70%] h-[70%]">
                   <Image
                     src={activeCharacter.characterImg || "/placeholder.svg"}
                     alt={activeCharacter.name}

@@ -6,7 +6,7 @@ export const characters = [
     headerImg:
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dk%20encabezado-lcoV3t6HQuJVVhjJXDqgmaGKudt5se.png",
     characterImg:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dk%20placeholder-kcoHFqc20rd5R8aa08Y1aK4VJ2gal4.png",
+      "https://i.imgur.com/uglk0ur.png",
     videos: [
       {
         id: "skills",
@@ -46,7 +46,7 @@ export const characters = [
     headerImg:
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DW%20encabezado-pb2BdiJ2sv6kUfmSS9UKZpemlyHyvt.png",
     characterImg:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DW%20placeholder-5nD9u3x1iccJXt9q1xfxxyUtT3tQRS.png",
+      "https://i.imgur.com/ZjjQ0Z7.png",
     videos: [
       {
         id: "skills",
@@ -78,7 +78,7 @@ export const characters = [
     headerImg:
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ELf%20encabezado-WmkejHhTPPZ6wZaPMkqTLLQg1QRAoB.png",
     characterImg:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ELF%20placeholder-IQncvz5LHHMYfxmBVAUDZloN0AKMXU.png",
+      "https://i.imgur.com/YfnqeUq.png",
     videos: [
       {
         id: "agility",
@@ -130,7 +130,7 @@ export const characters = [
     headerImg:
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DL%20encabezado-UtyMeAn3JYzXaRb3Qsg4WghhaJ5phs.png",
     characterImg:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DL%20PLACEHOLDER-TdrPDJNjf9yGOlJeBqBhFSvNmIREfb.png",
+      "https://i.imgur.com/PwqyfaI.png",
     videos: [
       {
         id: "skills",
@@ -170,7 +170,7 @@ export const characters = [
     headerImg:
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/MG%20encabezado-iMn0FldvAQ4OiKKXnIIy867l0HjIlk.png",
     characterImg:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/MG%20placeholder-DtMOijbmtu2FH0TAJV37AGm22MnjXa.png",
+      "https://i.imgur.com/slGxR7K.png",
     videos: [
       {
         id: "energy",
@@ -218,7 +218,7 @@ export const characters = [
     headerImg:
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/SM%20encabezado-98ZrOUin6DOUye2HxePJ9AEZbtViaU.png",
     characterImg:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/SM%20placeholder-4G6fG7ZaSh6nCX910ceshTDY3sMaSS.png",
+      "https://i.imgur.com/qzzND80.png",
     videos: [
       {
         id: "skills",
@@ -258,7 +258,7 @@ export const characters = [
     headerImg:
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/RF-encabezado-ct9fP32PedvAWUhrMyTYYYshiisORL.png",
     characterImg:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/RF%20placeholder-cfsrFGTGRBhHwD9HwdGcmRI3KWKo80.png",
+      "https://i.imgur.com/4LexNOe.png",
     videos: [
       {
         id: "skills",

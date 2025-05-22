@@ -42,7 +42,7 @@ export default function ClassesPage({ params }: { params: { lang: Locale } }) {
           : lang === "en"
             ? "Relentless warriors who master close combat. Equipped with swords and heavy armor, Dark Knights are the first line of defense in any battle."
             : "Guerreiros implacáveis que dominam o combate corpo a corpo. Equipados com espadas e armaduras pesadas, os Dark Knights são a primeira linha de defesa em qualquer batalha.",
-      imageSrc: "/images/classes/dk.jpg",
+      imageSrc: "/dk-placeholder.png",
       videoSrc: "/videos/blade-knight-skills.mp4",
     },
     {
