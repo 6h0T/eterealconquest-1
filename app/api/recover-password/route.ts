@@ -53,8 +53,39 @@ export async function POST(req: Request) {
     await resend.emails.send({
       from: "no-reply@mu-occidental.com",
       to: email,
-      subject: "Restablece tu contraseña",
-      html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><p><a href="${fullResetLink}">${fullResetLink}</a></p>`,
+      subject: "Restablece tu contraseña - MU EterealConquest",
+      html: `
+          <div style="background-color: #2a2a2a; padding: 20px; border-radius: 5px; margin-bottom: 20px; color: #ffffff;">
+            <p style="color: #ffffff;">Hola <strong style="color: #ffd700;">${userId}</strong>,</p>
+            <p style="color: #ffffff;">Has solicitado restablecer tu contraseña en MU Eterealconquest.</p>
+            <p style="color: #ffffff;">Para continuar con el proceso, haz clic en el siguiente botón:</p>
+              
+            <div style="text-align: center; margin: 25px 0;">
+              <a href="${fullResetLink}" 
+                 style="background: linear-gradient(to right, #ffd700, #ffed4a);
+                        color: #000000;
+                        text-decoration: none;
+                        padding: 12px 25px;
+                        border-radius: 5px;
+                        font-weight: bold;
+                        display: inline-block;">
+                Restablecer Contraseña
+              </a>
+            </div>
+              
+            <p style="margin-bottom: 15px; font-size: 13px; color: #ffffff !important;">
+              <span style="color: #ffffff !important;">Si el botón no funciona, copia y pega este enlace en tu navegador:</span>
+              <br>
+              <a href="${fullResetLink}" style="color: #ffd700; word-break: break-all;">${fullResetLink}</a>
+            </p>
+            
+            <div style="border-top: 1px solid #333333; padding-top: 20px; margin-top: 20px; font-size: 12px; color: #ffffff;">
+              <p style="margin-bottom: 10px; color: #ffffff;">⚠️ Este enlace expirará en 1 hora por razones de seguridad.</p>
+              <p style="margin-bottom: 10px; color: #ffffff;">🔒 Si no solicitaste este cambio, puedes ignorar este mensaje. Tu cuenta permanece segura.</p>
+              <p style="margin: 0; color: #ffffff;">© ${new Date().getFullYear()} MU Eterealconquest - Todos los derechos reservados</p>
+            </div>
+          </div>
+        `,
     })
 
     return NextResponse.json({ success: true, message: "Correo de recuperación enviado" })

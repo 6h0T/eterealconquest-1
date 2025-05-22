@@ -5,8 +5,11 @@ export async function GET(req: Request) {
   // Extraer el token de los parámetros de consulta
   const url = new URL(req.url)
   const token = url.searchParams.get("token")
+  
+  console.log("[VERIFY TOKEN] Token recibido:", token)
 
   if (!token) {
+    console.log("[VERIFY TOKEN] Error: Token no proporcionado")
     return NextResponse.json(
       { success: false, error: "Token no proporcionado" },
       { status: 400 }
@@ -15,9 +18,33 @@ export async function GET(req: Request) {
 
   try {
     // Conectar a la base de datos
+    console.log("[VERIFY TOKEN] Conectando a la base de datos")
     const db = await connectToDB()
+    console.log("[VERIFY TOKEN] Conexión exitosa a la base de datos")
+
+    // Verificar si la tabla existe
+    console.log("[VERIFY TOKEN] Verificando si existe la tabla PasswordRecovery2")
+    const tableCheck = await db
+      .request()
+      .query(`
+        SELECT CASE WHEN EXISTS (
+          SELECT * FROM sysobjects WHERE name='PasswordRecovery2' AND xtype='U'
+        ) THEN 1 ELSE 0 END AS TableExists
+      `)
+    
+    const tableExists = tableCheck.recordset[0].TableExists === 1
+    console.log("[VERIFY TOKEN] ¿Tabla PasswordRecovery2 existe?", tableExists)
+    
+    if (!tableExists) {
+      console.log("[VERIFY TOKEN] Error: Tabla PasswordRecovery2 no existe")
+      return NextResponse.json(
+        { success: false, error: "Sistema de recuperación no configurado" },
+        { status: 500 }
+      )
+    }
 
     // Verificar si el token existe y no ha expirado
+    console.log("[VERIFY TOKEN] Buscando token en la base de datos:", token.substring(0, 10) + "...")
     const tokenResult = await db
       .request()
       .input("token", token)
@@ -26,6 +53,8 @@ export async function GET(req: Request) {
         WHERE token = @token AND expires > GETDATE()
       `)
 
+    console.log("[VERIFY TOKEN] Resultados encontrados:", tokenResult.recordset.length)
+    
     if (tokenResult.recordset.length === 0) {
       console.log("[VERIFY TOKEN] Token inválido o expirado:", token.substring(0, 10) + "...")
       return NextResponse.json(
@@ -34,6 +63,8 @@ export async function GET(req: Request) {
       )
     }
 
+    console.log("[VERIFY TOKEN] Token válido para usuario:", tokenResult.recordset[0].memb___id)
+    
     // Token válido
     return NextResponse.json(
       { 
