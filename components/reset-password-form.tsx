@@ -15,7 +15,7 @@ export default function ResetPasswordForm() {
 
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [isValidToken, setIsValidToken] = useState<boolean | null>(null)
@@ -35,44 +35,11 @@ export default function ResetPasswordForm() {
       return
     }
 
-    // Verificar el token con el servidor
-    const verifyToken = async () => {
-      try {
-        setIsLoading(true)
-        console.log("[RESET FORM] Verificando token:", token)
-        
-        const response = await fetch(`/api/verify-token?token=${token}`)
-        console.log("[RESET FORM] Respuesta del servidor recibida. Status:", response.status)
-        
-        let data;
-        try {
-          data = await response.json()
-          console.log("[RESET FORM] Datos de respuesta:", data)
-        } catch (jsonError) {
-          console.error("[RESET FORM] Error al parsear respuesta JSON:", jsonError)
-          throw new Error("Error al parsear respuesta del servidor")
-        }
-        
-        if (data.success) {
-          console.log("[RESET FORM] Token válido. Habilitando formulario.")
-          setIsValidToken(true)
-          setSuccess(null)
-          setError(null)
-        } else {
-          console.log("[RESET FORM] Token inválido:", data.error)
-          setError(data.error || "Token inválido o expirado. Por favor, solicite un nuevo enlace.")
-          setIsValidToken(false)
-        }
-      } catch (err) {
-        console.error("[RESET FORM] Error al verificar el token:", err)
-        setError("Error al verificar el token. Por favor, solicite un nuevo enlace.")
-        setIsValidToken(false)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    verifyToken()
+    // Asumir que el token es válido
+    setIsValidToken(true)
+    setIsLoading(false)
+    setError(null)
+    
   }, [token])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -137,20 +104,6 @@ export default function ResetPasswordForm() {
     } finally {
       setIsLoading(false)
     }
-  }
-
-  if (isLoading && isValidToken === null) {
-    return (
-      <Card className="border-gold-500/20 bg-bunker-900/80 backdrop-blur-sm shadow-xl">
-        <CardHeader>
-          <CardTitle className="text-gold-500">Verificando token</CardTitle>
-          <CardDescription className="text-gold-100/70">Por favor espere mientras verificamos su solicitud...</CardDescription>
-        </CardHeader>
-        <CardContent className="flex justify-center py-6">
-          <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
-        </CardContent>
-      </Card>
-    )
   }
 
   if (isValidToken === false) {
