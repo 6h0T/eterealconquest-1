@@ -29,7 +29,7 @@ export async function POST(req: Request) {
       .input("token", token)
       .query(`
         SELECT TOP 1 * FROM PasswordRecovery2
-        WHERE token = @token AND expires > GETUTCDATE()
+        WHERE token = @token AND expires > DATEADD(HOUR, -3, GETDATE())
       `)
 
     if (tokenResult.recordset.length === 0) {
