@@ -33,32 +33,47 @@ export async function POST(req: Request) {
       `)
 
     if (tokenResult.recordset.length === 0) {
+      console.log("Token no encontrado en la base de datos:", token.substring(0, 10) + "...")
       return NextResponse.json({ 
         success: false, 
-        error: "Token inválido o expirado" 
+        error: "Token no encontrado. Por favor solicita un nuevo enlace de recuperación." 
       }, { status: 400 })
     }
 
     const userId = tokenResult.recordset[0].memb___id
+    console.log("Usuario encontrado para reseteo de contraseña:", userId)
 
-    // Actualizar la contraseña
-    await db
-      .request()
-      .input("userId", userId)
-      .input("password", password)
-      .query(`
-        UPDATE MEMB_INFO
-        SET memb__pwd = @password
-        WHERE memb___id = @userId
-      `)
+    try {
+      // Actualizar la contraseña
+      await db
+        .request()
+        .input("userId", userId)
+        .input("password", password)
+        .query(`
+          UPDATE MEMB_INFO
+          SET memb__pwd = @password
+          WHERE memb___id = @userId
+        `)
+    } catch (updateError) {
+      console.error("Error al actualizar la contraseña:", updateError)
+      return NextResponse.json({ 
+        success: false, 
+        error: "Error al actualizar la contraseña. Verifica que el usuario exista." 
+      }, { status: 500 })
+    }
 
-    // Eliminar el token usado
-    await db
-      .request()
-      .input("token", token)
-      .query(`
-        DELETE FROM PasswordRecovery2 WHERE token = @token
-      `)
+    try {
+      // Eliminar el token usado
+      await db
+        .request()
+        .input("token", token)
+        .query(`
+          DELETE FROM PasswordRecovery2 WHERE token = @token
+        `)
+    } catch (deleteError) {
+      console.error("Error al eliminar el token usado:", deleteError)
+      // No retornamos error aquí porque la contraseña ya se actualizó
+    }
 
     return NextResponse.json({ 
       success: true, 

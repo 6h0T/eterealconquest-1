@@ -30,14 +30,7 @@ export default function ResetPasswordForm() {
       return
     }
 
-    if (token.length < 10) {
-      setError("Token inválido. Por favor, solicite un nuevo enlace de recuperación.")
-      setIsValidToken(false)
-      setIsLoading(false)
-      return
-    }
-
-    // Asumir que el token es válido
+    // Siempre considerar el token como válido si existe
     setIsValidToken(true)
     setIsLoading(false)
     
