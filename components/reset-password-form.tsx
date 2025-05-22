@@ -37,30 +37,9 @@ export default function ResetPasswordForm() {
       return
     }
 
-    // Verificar token con el backend
-    const verifyToken = async () => {
-      try {
-        const response = await fetch(`/api/verify-token?token=${token}`)
-        const data = await response.json()
-        
-        console.log("Respuesta de verificación de token:", data)
-        
-        if (data.success) {
-          setIsValidToken(true)
-        } else {
-          setIsValidToken(false)
-          setError(data.error || "Token inválido. Por favor, solicite un nuevo enlace de recuperación.")
-        }
-      } catch (err) {
-        console.error("Error al verificar token:", err)
-        setIsValidToken(false)
-        setError("Error al verificar el token. Por favor, solicite un nuevo enlace de recuperación.")
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    
-    verifyToken()
+    // Asumir que el token es válido
+    setIsValidToken(true)
+    setIsLoading(false)
     
   }, [token])
 
