@@ -45,7 +45,7 @@ export async function POST(req: Request) {
         VALUES (@email, @token, @memb___id, @expires)
       `)
 
-    // Usar una URL relativa en lugar de absoluta
+    // Generar el enlace de restablecimiento sin [lang]
     const resetLink = `/restablecer?token=${token}`
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || ""
     const fullResetLink = baseUrl + resetLink
@@ -54,7 +54,49 @@ export async function POST(req: Request) {
       from: "no-reply@mu-occidental.com",
       to: email,
       subject: "Restablece tu contraseña",
-      html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><p><a href="${fullResetLink}">${fullResetLink}</a></p>`,
+      html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { background-color: #1a1a1a; color: #ffffff; font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .content { background-color: #1a1a1a; padding: 20px; border-radius: 5px; }
+    .button { display: inline-block; background-color: #FFD700; color: #000000 !important; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; margin: 20px 0; }
+    .user-id { color: #FFD700; font-weight: bold; }
+    .link { color: #FFD700; word-break: break-all; }
+    .warning-text { color: #ffffff; margin-top: 20px; }
+    .warning-icon { margin-right: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="content">
+      <p>Hola <span class="user-id">${userId}</span>,</p>
+      <p>Has solicitado restablecer tu contraseña en MU Eterealconquest.</p>
+      <p>Para continuar con el proceso, haz clic en el siguiente botón:</p>
+      
+      <div style="text-align: center;">
+        <a href="${fullResetLink}" class="button">Restablecer Contraseña</a>
+      </div>
+      
+      <p>Si el botón no funciona, copia y pega este enlace en tu navegador:</p>
+      <p class="link">${fullResetLink}</p>
+      
+      <div class="warning-text">
+        <span class="warning-icon">⚠️</span>
+        <span>Este enlace expirará en 1 hora por razones de seguridad.</span>
+      </div>
+      
+      <div style="margin-top: 20px;">
+        <span class="warning-icon">🔒</span>
+        <span>Si no solicitaste este cambio, puedes ignorar este mensaje. Tu cuenta permanece segura.</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+      `,
     })
 
     return NextResponse.json({ success: true, message: "Correo de recuperación enviado" })

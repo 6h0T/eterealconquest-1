@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { AlertCircle, CheckCircle } from "lucide-react"
+import { AlertCircle, CheckCircle, Loader2 } from "lucide-react"
 
 export default function ResetPasswordForm() {
   const router = useRouter()
@@ -97,58 +97,62 @@ export default function ResetPasswordForm() {
   }
 
   return (
-    <Card className="border-gold-500/50">
+    <Card className="border-gold-500/20 bg-bunker-950/60 backdrop-blur-sm shadow-xl">
       <CardHeader>
-        <CardTitle className="text-gold-500">Crear nueva contraseña</CardTitle>
-        <CardDescription>Ingrese su nueva contraseña para restablecer su cuenta</CardDescription>
+        <CardTitle className="text-gold-500 text-2xl">Crear nueva contraseña</CardTitle>
+        <CardDescription className="text-gray-300">Ingrese su nueva contraseña para restablecer su cuenta</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-              <span className="block sm:inline">{error}</span>
+            <div className="bg-red-900/40 border border-red-500/50 text-red-200 px-4 py-3 rounded">
+              <span>{error}</span>
             </div>
           )}
+          
           {success && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative flex items-center">
+            <div className="bg-green-900/40 border border-green-500/50 text-green-200 px-4 py-3 rounded flex items-center">
               <CheckCircle className="mr-2" />
-              <span className="block sm:inline">{success}</span>
+              <span>{success}</span>
             </div>
           )}
+          
           <div className="space-y-2">
-            <Label htmlFor="password">Nueva contraseña</Label>
+            <Label htmlFor="password" className="text-gray-300">Nueva contraseña</Label>
             <Input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              disabled={isLoading || !!success}
-              className="border-bunker-300"
+              disabled={isLoading}
+              className="bg-bunker-900/80 border-gold-500/20 focus:border-gold-400 text-white"
             />
           </div>
+          
           <div className="space-y-2">
-            <Label htmlFor="confirm-password">Confirmar contraseña</Label>
+            <Label htmlFor="confirm-password" className="text-gray-300">Confirmar contraseña</Label>
             <Input
               id="confirm-password"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              disabled={isLoading || !!success}
-              className="border-bunker-300"
+              disabled={isLoading}
+              className="bg-bunker-900/80 border-gold-500/20 focus:border-gold-400 text-white"
             />
           </div>
         </CardContent>
+        
         <CardFooter>
           <Button
             type="submit"
-            className="w-full bg-gold-500 hover:bg-gold-600 text-black"
-            disabled={isLoading || !!success}
+            className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-medium h-12"
+            disabled={isLoading}
           >
             {isLoading ? (
               <>
-                <span className="animate-spin mr-2">⟳</span>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Procesando...
               </>
             ) : (
