@@ -70,9 +70,9 @@ export async function GET(req: Request) {
       .request()
       .input("token", token)
       .query(`
-        SELECT TOP 1 *, GETDATE() as current_date 
+        SELECT TOP 1 *, GETUTCDATE() as current_date 
         FROM PasswordRecovery2
-        WHERE token = @token AND expires > GETDATE()
+        WHERE token = @token AND expires > GETUTCDATE()
       `)
 
     console.log("[VERIFY TOKEN] ¿Token válido con fecha?", expiredCheck.recordset.length > 0)

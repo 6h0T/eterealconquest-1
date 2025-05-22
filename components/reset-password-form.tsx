@@ -15,7 +15,7 @@ export default function ResetPasswordForm() {
 
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [isValidToken, setIsValidToken] = useState<boolean | null>(null)
@@ -26,19 +26,41 @@ export default function ResetPasswordForm() {
     if (!token) {
       setError("Token no proporcionado. Por favor, solicite un nuevo enlace de recuperación.")
       setIsValidToken(false)
+      setIsLoading(false)
       return
     }
 
     if (token.length < 10) {
       setError("Token inválido. Por favor, solicite un nuevo enlace de recuperación.")
       setIsValidToken(false)
+      setIsLoading(false)
       return
     }
 
-    // Asumir que el token es válido
-    setIsValidToken(true)
-    setIsLoading(false)
-    setError(null)
+    // Verificar token con el backend
+    const verifyToken = async () => {
+      try {
+        const response = await fetch(`/api/verify-token?token=${token}`)
+        const data = await response.json()
+        
+        console.log("Respuesta de verificación de token:", data)
+        
+        if (data.success) {
+          setIsValidToken(true)
+        } else {
+          setIsValidToken(false)
+          setError(data.error || "Token inválido. Por favor, solicite un nuevo enlace de recuperación.")
+        }
+      } catch (err) {
+        console.error("Error al verificar token:", err)
+        setIsValidToken(false)
+        setError("Error al verificar el token. Por favor, solicite un nuevo enlace de recuperación.")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
+    verifyToken()
     
   }, [token])
 
@@ -106,6 +128,19 @@ export default function ResetPasswordForm() {
     }
   }
 
+  if (isLoading && isValidToken === null) {
+    return (
+      <Card className="border-gold-500/20 bg-bunker-900/80 backdrop-blur-sm shadow-xl">
+        <CardHeader>
+          <CardTitle className="text-gold-500">Validando token...</CardTitle>
+        </CardHeader>
+        <CardContent className="flex justify-center py-6">
+          <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
+        </CardContent>
+      </Card>
+    )
+  }
+
   if (isValidToken === false) {
     return (
       <Card className="border-red-500 bg-bunker-900/80 backdrop-blur-sm shadow-xl">
@@ -158,6 +193,7 @@ export default function ResetPasswordForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={isLoading}
               className="bg-bunker-800 border-gold-500/30 focus:border-gold-400 text-gold-100"
             />
           </div>
@@ -170,6 +206,7 @@ export default function ResetPasswordForm() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
+              disabled={isLoading}
               className="bg-bunker-800 border-gold-500/30 focus:border-gold-400 text-gold-100"
             />
           </div>
