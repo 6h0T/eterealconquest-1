@@ -24,7 +24,7 @@ export default function FeaturesPage({ params }: { params: { lang: Locale } }) {
   const getGalleryItems = () => {
     return [
       {
-        image: `/placeholder.svg?height=800&width=600&query=fantasy game graphics engine update vertical`,
+        image: "https://i.imgur.com/I1nqMRc.jpeg",
         text: lang === "es" 
           ? "¡Motor Gráfico Modernizado y Actualizado!" 
           : lang === "en" 
@@ -38,7 +38,7 @@ export default function FeaturesPage({ params }: { params: { lang: Locale } }) {
             : "Otimização gráfica de última geração! Renovamos o motor gráfico para oferecer uma experiência fluida real. Quando você começar sua aventura, desfrutará de um Mu Online totalmente diferente! 🎨 Interface redesenhada, efeitos aprimorados e um jogo mais moderno do que nunca.",
       },
       {
-        image: `/placeholder.svg?height=800&width=600&query=fantasy game pvp vertical`,
+        image: "https://i.imgur.com/VinmmZR.jpeg",
         text: lang === "es" 
           ? "Rework de Habilidades: PvP Rediseñado" 
           : lang === "en" 
@@ -52,7 +52,7 @@ export default function FeaturesPage({ params }: { params: { lang: Locale } }) {
             : "O combate evolui. Novas habilidades, ajustes chave e um foco total no PvP. Cada classe se sente mais poderosa, estratégica e única do que nunca.",
       },
       {
-        image: `/placeholder.svg?height=800&width=600&query=fantasy game rarity system vertical`,
+        image: "https://i.imgur.com/7fiwQ3P.jpeg",
         text: lang === "es" 
           ? "SISTEMA EXCLUSIVO DE RAREZA!" 
           : lang === "en" 
@@ -66,7 +66,7 @@ export default function FeaturesPage({ params }: { params: { lang: Locale } }) {
             : "O comércio e a progressão atingem uma nova dimensão graças ao sistema de raridade de itens. Cada peça não pertence mais apenas a um tier específico, mas agora é classificada de acordo com sua raridade: <strong>Normal, Uncommon, Rare, Epic e Legendary</strong>. A raridade não define apenas o poder, mas também o prestígio. Obter itens Legendários será um símbolo de dedicação e habilidade, consolidando seu portador como um verdadeiro conquistador!.",
       },
       {
-        image: `/placeholder.svg?height=800&width=600&query=fantasy game dungeon vertical`,
+        image: "https://i.imgur.com/vz5vQgT.jpeg",
         text: lang === "es" 
           ? "Nuevo Sistema de Dungeons" 
           : lang === "en"

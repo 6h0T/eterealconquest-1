@@ -57,7 +57,7 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
   // Define gallery items with game screenshots
   const galleryItems = [
     {
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1-H04lYZFyOTea5WMZJa9FO3vwP7860g.png",
+      image: "https://i.imgur.com/I1nqMRc.jpeg",
       text: lang === "es" 
         ? "¡Motor Gráfico Modernizado y Actualizado!" 
         : lang === "pt" 
@@ -71,7 +71,7 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
           : "State-of-the-art graphic optimization! We have renewed the graphic engine to offer a real fluid experience. Once you start your adventure, you will enjoy a completely distinctive Mu Online! 🎨 Redesigned interface, improved effects, and a more modern game than ever.",
     },
     {
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2%20%281%29-wYZAAb03xIYLXEwxxbXq6fHp5JlZII.png",
+      image: "https://i.imgur.com/VinmmZR.jpeg",
       text: lang === "es" 
         ? "Rework de Habilidades: PvP Rediseñado" 
         : lang === "pt" 
@@ -85,7 +85,7 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
           : "Combat evolves. New skills, key adjustments, and a total focus on PvP. Each class feels more powerful, strategic, and unique than ever.",
     },
     {
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/3-IMpdmH8t4v8nSQz35ay2qu1Zqc75gf.png",
+      image: "https://i.imgur.com/7fiwQ3P.jpeg",
       text: lang === "es" 
         ? "SISTEMA EXCLUSIVO DE RAREZA!" 
         : lang === "pt" 
@@ -99,7 +99,7 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
           : "Trading and progression reach a new dimension thanks to the item rarity system. Each piece no longer just belongs to a specific tier, but is now classified according to its rarity: <strong>Normal, Uncommon, Rare, Epic and Legendary</strong>. Rarity not only defines power, but also prestige. Obtaining Legendary items will be a symbol of dedication and skill, establishing its bearer as a true conqueror!.",
     },
     {
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4-2r2V8To0sYVsoq6SLKxNKWlO0j6Lsv.png",
+      image: "https://i.imgur.com/vz5vQgT.jpeg",
       text: lang === "es" 
         ? "Nuevo Sistema de Dungeons" 
         : lang === "pt" 

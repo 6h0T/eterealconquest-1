@@ -282,7 +282,9 @@ export default function ArrowCarousel({ items }: ArrowCarouselProps) {
             const styles = getCardStyles(position)
 
             // Usar nuestra utilidad para obtener una URL válida
-            const imageUrl = getValidImageUrl(item.image, cardWidth, cardHeight, item.text)
+            const imageUrl = item.image.startsWith('/') && !item.image.startsWith('//') 
+              ? item.image // Si es una ruta absoluta pero no un protocolo, mantenerla como está
+              : getValidImageUrl(item.image, cardWidth, cardHeight, item.text)
 
             return (
               <motion.div
