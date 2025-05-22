@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -51,35 +53,22 @@ export function RecuperacionForm({ lang }: RecuperacionFormProps) {
     setError(null)
 
     try {
-      console.log("Enviando solicitud de recuperación para:", email)
-      
       const res = await fetch("/api/recover-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       })
 
-      let data;
-      try {
-        data = await res.json();
-      } catch (jsonError) {
-        console.error("Error al parsear respuesta JSON:", jsonError);
-        throw new Error(t.errorDefault);
-      }
+      const data = await res.json()
 
-      // Verificar si la respuesta es exitosa
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || t.errorDefault);
-      }
+      if (!res.ok) throw new Error(data.error || t.errorDefault)
 
-      console.log("Respuesta del servidor:", data);
-      setMessage(data.message || t.successMessage);
-      setEmail("");
+      setMessage(t.successMessage)
+      setEmail("")
     } catch (err: any) {
-      console.error("Error en recuperación:", err);
-      setError(err.message || t.errorDefault);
+      setError(err.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
