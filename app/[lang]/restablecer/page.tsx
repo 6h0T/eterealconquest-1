@@ -9,11 +9,13 @@ export default function ResetPasswordPage() {
       {/* Fondo con video de Vimeo */}
       <VimeoBackground videoId="1074465089" />
       
-      <div className="container mx-auto px-4">
-        <div className="max-w-md mx-auto">
+      <div className="container mx-auto px-4 relative z-20">
+        <div className="max-w-md mx-auto relative z-30">
           <h1 className="text-2xl font-bold text-center mb-6 gold-gradient-text">Restablecer Contraseña</h1>
           <Suspense fallback={<div>Cargando...</div>}>
-            <ResetPasswordForm />
+            <div className="relative z-40">
+              <ResetPasswordForm />
+            </div>
           </Suspense>
         </div>
       </div>
