@@ -42,8 +42,8 @@ export default function OnlineBadgeSimple() {
     // Cargar datos inmediatamente al montar el componente
     fetchOnline()
 
-    // Actualizar cada 4 minutos (240000 ms) en lugar de 15 segundos
-    const interval = setInterval(fetchOnline, 240000)
+    // Actualizar cada 2 minutos (120000 ms) en lugar de 4 minutos
+    const interval = setInterval(fetchOnline, 120000)
     return () => clearInterval(interval)
   }, [])
 
