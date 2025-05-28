@@ -11,6 +11,7 @@ import { i18n } from "@/i18n/config"
 import { getDictionary } from "@/i18n/config"
 import { setCookie } from "cookies-next"
 import OnlineBadgeSimple from "@/components/online-badge-simple"
+import { MobileNavbar } from "@/components/mobile-navbar"
 
 interface NavbarProps {
   lang: Locale
@@ -98,23 +99,31 @@ export function Navbar({ lang }: NavbarProps) {
   // Si estamos cargando, mostrar un esqueleto
   if (isLoading) {
     return (
-      <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
-        <div className="navbar-container">
-          <div className="navbar-left">
-            <div className="w-36 h-10 bg-bunker-800 animate-pulse rounded"></div>
-          </div>
-          <div className="flex-1 flex justify-center">
-            <div className="flex space-x-4">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="w-24 h-8 bg-bunker-800 animate-pulse rounded"></div>
-              ))}
+      <>
+        {/* Navbar móvil */}
+        <div className="block lg:hidden">
+          <MobileNavbar lang={lang} />
+        </div>
+        
+        {/* Navbar escritorio */}
+        <nav className={`hidden lg:block navbar ${scrolled ? "scrolled" : ""}`}>
+          <div className="navbar-container">
+            <div className="navbar-left">
+              <div className="w-36 h-10 bg-bunker-800 animate-pulse rounded"></div>
+            </div>
+            <div className="flex-1 flex justify-center">
+              <div className="flex space-x-4">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="w-24 h-8 bg-bunker-800 animate-pulse rounded"></div>
+                ))}
+              </div>
+            </div>
+            <div className="navbar-right">
+              <div className="w-24 h-10 bg-bunker-800 animate-pulse rounded"></div>
             </div>
           </div>
-          <div className="navbar-right">
-            <div className="w-24 h-10 bg-bunker-800 animate-pulse rounded"></div>
-          </div>
-        </div>
-      </nav>
+        </nav>
+      </>
     )
   }
 
@@ -184,141 +193,94 @@ export function Navbar({ lang }: NavbarProps) {
   ]
 
   return (
-    <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
-      <div className="navbar-container">
-        <div className="navbar-left">
-          <Link href={`/${lang}`} className="navbar-logo">
-            <img
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ICONO-OFICIAL-13-3gGmj2RPNX7685QOkTM5PzyDPjnwdn.png"
-              alt="ETEREALCONQUEST - S6EP3"
-              width={75}
-              height={75}
-              className="h-16 w-auto object-contain"
-            />
-          </Link>
-
-          <div className="flex items-center gap-6">
-            <OnlineBadgeSimple />
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div className="language-selector font-trade-winds">
-                  <Globe className="h-4 w-4 mr-1" />
-                  <span className="hidden sm:inline">{lang.toUpperCase()}</span>
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-bunker-800 border-gold-700/50">
-                {languages.map((language) => (
-                  <DropdownMenuItem
-                    key={language.code}
-                    className={`w-full cursor-pointer ${
-                      lang === language.code ? "text-gold-400" : "text-gold-100 hover:text-gold-300"
-                    }`}
-                    onClick={() => changeLanguage(language.code)}
-                  >
-                    {language.name}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-
-        <button
-          className="mobile-menu-button"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
-        >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-
-        <div className="radio-inputs-desktop">
-          {navItems.map((item) => (
-            <label className="radio" key={item.href}>
-              <input
-                type="radio"
-                name="navbar-radio"
-                checked={pathname === item.href.split("#")[0]}
-                onChange={() => {
-                  // Este onChange es necesario para React pero no hace nada
-                }}
-              />
-              <a
-                href={item.href}
-                onClick={(e) => {
-                  e.preventDefault()
-                  handleNavigation(item.href, item.isAnchor, item.isCenteredSection)
-                }}
-              >
-                <span className="name font-trade-winds">{item.name}</span>
-              </a>
-            </label>
-          ))}
-        </div>
-
-        <div className="navbar-right">
-          {dictionary && dictionary.navbar && (
-            <>
-              {isAuthenticated ? (
-                <Link href={`/${lang}/panel`}>
-                  <Button className="button-secondary hidden md:inline-flex">
-                    <User className="h-4 w-4 mr-2" />
-                    Panel de Usuario
-                  </Button>
-                </Link>
-              ) : (
-                <>
-                  <Link href={`/${lang}/inicio-sesion`}>
-                    <Button className="button-secondary hidden md:inline-flex">{dictionary.navbar.signin}</Button>
-                  </Link>
-                  <Link href={`/${lang}/registro`}>
-                    <button className="button hidden md:inline-flex">{dictionary.navbar.register}</button>
-                  </Link>
-                </>
-              )}
-            </>
-          )}
-        </div>
+    <>
+      {/* Navbar móvil */}
+      <div className="block lg:hidden">
+        <MobileNavbar lang={lang} />
       </div>
+      
+      {/* Navbar escritorio */}
+      <nav className={`hidden lg:block navbar ${scrolled ? "scrolled" : ""}`}>
+        <div className="navbar-container">
+          <div className="navbar-left">
+            <Link href={`/${lang}`} className="navbar-logo">
+              <img
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ICONO-OFICIAL-13-3gGmj2RPNX7685QOkTM5PzyDPjnwdn.png"
+                alt="ETEREALCONQUEST - S6EP3"
+                width={75}
+                height={75}
+                className="h-16 w-auto object-contain"
+              />
+            </Link>
 
-      {/* Menú móvil */}
-      <div className={`mobile-menu ${isOpen ? "open" : ""}`}>
-        <div className="mobile-menu-items">
-          {navItems.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className={`mobile-menu-item font-trade-winds ${pathname === item.href.split("#")[0] ? "active" : ""}`}
-              onClick={(e) => {
-                e.preventDefault()
-                handleNavigation(item.href, item.isAnchor, item.isCenteredSection)
-                setIsOpen(false)
-              }}
-            >
-              {item.name}
-            </a>
-          ))}
-          <div className="mobile-menu-buttons">
+            <div className="flex items-center gap-6">
+              <OnlineBadgeSimple />
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className="language-selector font-trade-winds">
+                    <Globe className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">{lang.toUpperCase()}</span>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-bunker-800 border-gold-700/50">
+                  {languages.map((language) => (
+                    <DropdownMenuItem
+                      key={language.code}
+                      className={`w-full cursor-pointer ${
+                        lang === language.code ? "text-gold-400" : "text-gold-100 hover:text-gold-300"
+                      }`}
+                      onClick={() => changeLanguage(language.code)}
+                    >
+                      {language.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+
+          <div className="radio-inputs-desktop">
+            {navItems.map((item) => (
+              <label className="radio" key={item.href}>
+                <input
+                  type="radio"
+                  name="navbar-radio"
+                  checked={pathname === item.href.split("#")[0]}
+                  onChange={() => {
+                    // Este onChange es necesario para React pero no hace nada
+                  }}
+                />
+                <a
+                  href={item.href}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleNavigation(item.href, item.isAnchor, item.isCenteredSection)
+                  }}
+                >
+                  <span className="name font-trade-winds">{item.name}</span>
+                </a>
+              </label>
+            ))}
+          </div>
+
+          <div className="navbar-right">
             {dictionary && dictionary.navbar && (
               <>
                 {isAuthenticated ? (
-                  <Link href={`/${lang}/panel`} className="w-full">
-                    <Button className="button-secondary w-full mb-2" onClick={() => setIsOpen(false)}>
+                  <Link href={`/${lang}/panel`}>
+                    <Button className="button-secondary">
                       <User className="h-4 w-4 mr-2" />
                       Panel de Usuario
                     </Button>
                   </Link>
                 ) : (
                   <>
-                    <Link href={`/${lang}/inicio-sesion`} className="w-full">
-                      <Button className="button-secondary w-full mb-2" onClick={() => setIsOpen(false)}>
-                        {dictionary.navbar.signin}
-                      </Button>
+                    <Link href={`/${lang}/inicio-sesion`}>
+                      <Button className="button-secondary">{dictionary.navbar.signin}</Button>
                     </Link>
-                    <Link href={`/${lang}/registro`} className="w-full">
-                      <button className="button w-full" onClick={() => setIsOpen(false)}>
-                        {dictionary.navbar.register}
-                      </button>
+                    <Link href={`/${lang}/registro`}>
+                      <button className="button">{dictionary.navbar.register}</button>
                     </Link>
                   </>
                 )}
@@ -326,7 +288,7 @@ export function Navbar({ lang }: NavbarProps) {
             )}
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </>
   )
 }

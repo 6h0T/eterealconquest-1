@@ -12,8 +12,11 @@ import type { Locale } from "@/i18n/config"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import Link from "next/link"
 import { getRecaptchaConfig } from "@/lib/actions"
+import { TermsModal } from "@/components/terms-modal"
+import { RulesModal } from "@/components/rules-modal"
 
 interface RegistroFormProps {
   lang: Locale
@@ -32,6 +35,10 @@ export function RegistroForm({ lang }: RegistroFormProps) {
     enabled: false,
     siteKey: "",
   })
+  const [termsAccepted, setTermsAccepted] = useState(false)
+  const [showTermsModal, setShowTermsModal] = useState(false)
+  const [rulesAccepted, setRulesAccepted] = useState(false)
+  const [showRulesModal, setShowRulesModal] = useState(false)
   const router = useRouter()
 
   // Cargar diccionario y la configuración de reCAPTCHA
@@ -114,6 +121,12 @@ export function RegistroForm({ lang }: RegistroFormProps) {
       validationError: "Error de validación. Por favor, verifica los datos ingresados.",
       verificationSent: "¡Registro iniciado! Revisa tu correo electrónico para verificar tu cuenta.",
       checkEmail: "Revisa tu bandeja de entrada y haz clic en el enlace de verificación para completar tu registro.",
+      termsAcceptance: "Acepto los",
+      termsAndConditions: "Términos y Condiciones",
+      termsRequired: "Debes aceptar los términos y condiciones para continuar",
+      rulesAcceptance: "Acepto el",
+      gameRules: "Reglamento de Juego",
+      rulesRequired: "Debes aceptar el reglamento de juego para continuar",
     },
     en: {
       username: "Username",
@@ -145,6 +158,12 @@ export function RegistroForm({ lang }: RegistroFormProps) {
       validationError: "Validation error. Please check your input data.",
       verificationSent: "Registration started! Check your email to verify your account.",
       checkEmail: "Check your inbox and click the verification link to complete your registration.",
+      termsAcceptance: "I accept the",
+      termsAndConditions: "Terms and Conditions",
+      termsRequired: "You must accept the terms and conditions to continue",
+      rulesAcceptance: "I accept the",
+      gameRules: "Game Rules",
+      rulesRequired: "You must accept the game rules to continue",
     },
     pt: {
       username: "Nome de usuário",
@@ -176,6 +195,12 @@ export function RegistroForm({ lang }: RegistroFormProps) {
       validationError: "Erro de validação. Por favor, verifique os dados inseridos.",
       verificationSent: "Registro iniciado! Verifique seu email para verificar sua conta.",
       checkEmail: "Verifique sua caixa de entrada e clique no link de verificação para completar seu registro.",
+      termsAcceptance: "Aceito os",
+      termsAndConditions: "Termos e Condições",
+      termsRequired: "Você deve aceitar os termos e condições para continuar",
+      rulesAcceptance: "Aceito o",
+      gameRules: "Regulamento do Jogo",
+      rulesRequired: "Você deve aceitar o regulamento do jogo para continuar",
     },
   }
 
@@ -188,6 +213,12 @@ export function RegistroForm({ lang }: RegistroFormProps) {
       email: z.string().email(t.emailInvalid),
       password: z.string().min(6, t.passwordLength),
       passwordConfirm: z.string().min(1, t.passwordRequired),
+      termsAccepted: z.boolean().refine((val) => val === true, {
+        message: t.termsRequired,
+      }),
+      rulesAccepted: z.boolean().refine((val) => val === true, {
+        message: t.rulesRequired,
+      }),
     })
     .refine((data) => data.password === data.passwordConfirm, {
       message: t.passwordMismatch,
@@ -199,6 +230,8 @@ export function RegistroForm({ lang }: RegistroFormProps) {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
+    watch,
   } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -206,13 +239,33 @@ export function RegistroForm({ lang }: RegistroFormProps) {
       email: "",
       password: "",
       passwordConfirm: "",
+      termsAccepted: false,
+      rulesAccepted: false,
     },
   })
+
+  // Observar el valor de termsAccepted y rulesAccepted
+  const watchedTermsAccepted = watch("termsAccepted")
+  const watchedRulesAccepted = watch("rulesAccepted")
 
   // Manejar envío del formulario
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsSubmitting(true)
     setSubmitError("")
+
+    // Verificar si los términos han sido aceptados
+    if (!data.termsAccepted) {
+      setSubmitError(t.termsRequired)
+      setIsSubmitting(false)
+      return
+    }
+
+    // Verificar si el reglamento ha sido aceptado
+    if (!data.rulesAccepted) {
+      setSubmitError(t.rulesRequired)
+      setIsSubmitting(false)
+      return
+    }
 
     try {
       // Eliminar la ejecución de reCAPTCHA
@@ -415,6 +468,70 @@ export function RegistroForm({ lang }: RegistroFormProps) {
               )}
             </div>
 
+            {/* Términos y Condiciones */}
+            <div className="space-y-1">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="termsAccepted"
+                  checked={watchedTermsAccepted}
+                  onCheckedChange={(checked) => {
+                    setValue("termsAccepted", !!checked)
+                    setTermsAccepted(!!checked)
+                  }}
+                  className="data-[state=checked]:bg-gold-600 data-[state=checked]:border-gold-600 border-gold-700/30"
+                  disabled={isSubmitting}
+                />
+                <Label htmlFor="termsAccepted" className="text-gold-300 text-sm cursor-pointer">
+                  {t.termsAcceptance}{" "}
+                  <button
+                    type="button"
+                    onClick={() => setShowTermsModal(true)}
+                    className="text-gold-500 hover:text-gold-400 underline font-medium"
+                  >
+                    {t.termsAndConditions}
+                  </button>
+                </Label>
+              </div>
+              {errors.termsAccepted && (
+                <p className="text-red-500 text-sm mt-1 flex items-center">
+                  <AlertCircle className="h-4 w-4 mr-1" />
+                  {errors.termsAccepted.message}
+                </p>
+              )}
+            </div>
+
+            {/* Reglamento de Juego */}
+            <div className="space-y-1">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="rulesAccepted"
+                  checked={watchedRulesAccepted}
+                  onCheckedChange={(checked) => {
+                    setValue("rulesAccepted", !!checked)
+                    setRulesAccepted(!!checked)
+                  }}
+                  className="data-[state=checked]:bg-gold-600 data-[state=checked]:border-gold-600 border-gold-700/30"
+                  disabled={isSubmitting}
+                />
+                <Label htmlFor="rulesAccepted" className="text-gold-300 text-sm cursor-pointer">
+                  {t.rulesAcceptance}{" "}
+                  <button
+                    type="button"
+                    onClick={() => setShowRulesModal(true)}
+                    className="text-gold-500 hover:text-gold-400 underline font-medium"
+                  >
+                    {t.gameRules}
+                  </button>
+                </Label>
+              </div>
+              {errors.rulesAccepted && (
+                <p className="text-red-500 text-sm mt-1 flex items-center">
+                  <AlertCircle className="h-4 w-4 mr-1" />
+                  {errors.rulesAccepted.message}
+                </p>
+              )}
+            </div>
+
             {/* Mensajes de éxito o error */}
             {submitSuccess && (
               <motion.div
@@ -476,6 +593,24 @@ export function RegistroForm({ lang }: RegistroFormProps) {
           </form>
         </CardContent>
       </Card>
+      
+      {/* Modal de Términos y Condiciones */}
+      <TermsModal
+        isOpen={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
+        lang={lang}
+        termsContent={dictionary?.registro?.termsContent || ""}
+        termsTitle={dictionary?.registro?.termsModalTitle || "Términos y Condiciones"}
+      />
+
+      {/* Modal de Reglamento de Juego */}
+      <RulesModal
+        isOpen={showRulesModal}
+        onClose={() => setShowRulesModal(false)}
+        lang={lang}
+        rulesContent={dictionary?.registro?.rulesContent || ""}
+        rulesTitle={dictionary?.registro?.rulesModalTitle || "Reglamento de Juego"}
+      />
     </>
   )
 }

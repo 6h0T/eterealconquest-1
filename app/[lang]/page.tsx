@@ -7,10 +7,12 @@ import { SectionDivider } from "@/components/section-divider"
 import { AltSectionDivider } from "@/components/alt-section-divider"
 import { VimeoScript } from "@/components/vimeo-script"
 import { VimeoBackground } from "@/components/vimeo-background"
+import { StaticBackground } from "@/components/static-background"
 import { characters } from "@/constants"
 import HomeNewsSection from "@/components/home-news-section"
 import { ClientDownloadButton } from "@/components/client-download-button"
 import ArrowCarousel from "@/components/arrow-carousel"
+import ServerInfoCarousel from "@/components/server-info-carousel"
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 
@@ -56,7 +58,7 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
     },
   }
 
-  // Define gallery items with game screenshots
+  // Define gallery items with game screenshots (para el carrusel original)
   const galleryItems = [
     {
       image: "https://i.imgur.com/I1nqMRc.jpeg",
@@ -166,10 +168,17 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
         {/* Divisor después del hero - como elemento independiente */}
         <AltSectionDivider />
 
-        {/* Features Section with Arrow Carousel */}
+        {/* Server Info Section with different backgrounds for desktop/mobile */}
         <section id="info-section" className="py-16 relative">
-          {/* Fondo con video de Vimeo */}
-          <VimeoBackground videoId="1074464598" fallbackId="1074465089" />
+          {/* Fondo con video para escritorio */}
+          <div className="hidden md:block absolute inset-0">
+            <VimeoBackground videoId="1074464598" fallbackId="1074465089" />
+          </div>
+          {/* Fondo con imagen para móvil */}
+          <div className="block md:hidden absolute inset-0">
+            <StaticBackground />
+          </div>
+          
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-2">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold gold-gradient-text mb-4">
@@ -177,11 +186,18 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
               </h2>
             </div>
 
-            {/* Arrow Carousel Component */}
-            <ArrowCarousel items={galleryItems} />
+            {/* Arrow Carousel para escritorio */}
+            <div className="hidden md:block">
+              <ArrowCarousel items={galleryItems} />
+            </div>
+
+            {/* Server Info Carousel para móvil */}
+            <div className="block md:hidden">
+              <ServerInfoCarousel lang={lang} />
+            </div>
             
-            {/* Botón para ir a la página de información */}
-            <div className="flex justify-center mt-8">
+            {/* Botón para ir a la página de información - oculto en móvil */}
+            <div className="hidden md:flex justify-center mt-8">
               <Link 
                 href={`/${lang}/informacion`} 
                 className="golden-button"
@@ -195,10 +211,17 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
         {/* Divisor después de features section - como elemento independiente */}
         <AltSectionDivider />
 
-        {/* News Section */}
+        {/* News Section with different backgrounds for desktop/mobile */}
         <section id="news-section" className="py-16 relative">
-          {/* Fondo con video de Vimeo */}
-          <VimeoBackground videoId="1074465089" />
+          {/* Fondo con video para escritorio */}
+          <div className="hidden md:block absolute inset-0">
+            <VimeoBackground videoId="1074465089" />
+          </div>
+          {/* Fondo con imagen para móvil */}
+          <div className="block md:hidden absolute inset-0">
+            <StaticBackground />
+          </div>
+          
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-2">
             <HomeNewsSection lang={lang} translations={newsTranslations[lang as keyof typeof newsTranslations]} />
           </div>
@@ -216,10 +239,17 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
         {/* Divisor después de classes section - como elemento independiente */}
         <SectionDivider />
 
-        {/* CTA Section */}
+        {/* CTA Section with different backgrounds for desktop/mobile */}
         <section id="cta-section" className="min-h-[500px] flex items-center justify-center relative">
-          {/* Fondo con video de Vimeo */}
-          <VimeoBackground videoId="1074465089" />
+          {/* Fondo con video para escritorio */}
+          <div className="hidden md:block absolute inset-0">
+            <VimeoBackground videoId="1074465089" />
+          </div>
+          {/* Fondo con imagen para móvil */}
+          <div className="block md:hidden absolute inset-0">
+            <StaticBackground />
+          </div>
+          
           <div className="container w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-2 flex flex-col items-center justify-center text-center py-20">
             <div className="flex flex-col items-center justify-center space-y-8">
               <h2 className="text-3xl md:text-5xl font-bold gold-gradient-text">{dict.cta.title}</h2>
@@ -230,12 +260,9 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
             </div>
           </div>
         </section>
-
-        {/* Divisor después de la sección CTA - como elemento independiente */}
-        <SectionDivider />
       </div>
 
-      {/* Componente de cliente para manejar el modal */}
+      {/* Client Download Button */}
       <ClientDownloadButton lang={lang} />
     </>
   )

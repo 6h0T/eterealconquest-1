@@ -46,7 +46,8 @@ export function Footer({ lang }: FooterProps) {
   return (
     <footer className="bg-bunker-900 pt-12 pb-6">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row justify-center gap-16 max-w-3xl mx-auto">
+        {/* Layout para desktop - mantener original */}
+        <div className="hidden md:flex flex-col md:flex-row justify-center gap-16 max-w-3xl mx-auto">
           <div className="flex-1">
             <h3 className="text-gold-400 font-bold text-lg mb-4 text-center md:text-left">
               {dictionary.footer?.quickLinks}
@@ -79,6 +80,7 @@ export function Footer({ lang }: FooterProps) {
               </li>
             </ul>
           </div>
+          
           <div className="flex-1">
             <h3 className="text-gold-400 font-bold text-lg mb-4 text-center md:text-left">
               {dictionary.footer?.social}
@@ -114,7 +116,85 @@ export function Footer({ lang }: FooterProps) {
             </div>
           </div>
         </div>
-        <div className="mt-8 pt-8 text-center">
+
+        {/* Layout para móvil - una sola línea */}
+        <div className="md:hidden">
+          {/* Contenido en una línea con títulos alineados */}
+          <div className="flex justify-between items-start gap-4">
+            {/* Enlaces rápidos */}
+            <div className="flex-1 ml-20">
+              <h3 className="text-gold-400 font-bold text-base mb-4">
+                {dictionary.footer?.quickLinks}
+              </h3>
+              <ul className="space-y-1">
+                <li>
+                  <Link href={`/${lang}`} className="text-gold-100 hover:text-gold-300 transition-colors text-sm">
+                    {dictionary.navbar?.home}
+                  </Link>
+                </li>
+                <li>
+                  <Link href={`/${lang}/features`} className="text-gold-100 hover:text-gold-300 transition-colors text-sm">
+                    {dictionary.navbar?.features}
+                  </Link>
+                </li>
+                <li>
+                  <Link href={`/${lang}/noticias`} className="text-gold-100 hover:text-gold-300 transition-colors text-sm">
+                    {dictionary.navbar?.news}
+                  </Link>
+                </li>
+                <li>
+                  <Link href={`/${lang}/download`} className="text-gold-100 hover:text-gold-300 transition-colors text-sm">
+                    {dictionary.navbar?.download}
+                  </Link>
+                </li>
+                <li>
+                  <Link href={`/${lang}/ranking`} className="text-gold-100 hover:text-gold-300 transition-colors text-sm">
+                    {dictionary.navbar?.ranking}
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Redes sociales */}
+            <div className="flex-1">
+              <h3 className="text-gold-400 font-bold text-base mb-4">
+                {dictionary.footer?.social}
+              </h3>
+              <div className="flex flex-col space-y-2">
+                <a
+                  href="https://discord.gg/2pF7h7uvRU"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center text-gold-100 hover:text-gold-400 transition-colors text-sm"
+                >
+                  <FaDiscord className="h-4 w-4 mr-2" />
+                  <span>Discord</span>
+                </a>
+                <a
+                  href="https://www.facebook.com/eterealconquest"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center text-gold-100 hover:text-gold-400 transition-colors text-sm"
+                >
+                  <Facebook className="h-4 w-4 mr-2" />
+                  <span>Facebook</span>
+                </a>
+                <a
+                  href="https://www.instagram.com/eterealconquest.mu/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center text-gold-100 hover:text-gold-400 transition-colors text-sm"
+                >
+                  <Instagram className="h-4 w-4 mr-2" />
+                  <span>Instagram</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Copyright - igual para ambas versiones */}
+        <div className="mt-8 pt-8 border-t border-bunker-700 text-center">
           <p className="text-gold-200 text-sm">
             &copy; {year} ETEREALCONQUEST. {dictionary.footer?.allRightsReserved}.
           </p>

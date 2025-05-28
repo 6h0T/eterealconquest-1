@@ -651,7 +651,7 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
           {showContent && (
             <motion.div
               key={`bg-${activeCharacter.id}`}
-              className="absolute left-0 bottom-0 h-full w-1/2 z-5"
+              className="hidden md:block absolute left-0 bottom-0 h-full w-1/2 z-5"
               variants={characterImageVariants}
               initial="initial"
               animate="animate"
@@ -677,11 +677,11 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
         {/* Contenido principal con animaciones secuenciales */}
         <div className="relative z-20 w-full h-screen flex items-center justify-center">
           <div className="flex w-full max-w-6xl px-4">
-            {/* Selector de clases con iconos */}
+            {/* Selector de clases con iconos - Desktop */}
             <AnimatePresence>
               {showSelector && (
                 <motion.div
-                  className="flex-shrink-0 mr-8 self-center relative z-30"
+                  className="hidden md:flex flex-shrink-0 mr-8 self-center relative z-30"
                   variants={selectorVariants}
                   initial="hidden"
                   animate="visible"
@@ -745,9 +745,70 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
             <AnimatePresence mode="wait">
               {showContent && (
                 <div key={activeCharacter.id} className="flex-grow">
-                  {/* Imagen del encabezado con animación */}
+                  {/* Selector horizontal para móvil - en la parte superior */}
+                  <AnimatePresence>
+                    {showSelector && (
+                      <motion.div
+                        className="md:hidden absolute top-4 left-0 right-0 z-40 px-4"
+                        variants={selectorVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                      >
+                        <div className="flex items-center justify-center space-x-2 bg-bunker-800/90 backdrop-blur-sm rounded-lg p-3 border border-gold-700/30">
+                          <button
+                            onClick={moveUp}
+                            className="w-8 h-8 rounded-full bg-bunker-700/80 flex items-center justify-center text-gold-400 hover:bg-bunker-600 hover:text-gold-300 transition-colors flex-shrink-0"
+                            aria-label="Personaje anterior"
+                            disabled={isAnimating}
+                          >
+                            <ChevronUp size={16} />
+                          </button>
+
+                          <div className="flex space-x-2 overflow-x-auto scrollbar-hide">
+                            {characters.map((char, i) => (
+                              <div
+                                key={i}
+                                className={`relative cursor-pointer transition-all duration-300 flex-shrink-0 ${isAnimating ? "pointer-events-none" : ""}`}
+                                onClick={() => changeClass(i)}
+                              >
+                                <div
+                                  className={`w-10 h-10 rounded-full overflow-hidden border-2 transition-all duration-300 ${
+                                    i === activeIndex
+                                      ? "border-gold-500 shadow-lg shadow-gold-500/30"
+                                      : "border-transparent hover:border-gold-500/50"
+                                  }`}
+                                >
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <Image
+                                      src={char.img || "/placeholder.svg"}
+                                      alt={char.name}
+                                      width={40}
+                                      height={40}
+                                      className={`object-contain transition-transform duration-300 ${i === activeIndex ? "scale-110" : ""}`}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          <button
+                            onClick={moveDown}
+                            className="w-8 h-8 rounded-full bg-bunker-700/80 flex items-center justify-center text-gold-400 hover:bg-bunker-600 hover:text-gold-300 transition-colors flex-shrink-0"
+                            aria-label="Siguiente personaje"
+                            disabled={isAnimating}
+                          >
+                            <ChevronDown size={16} />
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Imagen del encabezado con animación - Solo desktop */}
                   <motion.div
-                    className="absolute left-0 top-0 w-1/2 h-32 md:h-40 mb-8 z-10 flex items-center justify-center"
+                    className="hidden md:block absolute left-0 top-0 w-1/2 h-32 md:h-40 mb-8 z-10 flex items-center justify-center"
                     variants={headerVariants}
                     initial="initial"
                     animate="animate"
@@ -765,11 +826,22 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
 
                   {/* Contenido principal */}
                   <div className="flex flex-col md:flex-row items-start justify-between gap-8">
-                    {/* Espacio vacío donde estaba la imagen para mantener el layout */}
-                    <div className="md:w-1/3">{/* Empty space to maintain layout */}</div>
+                    {/* Espacio vacío donde estaba la imagen para mantener el layout - Solo desktop */}
+                    <div className="hidden md:block md:w-1/3">{/* Empty space to maintain layout */}</div>
 
-                    {/* Descripción y video a la derecha */}
-                    <div className="md:w-2/3">
+                    {/* Descripción y video - Centrado en móvil */}
+                    <div className="w-full md:w-2/3 mt-20 md:mt-0 flex flex-col items-center">
+                      {/* Título de la clase para móvil */}
+                      <motion.h1
+                        className="md:hidden text-center text-2xl font-bold gold-gradient-text mb-4"
+                        variants={headerVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                      >
+                        {activeCharacter.name}
+                      </motion.h1>
+
                       {/* Encabezado de Abilities Rework */}
                       <motion.h2
                         className="text-center text-xl md:text-2xl font-bold text-gold-500 mb-3 border-b border-gold-500/30 pb-2"
@@ -780,9 +852,10 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
                       >
                         {dictionary.classes?.abilitiesRework || "Abilities Rework"}
                       </motion.h2>
-                      {/* Video con animación */}
+
+                      {/* Video con animación - Centrado */}
                       <motion.div
-                        className="relative w-full aspect-video bg-bunker-800/70 backdrop-blur-sm rounded-lg overflow-hidden cursor-pointer mb-4"
+                        className="relative w-full max-w-lg aspect-video bg-bunker-800/70 backdrop-blur-sm rounded-lg overflow-hidden cursor-pointer mb-4"
                         variants={videoVariants}
                         initial="initial"
                         animate="animate"
@@ -876,37 +949,36 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
 
                       {/* Skill icons section - Rediseñado para mostrar habilidades en horizontal */}
                       <motion.div
-                        className="p-4"
+                        className="w-full max-w-2xl mx-auto p-4"
                         variants={descriptionVariants}
                         initial="initial"
                         animate="animate"
                         exit="exit"
                       >
-                        <h3 className="text-gold-400 font-bold mb-3 flex items-center justify-center">Habilidades</h3>
+                        <h3 className="text-gold-400 font-bold mb-4 text-center text-lg">Habilidades</h3>
 
                         {/* Contenedor de iconos de habilidades centrados */}
                         <div className="flex justify-center items-center mb-6">
-                          <div className="flex flex-wrap justify-center gap-3 max-w-3xl">
+                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 w-full max-w-lg md:max-w-3xl">
                             {getSkillIcons().map((icon, index) => (
                               <div
                                 key={index}
-                                className={`flex flex-col items-center cursor-pointer transition-all duration-300 ${
+                                className={`flex flex-col items-center cursor-pointer transition-all duration-300 p-2 rounded-lg ${
                                   activeSkill === icon.id
-                                    ? "bg-gold-500/10 rounded-lg"
-                                    : "hover:bg-bunker-700/50 hover:rounded-lg"
+                                    ? "bg-gold-500/10 border border-gold-500/30"
+                                    : "hover:bg-bunker-700/50 border border-transparent hover:border-gold-700/20"
                                 }`}
                                 onClick={() => toggleSkill(icon.id)}
                               >
-                                <div className="w-[84px] h-[84px] relative flex-shrink-0 p-2">
+                                <div className="w-16 h-16 md:w-[84px] md:h-[84px] relative flex-shrink-0 mb-2">
                                   <Image
                                     src={icon.img || "/placeholder.svg"}
                                     alt={icon.id}
-                                    width={84}
-                                    height={84}
+                                    fill
                                     className="object-contain"
                                   />
                                 </div>
-                                <p className="text-gold-300 text-sm font-medium text-center px-1">
+                                <p className="text-gold-300 text-xs md:text-sm font-medium text-center leading-tight">
                                   {icon.id.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
                                 </p>
                               </div>
@@ -923,13 +995,13 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
                               initial="collapsed"
                               animate="expanded"
                               exit="exit"
-                              className="bg-bunker-900/70 p-3 rounded-lg border border-gold-600/20 mt-2 overflow-hidden"
+                              className="bg-bunker-900/70 p-4 rounded-lg border border-gold-600/20 mt-4 overflow-hidden mx-auto max-w-lg"
                             >
                               <div className="skill-description-content">
-                                <h4 className="text-gold-400 font-medium mb-1">
+                                <h4 className="text-gold-400 font-medium mb-2 text-center">
                                   {activeSkill.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
                                 </h4>
-                                <p className="text-gold-100">
+                                <p className="text-gold-100 text-sm md:text-base text-center">
                                   {skillDescriptions[activeSkill as keyof typeof skillDescriptions] ||
                                     "No hay descripción disponible para esta habilidad."}
                                 </p>
@@ -940,7 +1012,7 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
 
                         {/* Mensaje cuando no hay habilidades */}
                         {getSkillIcons().length === 0 && (
-                          <p className="text-gold-100/70 italic">No hay información de habilidades disponible.</p>
+                          <p className="text-gold-100/70 italic text-center">No hay información de habilidades disponible.</p>
                         )}
                       </motion.div>
                     </div>
@@ -971,6 +1043,16 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
         
         ::-webkit-scrollbar-thumb:hover {
           background: rgba(255, 215, 0, 0.7);
+        }
+
+        /* Ocultar scrollbar para el selector horizontal móvil */
+        .scrollbar-hide {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;  /* Chrome, Safari and Opera */
         }
         
         /* Estilos para la animación de la descripción de habilidades */
