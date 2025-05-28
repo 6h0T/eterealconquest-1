@@ -1,30 +1,7 @@
-# Fork of eterealconquest
-
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
-
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/6h0ts-projects/v0-fork-of-eterealconquest-k8)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/oVi0a0ZIpYk)
-
-## Overview
-
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
-
-## Deployment
-
-Your project is live at:
-
-**[https://vercel.com/6h0ts-projects/v0-fork-of-eterealconquest-k8](https://vercel.com/6h0ts-projects/v0-fork-of-eterealconquest-k8)**
-
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.dev/chat/projects/oVi0a0ZIpYk](https://v0.dev/chat/projects/oVi0a0ZIpYk)**
-
-## How It Works
-
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+REPOSITORIO ETEREAL CONQUEST MU ONLINE - PLATAFORMA WEB
+ADVERTENCIA CONFIDENCIAL
+ESTE REPOSITORIO CONTIENE EL CÓDIGO FUENTE DE LA WEB DEL PROYECTO PRIVADO ETEREAL CONQUEST.
+DESARROLLADO EXCLUSIVAMENTE POR GH0TSTUDIO.
+⚠️ ACCESO RESTRINGIDO A PERSONAL AUTORIZADO.
+⚠️ PROHIBIDA SU DISTRIBUCIÓN, MODIFICACIÓN O USO SIN PERMISO EXPRESO.
+⚠️ DERECHOS INTELECTUALES RESERVADOS POR GH0TSTUDIO (2025).
