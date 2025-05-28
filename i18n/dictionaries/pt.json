@@ -234,7 +234,9 @@
     "showPassword": "Mostrar senha",
     "hidePassword": "Ocultar senha",
     "alreadyHaveAccount": "Já tem uma conta?",
-    "login": "Entrar"
+    "login": "Entrar",
+    "verificationSent": "Registro iniciado! Verifique seu email para verificar sua conta.",
+    "checkEmail": "Verifique sua caixa de entrada e clique no link de verificação para completar seu registro."
   },
   "login": {
     "title": "Entrar",

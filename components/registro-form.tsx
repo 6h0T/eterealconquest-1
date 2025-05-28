@@ -25,6 +25,7 @@ export function RegistroForm({ lang }: RegistroFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState("")
+  const [requiresVerification, setRequiresVerification] = useState(false)
   const [dictionary, setDictionary] = useState<any>({})
   const [recaptchaLoaded, setRecaptchaLoaded] = useState(false)
   const [recaptchaConfig, setRecaptchaConfig] = useState<{ enabled: boolean; siteKey: string }>({
@@ -111,6 +112,8 @@ export function RegistroForm({ lang }: RegistroFormProps) {
       serverError: "Error en el servidor. Inténtalo más tarde.",
       recaptchaError: "Error de verificación reCAPTCHA. Por favor, inténtalo de nuevo.",
       validationError: "Error de validación. Por favor, verifica los datos ingresados.",
+      verificationSent: "¡Registro iniciado! Revisa tu correo electrónico para verificar tu cuenta.",
+      checkEmail: "Revisa tu bandeja de entrada y haz clic en el enlace de verificación para completar tu registro.",
     },
     en: {
       username: "Username",
@@ -140,6 +143,8 @@ export function RegistroForm({ lang }: RegistroFormProps) {
       serverError: "Server error. Please try again later.",
       recaptchaError: "reCAPTCHA verification failed. Please try again.",
       validationError: "Validation error. Please check your input data.",
+      verificationSent: "Registration started! Check your email to verify your account.",
+      checkEmail: "Check your inbox and click the verification link to complete your registration.",
     },
     pt: {
       username: "Nome de usuário",
@@ -169,6 +174,8 @@ export function RegistroForm({ lang }: RegistroFormProps) {
       serverError: "Erro no servidor. Tente novamente mais tarde.",
       recaptchaError: "Verificação reCAPTCHA falhou. Por favor, tente novamente.",
       validationError: "Erro de validação. Por favor, verifique os dados inseridos.",
+      verificationSent: "Registro iniciado! Verifique seu email para verificar sua conta.",
+      checkEmail: "Verifique sua caixa de entrada e clique no link de verificação para completar seu registro.",
     },
   }
 
@@ -255,13 +262,17 @@ export function RegistroForm({ lang }: RegistroFormProps) {
       }
 
       // Registro exitoso
-      setSubmitSuccess(true)
-      console.log("Registro exitoso:", result.message)
-
-      // Redirigir después de un breve retraso
-      setTimeout(() => {
-        router.push(`/${lang}/inicio-sesion`)
-      }, 2000)
+      if (result.requiresVerification) {
+        setRequiresVerification(true)
+        console.log("Registro iniciado, requiere verificación:", result.message)
+      } else {
+        setSubmitSuccess(true)
+        console.log("Registro exitoso:", result.message)
+        // Redirigir después de un breve retraso
+        setTimeout(() => {
+          router.push(`/${lang}/inicio-sesion`)
+        }, 2000)
+      }
     } catch (error: any) {
       console.error("Error al registrar:", error)
       setSubmitError(error.message || t.serverError)
@@ -413,6 +424,20 @@ export function RegistroForm({ lang }: RegistroFormProps) {
               >
                 <Check className="h-5 w-5 mr-2" />
                 {t.success}
+              </motion.div>
+            )}
+
+            {requiresVerification && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-blue-900/30 border border-blue-500/30 text-blue-300 p-4 rounded-md space-y-2"
+              >
+                <div className="flex items-center">
+                  <Mail className="h-5 w-5 mr-2" />
+                  <span className="font-medium">{t.verificationSent}</span>
+                </div>
+                <p className="text-sm text-blue-200">{t.checkEmail}</p>
               </motion.div>
             )}
 

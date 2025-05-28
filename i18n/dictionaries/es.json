@@ -234,7 +234,9 @@
     "showPassword": "Mostrar contraseña",
     "hidePassword": "Ocultar contraseña",
     "alreadyHaveAccount": "¿Ya tienes una cuenta?",
-    "login": "Iniciar sesión"
+    "login": "Iniciar sesión",
+    "verificationSent": "¡Registro iniciado! Revisa tu correo electrónico para verificar tu cuenta.",
+    "checkEmail": "Revisa tu bandeja de entrada y haz clic en el enlace de verificación para completar tu registro."
   },
   "login": {
     "title": "Iniciar Sesión",
