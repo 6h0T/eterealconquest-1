@@ -121,14 +121,72 @@ export async function POST(req: Request) {
           VALUES (@email, @username, @action, @ipAddress, @userAgent, @details)
         `)
 
-      // Generar el enlace de verificación
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || ""
-      const verificationLink = `${baseUrl}/verificar-email?token=${verificationToken}`
+      // Detectar el idioma del usuario desde el referer o headers
+      const referer = req.headers.get("referer") || ""
+      const acceptLanguage = req.headers.get("accept-language") || ""
+      
+      let userLang = "es" // idioma por defecto
+      
+      // Primero intentar detectar desde la URL de referer
+      if (referer.includes("/en/")) {
+        userLang = "en"
+      } else if (referer.includes("/pt/")) {
+        userLang = "pt"
+      } else if (referer.includes("/es/")) {
+        userLang = "es"
+      } else {
+        // Si no se detecta desde referer, usar accept-language
+        userLang = acceptLanguage.includes("en") ? "en" : 
+                  acceptLanguage.includes("pt") ? "pt" : "es"
+      }
+      
+      // Generar el enlace de verificación con el idioma correcto
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001"
+      const verificationLink = `${baseUrl}/${userLang}/verificar-email?token=${verificationToken}`
 
-             // Enviar email de verificación
-       const emailSendResult = await sendEmail({
+      // Contenido del email según el idioma
+      const emailContent = {
+        es: {
+          subject: "Verifica tu cuenta - Etereal Conquest",
+          greeting: "¡Hola",
+          welcome: "¡Bienvenido a Etereal Conquest! Para completar tu registro, necesitas verificar tu dirección de correo electrónico.",
+          button: "✅ Verificar mi cuenta",
+          fallback: "Si el botón no funciona, copia y pega este enlace en tu navegador:",
+          expiry: "Este enlace expirará en 24 horas por razones de seguridad.",
+          ignore: "Si no creaste esta cuenta, puedes ignorar este mensaje.",
+          copyright: "© 2024 Etereal Conquest. Todos los derechos reservados."
+        },
+        en: {
+          subject: "Verify your account - Etereal Conquest",
+          greeting: "Hello",
+          welcome: "Welcome to Etereal Conquest! To complete your registration, you need to verify your email address.",
+          button: "✅ Verify my account",
+          fallback: "If the button doesn't work, copy and paste this link in your browser:",
+          expiry: "This link will expire in 24 hours for security reasons.",
+          ignore: "If you didn't create this account, you can ignore this message.",
+          copyright: "© 2024 Etereal Conquest. All rights reserved."
+        },
+        pt: {
+          subject: "Verifique sua conta - Etereal Conquest",
+          greeting: "Olá",
+          welcome: "Bem-vindo ao Etereal Conquest! Para completar seu registro, você precisa verificar seu endereço de email.",
+          button: "✅ Verificar minha conta",
+          fallback: "Se o botão não funcionar, copie e cole este link no seu navegador:",
+          expiry: "Este link expirará em 24 horas por razões de segurança.",
+          ignore: "Se você não criou esta conta, pode ignorar esta mensagem.",
+          copyright: "© 2024 Etereal Conquest. Todos os direitos reservados."
+        }
+      }
+
+      const content = emailContent[userLang as keyof typeof emailContent] || emailContent.es
+
+      console.log(`Idioma detectado para ${username}: ${userLang} (referer: ${referer})`)
+
+      // Enviar email de verificación
+      const emailSendResult = await sendEmail({
         to: email,
-        subject: "Verifica tu cuenta - Etereal Conquest",
+        subject: content.subject,
+        from: "Etereal Conquest <noreply@mu-occidental.com>",
         html: `
 <!DOCTYPE html>
 <html>
@@ -154,28 +212,28 @@ export async function POST(req: Request) {
         <h1>🏰 ETEREAL CONQUEST</h1>
       </div>
       
-      <p>¡Hola <span class="user-id">${username}</span>!</p>
-      <p>¡Bienvenido a Etereal Conquest! Para completar tu registro, necesitas verificar tu dirección de correo electrónico.</p>
+      <p>${content.greeting} <span class="user-id">${username}</span>!</p>
+      <p>${content.welcome}</p>
       
       <div style="text-align: center;">
-        <a href="${verificationLink}" class="button">✅ Verificar mi cuenta</a>
+        <a href="${verificationLink}" class="button">${content.button}</a>
       </div>
       
-      <p>Si el botón no funciona, copia y pega este enlace en tu navegador:</p>
+      <p>${content.fallback}</p>
       <p class="link">${verificationLink}</p>
       
       <div class="warning-text">
         <span class="warning-icon">⏰</span>
-        <span>Este enlace expirará en 24 horas por razones de seguridad.</span>
+        <span>${content.expiry}</span>
       </div>
       
       <div style="margin-top: 20px;">
         <span class="warning-icon">🔒</span>
-        <span>Si no creaste esta cuenta, puedes ignorar este mensaje.</span>
+        <span>${content.ignore}</span>
       </div>
       
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; text-align: center; font-size: 12px; color: #888;">
-        <p>© 2024 Etereal Conquest. Todos los derechos reservados.</p>
+        <p>${content.copyright}</p>
       </div>
     </div>
   </div>
