@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import { CheckCircle, XCircle, Loader2, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { ImageBackground } from "@/components/image-background"
 
 type VerificationState = "loading" | "success" | "error" | "invalid"
 
@@ -100,13 +101,20 @@ export default function VerificarEmailPage({ params }: { params: { lang: string 
   const t = texts[lang] || texts.es
 
   useEffect(() => {
+    console.log("Token recibido:", token)
+    console.log("URL completa:", window.location.href)
+    console.log("Search params:", window.location.search)
+    
     if (!token) {
+      console.log("No se encontró token en la URL")
       setState("invalid")
       return
     }
 
     const verifyEmail = async () => {
       try {
+        console.log("Enviando token a la API:", token)
+        
         const response = await fetch("/api/verify-email", {
           method: "POST",
           headers: {
@@ -115,7 +123,9 @@ export default function VerificarEmailPage({ params }: { params: { lang: string 
           body: JSON.stringify({ token }),
         })
 
+        console.log("Respuesta de la API:", response.status, response.statusText)
         const data = await response.json()
+        console.log("Datos de respuesta:", data)
 
         if (response.ok && data.success) {
           setState("success")
@@ -155,12 +165,12 @@ export default function VerificarEmailPage({ params }: { params: { lang: string 
   const getIcon = () => {
     switch (state) {
       case "loading":
-        return <Loader2 className="h-16 w-16 animate-spin text-blue-500" />
+        return <Loader2 className="h-16 w-16 animate-spin text-gold-500" />
       case "success":
-        return <CheckCircle className="h-16 w-16 text-green-500" />
+        return <CheckCircle className="h-16 w-16 text-green-400" />
       case "error":
       case "invalid":
-        return <XCircle className="h-16 w-16 text-red-500" />
+        return <XCircle className="h-16 w-16 text-red-400" />
     }
   }
 
@@ -199,14 +209,18 @@ export default function VerificarEmailPage({ params }: { params: { lang: string 
   const content = getContent()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
-      >
-        <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+    <div className="pt-20 pb-16 relative overflow-visible min-h-screen">
+      {/* Fondo con imagen igual al panel de usuario */}
+      <ImageBackground imagePath="https://i.imgur.com/MrDWSAr.jpeg" overlayOpacity={0.3} />
+      
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-20 flex items-center justify-center min-h-screen">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-md"
+        >
+          <Card className="bg-bunker-800/90 backdrop-blur-sm border border-gold-700/30 shadow-xl">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <motion.div
@@ -217,7 +231,7 @@ export default function VerificarEmailPage({ params }: { params: { lang: string 
                 {getIcon()}
               </motion.div>
             </div>
-            <CardTitle className="text-2xl font-bold text-white">
+            <CardTitle className="text-2xl font-bold text-gold-300 font-trade-winds">
               {t.title}
             </CardTitle>
           </CardHeader>
@@ -227,10 +241,10 @@ export default function VerificarEmailPage({ params }: { params: { lang: string 
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
             >
-              <h3 className="text-xl font-semibold text-white mb-2">
+              <h3 className="text-xl font-semibold text-gold-200 mb-2">
                 {content.title}
               </h3>
-              <p className="text-gray-300 mb-6">
+              <p className="text-gold-100 mb-6">
                 {content.description}
               </p>
             </motion.div>
@@ -243,7 +257,7 @@ export default function VerificarEmailPage({ params }: { params: { lang: string 
               >
                 <Button
                   onClick={handleButtonClick}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  className="w-full bg-gold-600 hover:bg-gold-700 text-bunker-950 font-semibold"
                   size="lg"
                 >
                   {content.buttonText}
@@ -256,7 +270,7 @@ export default function VerificarEmailPage({ params }: { params: { lang: string 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7 }}
-                className="text-sm text-gray-400 mt-4"
+                className="text-sm text-gold-400 mt-4"
               >
                 Serás redirigido automáticamente en unos segundos...
               </motion.p>
@@ -264,6 +278,7 @@ export default function VerificarEmailPage({ params }: { params: { lang: string 
           </CardContent>
         </Card>
       </motion.div>
+      </div>
     </div>
   )
 } 
