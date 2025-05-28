@@ -13,7 +13,7 @@ export async function sendEmail({
   to,
   subject,
   html,
-  from = "Etereal Conquest <noreply@mu-occidental.com>",
+  from = "Etereal Conquest <noreply@eterealconquest.com>",
 }: {
   to: string
   subject: string

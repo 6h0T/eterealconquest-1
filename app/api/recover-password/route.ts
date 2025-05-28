@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     const fullResetLink = baseUrl + resetLink
 
     await resend.emails.send({
-      from: "no-reply@mu-occidental.com",
+      from: "no-reply@eterealconquest.com",
       to: email,
       subject: "Restablece tu contraseña",
       html: `

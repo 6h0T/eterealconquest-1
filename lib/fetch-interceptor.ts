@@ -5,8 +5,8 @@
 
 // Dominios de nuestra aplicación (con y sin www)
 const OUR_DOMAINS = [
-  "mu-occidental.com",
-  "www.mu-occidental.com",
+  "eterealconquest.com",
+  "www.eterealconquest.com",
   // Agrega aquí otros dominios si es necesario (staging, desarrollo, etc.)
 ]
 

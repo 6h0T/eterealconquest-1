@@ -186,7 +186,7 @@ export async function POST(req: Request) {
       const emailSendResult = await sendEmail({
         to: email,
         subject: content.subject,
-        from: "Etereal Conquest <noreply@mu-occidental.com>",
+        from: "Etereal Conquest <noreply@eterealconquest.com>",
         html: `
 <!DOCTYPE html>
 <html>
