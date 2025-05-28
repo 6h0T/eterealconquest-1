@@ -61,12 +61,13 @@ export async function POST(req: Request) {
   <style>
     body { background-color: #1a1a1a; color: #ffffff; font-family: Arial, sans-serif; margin: 0; padding: 0; }
     .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .content { background-color: #1a1a1a; padding: 20px; border-radius: 5px; }
+    .content { background-color: #1a1a1a; padding: 20px; border-radius: 5px; color: #ffffff; }
     .button { display: inline-block; background-color: #FFD700; color: #000000 !important; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; margin: 20px 0; }
     .user-id { color: #FFD700; font-weight: bold; }
     .link { color: #FFD700; word-break: break-all; }
     .warning-text { color: #ffffff; margin-top: 20px; }
     .warning-icon { margin-right: 10px; }
+    p, span, div { color: #ffffff; }
   </style>
 </head>
 <body>

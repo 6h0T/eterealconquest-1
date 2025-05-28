@@ -13,7 +13,7 @@ export async function GET() {
     }
 
     const result = await pool.request().query(`
-      SELECT TOP 10 
+      SELECT TOP 50 
         C.Name, 
         C.cLevel, 
         C.Class, 

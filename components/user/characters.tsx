@@ -600,15 +600,16 @@ export function UserCharacters({ username, lang }: UserCharactersProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
+      className="w-full h-full flex flex-col flex-1"
     >
-      <Card className="bg-bunker-800/90 backdrop-blur-sm border border-gold-700/30 w-full max-w-none">
+      <Card className="bg-bunker-800/90 backdrop-blur-sm border border-gold-700/30 w-full max-w-none h-full min-h-full flex-1">
         <CardHeader>
           <CardTitle className="text-gold-400 flex items-center">
             <Shield className="h-5 w-5 mr-2" />
             {t.characters}
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-6 md:p-8">
+        <CardContent className="p-6 md:p-8 flex-1">
           <div className="mb-4 p-3 bg-bunker-700/50 border border-gold-700/30 text-gold-300 rounded-md flex items-center">
             <AlertCircle className="h-5 w-5 mr-2 text-gold-400" />
             {t.accountDisconnected}

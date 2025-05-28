@@ -1,53 +1,45 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Image from "next/image"
 
 interface ImageBackgroundProps {
-  imageSrc: string
+  imagePath: string
   className?: string
   overlayOpacity?: number
 }
 
-export function ImageBackground({ imageSrc, className = "", overlayOpacity = 0.6 }: ImageBackgroundProps) {
-  const [loaded, setLoaded] = useState(false)
+export function ImageBackground({
+  imagePath,
+  className = "",
+  overlayOpacity = 0.6,
+}: ImageBackgroundProps) {
+  const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
-    // Precargar la imagen para evitar parpadeos
-    const img = new Image()
-    img.src = imageSrc
-    img.onload = () => {
-      setLoaded(true)
-    }
-    img.onerror = () => {
-      // En caso de error, también marcamos como cargado para evitar bloqueos
-      console.error("Error loading background image:", imageSrc)
-      setLoaded(true)
-    }
-
-    return () => {
-      // Limpiar los event listeners para evitar memory leaks
-      img.onload = null
-      img.onerror = null
-    }
-  }, [imageSrc])
+    setIsLoaded(true)
+  }, [])
 
   return (
-    <div className={`absolute inset-0 overflow-hidden ${className}`}>
+    <div className={`absolute inset-0 overflow-hidden ${className}`} style={{ height: "100%" }}>
       {/* Overlay con opacidad configurable */}
       <div className="absolute inset-0 bg-bunker-950 z-10" style={{ opacity: overlayOpacity }}></div>
 
       {/* Contenedor de la imagen */}
       <div className="absolute inset-0 w-full h-full z-0">
-        <div
-          className={`w-full h-full transition-opacity duration-700 ${loaded ? "opacity-100" : "opacity-0"}`}
-          style={{
-            backgroundImage: `url(${imageSrc})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            transform: "scale(1.2)", // Aplicar zoom del 20%
-          }}
-        />
+        {isLoaded && (
+          <Image
+            src={imagePath}
+            alt="Background"
+            fill
+            sizes="100vw"
+            priority
+            style={{
+              objectFit: "cover",
+              objectPosition: "center",
+            }}
+          />
+        )}
       </div>
     </div>
   )

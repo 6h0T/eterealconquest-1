@@ -44,6 +44,7 @@ export function UserSettings({ username, lang }: UserSettingsProps) {
       emailSuccess: "Correo electrónico cambiado con éxito",
       passwordError: "Error al cambiar la contraseña",
       emailError: "Error al cambiar el correo electrónico",
+      emailInUse: "El correo electrónico ya está en uso",
       passwordMismatch: "Las contraseñas no coinciden",
       passwordRequired: "La contraseña es requerida",
       passwordLength: "La contraseña debe tener al menos 6 caracteres",
@@ -70,6 +71,7 @@ export function UserSettings({ username, lang }: UserSettingsProps) {
       emailSuccess: "Email address changed successfully",
       passwordError: "Error changing password",
       emailError: "Error changing email address",
+      emailInUse: "Email is already in use",
       passwordMismatch: "Passwords do not match",
       passwordRequired: "Password is required",
       passwordLength: "Password must be at least 6 characters",
@@ -96,6 +98,7 @@ export function UserSettings({ username, lang }: UserSettingsProps) {
       emailSuccess: "Endereço de email alterado com sucesso",
       passwordError: "Erro ao alterar senha",
       emailError: "Erro ao alterar endereço de email",
+      emailInUse: "O email já está em uso",
       passwordMismatch: "As senhas não coincidem",
       passwordRequired: "A senha é obrigatória",
       passwordLength: "A senha deve ter pelo menos 6 caracteres",
@@ -223,10 +226,6 @@ export function UserSettings({ username, lang }: UserSettingsProps) {
         }),
       })
 
-      if (!response.ok) {
-        throw new Error(t.serverError)
-      }
-
       let data
       try {
         data = await response.json()
@@ -236,6 +235,10 @@ export function UserSettings({ username, lang }: UserSettingsProps) {
       }
 
       if (!data?.success) {
+        // Manejar específicamente el caso de correo electrónico en uso
+        if (data?.error && data.error.includes("correo electrónico ya está en uso")) {
+          throw new Error(t.emailInUse)
+        }
         throw new Error(data?.error || t.unknownError)
       }
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { RankingsTabs } from "@/components/rankings-tabs"
 import { SectionDivider } from "@/components/section-divider"
-import { VimeoBackground } from "@/components/vimeo-background"
+import { ImageBackground } from "@/components/image-background"
 import type { Locale } from "@/i18n/config"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -22,8 +22,8 @@ export default function RankingsPage({ params }: { params: { lang: Locale } }) {
   return (
     <>
       <div className="pt-20 pb-16 relative overflow-visible min-h-screen">
-        {/* Fondo con video de Vimeo */}
-        <VimeoBackground videoId="1074464598" fallbackId="1074465089" />
+        {/* Fondo con imagen */}
+        <ImageBackground imagePath="https://i.imgur.com/MrDWSAr.jpeg" overlayOpacity={0.6} />
 
         <AnimatePresence mode="wait">
           <motion.div

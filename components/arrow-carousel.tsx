@@ -432,7 +432,7 @@ export default function ArrowCarousel({ items }: ArrowCarouselProps) {
       {/* Video Modal with Two Columns - Dynamic content based on selected item */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent
-          className="sm:max-w-[1100px] max-h-[95vh] bg-black/90 border-gold-600/30 text-gold-100 p-0 overflow-hidden"
+          className="sm:max-w-[1200px] max-h-[95vh] bg-black/90 border-gold-600/30 text-gold-100 p-0 overflow-hidden"
           style={{ backdropFilter: "blur(8px)" }}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0 h-full" style={{ minHeight: "600px" }}>
@@ -454,12 +454,12 @@ export default function ArrowCarousel({ items }: ArrowCarouselProps) {
               <div className="w-full h-full flex items-center justify-center">
                 {getModalContent(selectedItem).video && (
                   selectedItem?.text.includes("RAREZA") || selectedItem?.text.includes("RARITY") || selectedItem?.text.includes("RARIDADE") ? (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <div style={{width: "100%", maxWidth: "100%"}} dangerouslySetInnerHTML={{ __html: getModalContent(selectedItem).video as string }} />
+                    <div className="w-full h-full flex items-center justify-center p-6">
+                      <div style={{width: "90%", maxWidth: "90%"}} dangerouslySetInnerHTML={{ __html: getModalContent(selectedItem).video as string }} />
                     </div>
                   ) : selectedItem?.vimeoEmbed ? (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <div style={{width: "100%", maxWidth: "100%"}} dangerouslySetInnerHTML={{ __html: selectedItem.vimeoEmbed }} />
+                    <div className="aspect-video mb-6 w-full overflow-hidden rounded-lg">
+                      <div dangerouslySetInnerHTML={{ __html: selectedItem.vimeoEmbed }} />
                     </div>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">

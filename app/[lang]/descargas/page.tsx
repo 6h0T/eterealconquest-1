@@ -153,7 +153,6 @@ export default function DescargasPage({ params }: { params: { lang: Locale } }) 
         <VimeoBackground
           videoId="1074465089"
           overlayOpacity={0.75}
-          extraZoom={true} // Activar zoom extra solo para esta página
         />
       </div>
 

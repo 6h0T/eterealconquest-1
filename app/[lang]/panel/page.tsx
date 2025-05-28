@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { getDictionary } from "@/i18n/config"
 import type { Locale } from "@/i18n/config"
-import { VimeoBackground } from "@/components/vimeo-background"
+import { ImageBackground } from "@/components/image-background"
 import { SectionDivider } from "@/components/section-divider"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { motion } from "framer-motion"
@@ -12,6 +12,7 @@ import { UserAccountInfo } from "@/components/user/account-info"
 import { UserCharacters } from "@/components/user/characters"
 import { UserSettings } from "@/components/user/settings"
 import { UserDonation } from "@/components/user/donation"
+import { LiveClock } from "@/components/live-clock"
 import { Shield, User, Settings, Gift } from "lucide-react"
 
 export default function UserPanelPage({ params }: { params: { lang: Locale } }) {
@@ -144,11 +145,11 @@ export default function UserPanelPage({ params }: { params: { lang: Locale } }) 
 
   return (
     <div className="pt-20 pb-16 relative overflow-visible min-h-screen">
-      {/* Fondo con video de Vimeo */}
-      <VimeoBackground videoId="1074464598" fallbackId="1074465089" />
+      {/* Fondo con imagen */}
+      <ImageBackground imagePath="https://i.imgur.com/MrDWSAr.jpeg" overlayOpacity={0.3} />
 
       <motion.div
-        className="container max-w-6xl mx-auto px-4 sm:px-6 relative z-20"
+        className="container max-w-6xl mx-auto px-4 sm:px-6 relative z-20 mb-8"
         initial="hidden"
         animate="visible"
         variants={containerVariants}
@@ -156,27 +157,18 @@ export default function UserPanelPage({ params }: { params: { lang: Locale } }) 
         <motion.div className="text-center mb-10" variants={itemVariants}>
           <h1 className="text-4xl md:text-5xl font-bold gold-gradient-text mb-4">{t.title}</h1>
           <p className="text-xl text-gold-100 max-w-3xl mx-auto mb-2">{t.subtitle}</p>
-          <p className="text-gold-400">
+          <p className="text-gold-400 mb-2">
             <span className="text-green-400 font-medium flex items-center justify-center">
               <span className="w-2 h-2 rounded-full bg-green-500 mr-2 inline-block"></span>
               Bienvenido, <span className="font-bold text-gold-300 mx-1">{username}</span>
             </span>
           </p>
+          <LiveClock className="mt-2" />
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <Tabs defaultValue="characters" className="w-full">
+          <Tabs defaultValue="account" className="w-full">
             <TabsList className="h-16 items-center justify-center bg-transparent grid grid-cols-3 overflow-hidden rounded-lg mb-8 shadow-lg shadow-bunker-900/50 border border-gold-700/30 gap-2 p-2">
-              <TabsTrigger
-                value="characters"
-                className="relative inline-flex items-center justify-center gap-2 h-full px-4 overflow-hidden font-medium transition-all rounded-md font-trade-winds border border-gold-700/30
-                data-[state=active]:!bg-[#ffd70030] data-[state=active]:!text-gold-300 data-[state=active]:border-gold-500
-                data-[state=inactive]:bg-transparent data-[state=inactive]:text-gold-400 data-[state=inactive]:hover:bg-bunker-700/50 data-[state=inactive]:hover:text-gold-300
-                focus-visible:outline-none focus-visible:ring-0 dark:focus-visible:ring-0 dark:data-[state=active]:!bg-[#ffd70030]"
-              >
-                <Shield className="h-5 w-5" />
-                <span className="font-medium">{t.characters}</span>
-              </TabsTrigger>
               <TabsTrigger
                 value="account"
                 className="relative inline-flex items-center justify-center gap-2 h-full px-4 overflow-hidden font-medium transition-all rounded-md font-trade-winds border border-gold-700/30
@@ -186,6 +178,16 @@ export default function UserPanelPage({ params }: { params: { lang: Locale } }) 
               >
                 <User className="h-5 w-5" />
                 <span className="font-medium">{t.account}</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="characters"
+                className="relative inline-flex items-center justify-center gap-2 h-full px-4 overflow-hidden font-medium transition-all rounded-md font-trade-winds border border-gold-700/30
+                data-[state=active]:!bg-[#ffd70030] data-[state=active]:!text-gold-300 data-[state=active]:border-gold-500
+                data-[state=inactive]:bg-transparent data-[state=inactive]:text-gold-400 data-[state=inactive]:hover:bg-bunker-700/50 data-[state=inactive]:hover:text-gold-300
+                focus-visible:outline-none focus-visible:ring-0 dark:focus-visible:ring-0 dark:data-[state=active]:!bg-[#ffd70030]"
+              >
+                <Shield className="h-5 w-5" />
+                <span className="font-medium">{t.characters}</span>
               </TabsTrigger>
               {/* BOTÓN DE DONACIÓN OCULTO - PARA REACTIVAR ELIMINA EL COMENTARIO DE ESTA SECCIÓN 
               <TabsTrigger
@@ -209,13 +211,13 @@ export default function UserPanelPage({ params }: { params: { lang: Locale } }) 
               </TabsTrigger>
             </TabsList>
 
-            <div className="bg-bunker-900/30 backdrop-blur-sm p-1 rounded-xl border border-gold-700/20 shadow-xl">
-              <TabsContent value="characters" className="p-4">
-                <UserCharacters username={username} lang={lang} />
-              </TabsContent>
-
+            <div className="backdrop-blur-sm p-1 rounded-xl border border-gold-700/20 shadow-xl min-h-full">
               <TabsContent value="account" className="p-4">
                 <UserAccountInfo username={username} lang={lang} />
+              </TabsContent>
+              
+              <TabsContent value="characters" className="p-4 h-full">
+                <UserCharacters username={username} lang={lang} />
               </TabsContent>
 
               {/* CONTENIDO DE DONACIÓN OCULTO - PARA REACTIVAR ELIMINA EL COMENTARIO DE ESTA SECCIÓN 
@@ -232,8 +234,7 @@ export default function UserPanelPage({ params }: { params: { lang: Locale } }) 
         </motion.div>
       </motion.div>
 
-      {/* Divisor al final de la página */}
-      <SectionDivider />
+
     </div>
   )
 }

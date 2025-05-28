@@ -833,7 +833,7 @@ section + section {
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
-  background-color: #11141a; /* Color de fondo mientras se carga el video */
+  background-color: #11141a; /* Restaurar el color de fondo original */
 }
 
 .vimeo-wrapper iframe {
@@ -1034,10 +1034,9 @@ section {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  min-width: 200% !important;
-  min-height: 200% !important;
-  width: auto !important;
-  height: auto !important;
+  width: 200% !important;
+  height: 200% !important;
+  object-fit: cover !important;
 }
 
 /* Añadir estilos específicos para las pestañas al final del archivo */
@@ -1152,4 +1151,94 @@ section {
   width: 100% !important;
   height: 100% !important;
   display: block;
+}
+
+/* Estilos para solucionar problema de fondo en panel de usuario con muchos personajes */
+.min-h-full {
+  min-height: 100% !important;
+}
+
+.h-full {
+  height: 100% !important;
+}
+
+[data-state="active"].h-full {
+  min-height: 100% !important;
+  background-color: inherit !important;
+}
+
+.bg-bunker-800\/90.backdrop-blur-sm.border.border-gold-700\/30.w-full.max-w-none.h-full.min-h-full {
+  height: auto !important;
+  min-height: 100% !important;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Asegurar que la lista de personajes siempre tenga fondo completo */
+.space-y-6 {
+  background-color: inherit;
+  min-height: 100%;
+}
+
+/* Mejorar el panel de usuario para cubrir todo el fondo */
+.pt-20.pb-16.relative.overflow-visible.min-h-screen {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Contenedor del video de fondo */
+.absolute.inset-0.overflow-hidden {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* Video de fondo */
+.absolute.inset-0.overflow-hidden iframe {
+  position: absolute;
+  top: 100%;
+  left: 100%;
+  transform: translate(-50%, -50%);
+  min-width: 150%;
+  min-height: 150%;
+  width: auto;
+  height: auto;
+}
+
+/* Contenido del panel por encima del video */
+.container.max-w-6xl.mx-auto.px-4.sm\:px-6.relative.z-20.mb-8 {
+  position: relative;
+  z-index: 1;
+}
+
+/* Footer por encima del video */
+footer {
+  position: relative;
+  z-index: 2;
+}
+
+/* Estilo para asegurar que las imágenes de fondo cubran correctamente el contenedor */
+.pt-20.pb-16.relative.overflow-visible img[alt="Background"] {
+  object-fit: cover !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Eliminar estos selectores adicionales que agregamos */
+/* Eliminar cualquier fondo gris en todos los iframes de vimeo */
+iframe[src*="player.vimeo.com"] {
+  background-color: #11141a !important;
+}
+
+/* Asegurar que los videos de Vimeo en todas las páginas estén centrados correctamente */
+div[style*="padding:56.25% 0 0 0;position:relative;"] {
+  background-color: #11141a !important;
+}
+
+div[style*="padding:56.25% 0 0 0;position:relative;"] iframe {
+  background-color: #11141a !important;
 }

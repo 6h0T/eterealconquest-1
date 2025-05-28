@@ -18,7 +18,7 @@ export async function GET(request: Request, { params }: { params: { type: string
     switch (type) {
       case "resets":
         query = `
-          SELECT TOP 10 Name, Class, cLevel, Resets
+          SELECT TOP 50 Name, Class, cLevel, Resets
           FROM Character
           WHERE Name IS NOT NULL 
             AND cLevel IS NOT NULL
@@ -29,7 +29,7 @@ export async function GET(request: Request, { params }: { params: { type: string
         break
       case "grandresets":
         query = `
-          SELECT TOP 10 Name, Class, Resets, GrandResets
+          SELECT TOP 50 Name, Class, Resets, GrandResets
           FROM Character
           WHERE Name IS NOT NULL
             AND GrandResets > 0
@@ -39,7 +39,7 @@ export async function GET(request: Request, { params }: { params: { type: string
         break
       case "gens":
         query = `
-          SELECT TOP 10 Name, Class, GensFamily, GensContribution
+          SELECT TOP 50 Name, Class, GensFamily, GensContribution
           FROM Character
           WHERE Name IS NOT NULL
             AND GensFamily > 0
@@ -49,7 +49,7 @@ export async function GET(request: Request, { params }: { params: { type: string
         break
       case "votes":
         query = `
-          SELECT TOP 10 username as Name, votes
+          SELECT TOP 50 username as Name, votes
           FROM webengine_votes
           WHERE username IS NOT NULL
             AND votes > 0
@@ -58,7 +58,7 @@ export async function GET(request: Request, { params }: { params: { type: string
         break
       case "master":
         query = `
-          SELECT TOP 10 Name, Class, cLevel, Resets, MasterLevel
+          SELECT TOP 50 Name, Class, cLevel, Resets, MasterLevel
           FROM Character
           WHERE Name IS NOT NULL
             AND MasterLevel > 0

@@ -7,7 +7,7 @@ interface VimeoBackgroundProps {
   fallbackId?: string // ID de respaldo en caso de que el principal no funcione
   className?: string
   overlayOpacity?: number
-  extraZoom?: boolean // Prop para controlar el zoom extra
+  extraZoom?: boolean // No usaremos esta prop pero la mantenemos para compatibilidad
   pauseOnClick?: boolean // Prop para controlar si el video se pausa al hacer clic
 }
 
@@ -16,13 +16,12 @@ export function VimeoBackground({
   fallbackId,
   className = "",
   overlayOpacity = 0.6,
-  extraZoom = false,
+  extraZoom = false, // Mantenido por compatibilidad
   pauseOnClick = true, // Por defecto, pausar al hacer clic
 }: VimeoBackgroundProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const [isLoaded, setIsLoaded] = useState(false)
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const [vimeoPlayer, setVimeoPlayer] = useState<any>(null)
   const [isPlaying, setIsPlaying] = useState(true)
 
@@ -30,44 +29,8 @@ export function VimeoBackground({
   const validVideoId = videoId || fallbackId || "1074465089" // ID de respaldo por si acaso
 
   useEffect(() => {
-    // Función para calcular las dimensiones necesarias para cubrir el contenedor
-    const calculateDimensions = () => {
-      if (!containerRef.current) return
-
-      const containerWidth = containerRef.current.offsetWidth
-      const containerHeight = containerRef.current.offsetHeight
-      const aspectRatio = 16 / 9
-
-      // Calcular dimensiones para cubrir completamente el contenedor
-      let width, height
-
-      // Factor de escala basado en la prop extraZoom
-      const scaleFactor = extraZoom ? 2.5 : 1.5
-
-      if (containerWidth / containerHeight > aspectRatio) {
-        // Si el contenedor es más ancho que la relación de aspecto del video
-        width = containerWidth * scaleFactor
-        height = width / aspectRatio
-      } else {
-        // Si el contenedor es más alto que la relación de aspecto del video
-        height = containerHeight * scaleFactor
-        width = height * aspectRatio
-      }
-
-      setDimensions({ width, height })
-    }
-
-    // Calcular dimensiones iniciales
-    calculateDimensions()
     setIsLoaded(true)
-
-    // Recalcular cuando cambie el tamaño de la ventana
-    window.addEventListener("resize", calculateDimensions)
-
-    return () => {
-      window.removeEventListener("resize", calculateDimensions)
-    }
-  }, [extraZoom])
+  }, [])
 
   // Inicializar el reproductor de Vimeo cuando el iframe está cargado
   useEffect(() => {
@@ -77,7 +40,7 @@ export function VimeoBackground({
         setVimeoPlayer(player)
 
         // Asegurarse de que el video se reproduce automáticamente
-        player.play().catch((error) => {
+        player.play().catch((error: Error) => {
           console.warn("Error al reproducir automáticamente el video de Vimeo:", error)
         })
 
@@ -112,6 +75,7 @@ export function VimeoBackground({
       ref={containerRef}
       className={`absolute inset-0 overflow-hidden ${className}`}
       onClick={pauseOnClick ? handleClick : undefined}
+      style={{ height: "100%" }}
     >
       {/* Overlay con opacidad configurable */}
       <div className="absolute inset-0 bg-bunker-950 z-10" style={{ opacity: overlayOpacity }}></div>
@@ -125,16 +89,14 @@ export function VimeoBackground({
             frameBorder="0"
             allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
             title="Background Video"
-            className="absolute"
             style={{
               position: "absolute",
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              width: `${dimensions.width}px`,
-              height: `${dimensions.height}px`,
-              minWidth: extraZoom ? "200%" : "150%", // Ajustar según extraZoom
-              minHeight: extraZoom ? "200%" : "150%", // Ajustar según extraZoom
+              width: "250%",
+              height: "250%",
+              objectFit: "cover"
             }}
             onError={() => {
               // Si hay un error al cargar el video, intentar con el ID de respaldo

@@ -1,11 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Loader2 } from "lucide-react"
+import { Loader2, ChevronLeft, ChevronRight } from "lucide-react"
 import { useLanguage } from "@/i18n/context"
 import { ClassAvatar } from "./class-avatar"
 import { fetchFromApi } from "@/lib/api-utils"
 import "@/app/medal-glow.css"
+import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/pagination"
 
 // Definir la interfaz para los datos del personaje
 interface CharacterData {
@@ -81,11 +82,13 @@ const getNoGuildTranslation = (lang: string): string => {
 }
 
 export function RankingsLevelTable() {
-  const { lang } = useLanguage()
+  const { language } = useLanguage()
   const [characters, setCharacters] = useState<CharacterData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const noGuildText = getNoGuildTranslation(lang)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+  const noGuildText = getNoGuildTranslation(language)
 
   useEffect(() => {
     const fetchRankings = async () => {
@@ -125,11 +128,11 @@ export function RankingsLevelTable() {
     }
 
     fetchRankings()
-  }, [lang, noGuildText])
+  }, [language, noGuildText])
 
   // Textos según el idioma
   const getLocalizedText = () => {
-    switch (lang) {
+    switch (language) {
       case "en":
         return {
           loading: "Loading rankings...",
@@ -141,6 +144,10 @@ export function RankingsLevelTable() {
           class: "Class",
           resets: "Resets",
           error: "Could not load rankings. Please try again later.",
+          prevPage: "Previous",
+          nextPage: "Next",
+          page: "Page",
+          of: "of",
         }
       case "pt":
         return {
@@ -153,6 +160,10 @@ export function RankingsLevelTable() {
           class: "Classe",
           resets: "Resets",
           error: "Não foi possível carregar os rankings. Por favor, tente novamente mais tarde.",
+          prevPage: "Anterior",
+          nextPage: "Próximo",
+          page: "Página",
+          of: "de",
         }
       case "es":
       default:
@@ -166,11 +177,41 @@ export function RankingsLevelTable() {
           class: "Clase",
           resets: "Resets",
           error: "No se pudieron cargar los rankings. Por favor, intenta de nuevo más tarde.",
+          prevPage: "Anterior",
+          nextPage: "Siguiente",
+          page: "Página",
+          of: "de",
         }
     }
   }
 
   const text = getLocalizedText()
+
+  // Cálculos para la paginación
+  const totalPages = Math.ceil(characters.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = characters.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Funciones para la paginación
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Función para cambiar a una página específica
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   // Función para renderizar el indicador de posición (medalla o número)
   const renderPositionIndicator = (position: number) => {
@@ -225,89 +266,164 @@ export function RankingsLevelTable() {
     }
   }
 
+  if (loading) {
+    return (
+      <div className="text-center p-8">
+        <Loader2 className="h-12 w-12 animate-spin text-gold-400 mx-auto mb-4" />
+        <p className="text-gold-300">{text.loading}</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="text-center p-8">
+        <div className="bg-red-500/20 text-red-100 p-4 rounded-md mb-4">
+          <p>{error}</p>
+        </div>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-gold-600 text-bunker-950 rounded-md hover:bg-gold-500 transition-colors"
+        >
+          {text.retry}
+        </button>
+      </div>
+    )
+  }
+
+  if (!characters || characters.length === 0) {
+    return (
+      <div className="text-center p-8">
+        <p className="text-gold-300">{text.noCharacters}</p>
+      </div>
+    )
+  }
+
   return (
-    <div className="w-full overflow-hidden rounded-lg border border-gold-500/30 bg-bunker-950/80 backdrop-blur-sm">
-      {loading ? (
-        <div className="flex flex-col items-center justify-center py-20">
-          <Loader2 className="h-12 w-12 animate-spin text-gold-400" />
-          <p className="mt-4 text-gold-100">{text.loading}</p>
-        </div>
-      ) : error ? (
-        <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-          <p className="text-red-400 mb-4">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-gold-600 hover:bg-gold-500 text-bunker-950 font-medium rounded-md transition-colors"
-          >
-            {text.retry}
-          </button>
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gold-500/30 bg-bunker-900/50">
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gold-300 uppercase tracking-wider">
-                  {text.position}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gold-300 uppercase tracking-wider">
-                  {text.character}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gold-300 uppercase tracking-wider">
-                  {text.level}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gold-300 uppercase tracking-wider">
-                  {text.class}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gold-300 uppercase tracking-wider">
-                  {text.resets}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gold-300 uppercase tracking-wider">
-                  Guild
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {characters.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-gold-100">
-                    {text.noCharacters}
-                  </td>
-                </tr>
-              ) : (
-                characters.map((character, index) => (
-                  <tr
-                    key={index}
-                    className={`
-                      border-b border-bunker-800/50 
-                      ${index % 2 === 0 ? "bg-bunker-900/30" : "bg-bunker-950/50"}
-                      hover:bg-gold-900/20 transition-colors
-                    `}
-                  >
-                    <td className="px-4 py-3 whitespace-nowrap">{renderPositionIndicator(index + 1)}</td>
-                    {/* Columna de nombre SIN avatar - solo el texto del nombre */}
-                    <td className="px-4 py-3 whitespace-nowrap font-medium text-gold-100">{character.Name}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-red-400 font-medium">{character.cLevel}</td>
-                    {/* Columna de clase CON avatar */}
-                    <td className="px-4 py-3 whitespace-nowrap text-gold-100">
-                      <div className="flex items-center gap-2">
-                        <ClassAvatar classId={character.Class} size={28} />
-                        <span>{getClassName(character.Class)}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-gold-300 font-medium">{character.Resets}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      {character.Guild === noGuildText ? (
-                        <span className="text-gray-400">Sin Clan</span>
-                      ) : (
-                        <span className="font-medium text-gold-100">{character.Guild}</span>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+    <div className="overflow-x-auto rounded-md shadow-md bg-bunker-900/90 border border-gold-600 p-4">
+      <table className="min-w-full text-gold-100 text-sm">
+        <thead>
+          <tr className="bg-bunker-800 border-b border-gold-600">
+            <th className="px-4 py-2 text-left">#</th>
+            <th className="px-4 py-2 text-left">{text.character}</th>
+            <th className="px-4 py-2 text-left">{text.level}</th>
+            <th className="px-4 py-2 text-left">{text.class}</th>
+            <th className="px-4 py-2 text-left min-w-[120px]">Guild</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentItems.map((character, index) => (
+            <tr key={indexOfFirstItem + index} className="hover:bg-bunker-700 border-b border-gold-700/30">
+              <td className="px-4 py-2">
+                {renderPositionIndicator(indexOfFirstItem + index + 1)}
+              </td>
+              <td className="px-4 py-2">{character.Name}</td>
+              <td className="px-4 py-2">{character.cLevel}</td>
+              <td className="px-4 py-2">
+                <div className="flex items-center gap-2">
+                  <ClassAvatar classId={character.Class} size={28} />
+                  <span>{getClassName(character.Class)}</span>
+                </div>
+              </td>
+              <td className="px-4 py-2 min-w-[120px]">
+                {character.Guild === noGuildText ? (
+                  <span className="text-gray-400">{noGuildText}</span>
+                ) : (
+                  <span className="font-medium text-gold-100">{character.Guild}</span>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      
+      {/* Controles de paginación con Pagination de shadcn/ui */}
+      {characters.length > itemsPerPage && (
+        <div className="mt-4 border-t border-gold-700/30 pt-4">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <button
+                  onClick={handlePrevPage}
+                  disabled={currentPage === 1}
+                  className={`flex items-center gap-1 px-3 py-1.5 text-sm rounded border border-gold-700/30 ${
+                    currentPage === 1
+                      ? "bg-bunker-800/70 text-gold-500/50 cursor-not-allowed"
+                      : "bg-bunker-800 text-gold-400 hover:bg-bunker-700 hover:text-gold-300"
+                  }`}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  {text.prevPage}
+                </button>
+              </PaginationItem>
+              
+              {/* Número de página actual y total */}
+              <PaginationItem>
+                <span className="mx-2 text-gold-400">
+                  {text.page} {currentPage} {text.of} {totalPages}
+                </span>
+              </PaginationItem>
+              
+              {/* Números de página */}
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                // Mostrar hasta 5 páginas alrededor de la actual
+                let pageToShow: number;
+                
+                if (totalPages <= 5) {
+                  // Si hay 5 o menos páginas, mostrarlas todas
+                  pageToShow = i + 1;
+                } else {
+                  // Calcular qué páginas mostrar
+                  const startPage = Math.max(1, currentPage - 2);
+                  
+                  // Ajustar si estamos cerca del final
+                  if (startPage + 4 > totalPages) {
+                    pageToShow = totalPages - 4 + i;
+                  } else {
+                    pageToShow = startPage + i;
+                  }
+                  
+                  // Asegurarse de que pageToShow no sea menor que 1
+                  if (pageToShow < 1) {
+                    pageToShow = 1;
+                  }
+                }
+                
+                // No mostrar números de página fuera del rango total
+                if (pageToShow > totalPages) return null;
+                
+                return (
+                  <PaginationItem key={pageToShow}>
+                    <button
+                      onClick={() => goToPage(pageToShow)}
+                      className={`w-8 h-8 flex items-center justify-center rounded ${
+                        currentPage === pageToShow
+                          ? "bg-gold-600 text-bunker-950 font-bold"
+                          : "bg-bunker-800 text-gold-400 hover:bg-bunker-700"
+                      }`}
+                    >
+                      {pageToShow}
+                    </button>
+                  </PaginationItem>
+                );
+              })}
+              
+              <PaginationItem>
+                <button
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                  className={`flex items-center gap-1 px-3 py-1.5 text-sm rounded border border-gold-700/30 ${
+                    currentPage === totalPages
+                      ? "bg-bunker-800/70 text-gold-500/50 cursor-not-allowed"
+                      : "bg-bunker-800 text-gold-400 hover:bg-bunker-700 hover:text-gold-300"
+                  }`}
+                >
+                  {text.nextPage}
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       )}
     </div>

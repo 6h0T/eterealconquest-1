@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Trophy, Award, Crown, Star, Heart, Users, Swords, AlertTriangle } from "lucide-react"
+import { Trophy, Award, Crown, Star, Heart, Users, Swords, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react"
 import type { Locale } from "@/i18n/config"
 import { ClassAvatar } from "./class-avatar"
 import { fetchFromApi } from "@/lib/api-utils"
 import "@/app/medal-glow.css"
+import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/pagination"
 
 interface RankingsTableProps {
   type: string
@@ -44,6 +45,8 @@ export function RankingsTable({ type = "resets", lang = "es" }: RankingsTablePro
   const [error, setError] = useState<string | null>("")
   const [isDemo, setIsDemo] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
 
   // Traducciones específicas para la tabla de rankings
   const translations = {
@@ -69,6 +72,11 @@ export function RankingsTable({ type = "resets", lang = "es" }: RankingsTablePro
       masterLevel: "Master Level",
       demoData: "Mostrando datos de ejemplo",
       noGuild: "Sin Clan", // Cambiado de "Sin Clan" a "Sin Clan" para mantener consistencia
+      prevPage: "Anterior",
+      nextPage: "Siguiente",
+      page: "Página",
+      of: "de",
+      value: "Valor", // Añadido para el caso default
     },
     en: {
       loading: "Loading rankings...",
@@ -92,6 +100,11 @@ export function RankingsTable({ type = "resets", lang = "es" }: RankingsTablePro
       masterLevel: "Master Level",
       demoData: "Showing sample data",
       noGuild: "No Guild",
+      prevPage: "Previous",
+      nextPage: "Next",
+      page: "Page",
+      of: "of",
+      value: "Value", // Añadido para el caso default
     },
     pt: {
       loading: "Carregando rankings...",
@@ -115,6 +128,11 @@ export function RankingsTable({ type = "resets", lang = "es" }: RankingsTablePro
       masterLevel: "Master Level",
       demoData: "Mostrando dados de exemplo",
       noGuild: "Sem Clã",
+      prevPage: "Anterior",
+      nextPage: "Próximo",
+      page: "Página",
+      of: "de",
+      value: "Valor", // Añadido para el caso default
     },
   }
 
@@ -353,6 +371,32 @@ export function RankingsTable({ type = "resets", lang = "es" }: RankingsTablePro
     }
   }
 
+  // Cálculos para la paginación
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Funciones para la paginación
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Función para cambiar a una página específica
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
   // Renderizar estado de carga
   if (isLoading) {
     return (
@@ -537,7 +581,7 @@ export function RankingsTable({ type = "resets", lang = "es" }: RankingsTablePro
         <thead>{getHeaders()}</thead>
         <tbody>
           {data.length > 0 ? (
-            data.map((char, i) => getRowData(char, i))
+            currentItems.map((char, i) => getRowData(char, indexOfFirstItem + i))
           ) : (
             <tr>
               <td colSpan={5} className="px-4 py-8 text-center text-gold-300">
@@ -547,6 +591,96 @@ export function RankingsTable({ type = "resets", lang = "es" }: RankingsTablePro
           )}
         </tbody>
       </table>
+
+      {/* Controles de paginación con Pagination de shadcn/ui */}
+      {data.length > itemsPerPage && (
+        <div className="mt-4 border-t border-gold-700/30 pt-4">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <button
+                  onClick={handlePrevPage}
+                  disabled={currentPage === 1}
+                  className={`flex items-center gap-1 px-3 py-1.5 text-sm rounded border border-gold-700/30 ${
+                    currentPage === 1
+                      ? "bg-bunker-800/70 text-gold-500/50 cursor-not-allowed"
+                      : "bg-bunker-800 text-gold-400 hover:bg-bunker-700 hover:text-gold-300"
+                  }`}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  {t.prevPage}
+                </button>
+              </PaginationItem>
+              
+              {/* Número de página actual y total */}
+              <PaginationItem>
+                <span className="mx-2 text-gold-400">
+                  {t.page} {currentPage} {t.of} {totalPages}
+                </span>
+              </PaginationItem>
+              
+              {/* Números de página */}
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                // Mostrar hasta 5 páginas alrededor de la actual
+                let pageToShow: number;
+                
+                if (totalPages <= 5) {
+                  // Si hay 5 o menos páginas, mostrarlas todas
+                  pageToShow = i + 1;
+                } else {
+                  // Calcular qué páginas mostrar
+                  const startPage = Math.max(1, currentPage - 2);
+                  
+                  // Ajustar si estamos cerca del final
+                  if (startPage + 4 > totalPages) {
+                    pageToShow = totalPages - 4 + i;
+                  } else {
+                    pageToShow = startPage + i;
+                  }
+                  
+                  // Asegurarse de que pageToShow no sea menor que 1
+                  if (pageToShow < 1) {
+                    pageToShow = 1;
+                  }
+                }
+                
+                // No mostrar números de página fuera del rango total
+                if (pageToShow > totalPages) return null;
+                
+                return (
+                  <PaginationItem key={pageToShow}>
+                    <button
+                      onClick={() => goToPage(pageToShow)}
+                      className={`w-8 h-8 flex items-center justify-center rounded ${
+                        currentPage === pageToShow
+                          ? "bg-gold-600 text-bunker-950 font-bold"
+                          : "bg-bunker-800 text-gold-400 hover:bg-bunker-700"
+                      }`}
+                    >
+                      {pageToShow}
+                    </button>
+                  </PaginationItem>
+                );
+              })}
+              
+              <PaginationItem>
+                <button
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                  className={`flex items-center gap-1 px-3 py-1.5 text-sm rounded border border-gold-700/30 ${
+                    currentPage === totalPages
+                      ? "bg-bunker-800/70 text-gold-500/50 cursor-not-allowed"
+                      : "bg-bunker-800 text-gold-400 hover:bg-bunker-700 hover:text-gold-300"
+                  }`}
+                >
+                  {t.nextPage}
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   )
 }
