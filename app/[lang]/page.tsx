@@ -11,6 +11,8 @@ import { characters } from "@/constants"
 import HomeNewsSection from "@/components/home-news-section"
 import { ClientDownloadButton } from "@/components/client-download-button"
 import ArrowCarousel from "@/components/arrow-carousel"
+import Link from "next/link"
+import { ChevronRight } from "lucide-react"
 
 export default async function Home({ params }: { params: { lang: Locale } }) {
   // @ts-ignore - Suppress TS warning about direct param access
@@ -177,6 +179,16 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
 
             {/* Arrow Carousel Component */}
             <ArrowCarousel items={galleryItems} />
+            
+            {/* Botón para ir a la página de información */}
+            <div className="flex justify-center mt-8">
+              <Link 
+                href={`/${lang}/informacion`} 
+                className="golden-button"
+              >
+                {dict?.common?.viewMoreInfo || "Ver más información"}
+              </Link>
+            </div>
           </div>
         </section>
 
