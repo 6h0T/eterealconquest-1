@@ -20,66 +20,49 @@ export default function ServerInfoCarousel({ lang }: ServerInfoCarouselProps) {
         {
           title: "Información General",
           content: [
-            "🎮 Versión: Season 6 Episode 3",
-            "⚡ Experiencia: 9999x",
-            "💰 Drop: 80%",
-            "🏆 Zen: 60%",
-            "🔥 Máximo Reset: 50",
-            "⭐ Máximo Grand Reset: 20",
-            "🎯 Máximo Nivel: 400",
-            "💎 Máximo Stats: 32.767"
+            "🎮 Versión: Season 6",
+            "⚡ Experiencia: 10x (Dinámica)",
+            "💰 Drop: 30%",
+            "🏆 Zen: Low",
+            "🔥 Tipo de Servidor: No Reset",
+            "🎯 Nivel máximo: 400",
+            "💎 Cuentas máximas por PC: 5"
           ]
         },
         {
-          title: "Sistema de Resets",
+          title: "Características Especiales en Etereal Mu!",
           content: [
-            "🔄 Reset disponible desde nivel 400",
-            "📈 Cada reset otorga puntos adicionales",
-            "🌟 Grand Reset disponible tras 50 resets",
-            "💪 Bonificaciones especiales por Grand Reset",
-            "🎁 Recompensas exclusivas por milestone",
-            "⚔️ Acceso a contenido de alto nivel",
-            "🏅 Títulos especiales por logros",
-            "🔮 Items únicos por progresión"
+            "⚡ Motor gráfico actualizado, fluidez única!",
+            "🎨 Interfaz modernizada",
+            "🌍 Sistema multilenguaje 100% funcional en Español, Inglés, Portugués.",
+            "💎 Nuevo sistema de rareza en items (Legendary, Epic, Rare, Uncommon)",
+            "🏰 Nuevo sistema de Dungeons",
+            "🗺️ Nuevo continente",
+            "🚁 Sistema de Dirigibles exclusivo para descubrir nuevos continentes"
           ]
         },
         {
           title: "Sistema PvP",
           content: [
-            "⚔️ PvP balanceado y competitivo",
-            "🏟️ Eventos PvP regulares",
-            "🏆 Rankings y torneos",
-            "💀 Sistema de duelos mejorado",
-            "🛡️ Anti-hack y anti-cheat activo",
-            "🎯 Zonas PvP especializadas",
-            "👑 Recompensas por victorias",
-            "🔥 Sistema de guilds avanzado"
+            "⚔️ Nuevo evento PvP Battlegrounds",
+            "🏆 Sistema de clasificaciones según tus resultados en eventos!",
+            "✨ Habilidades mejoradas y modificadas en todas las razas",
+            "🛡️ Antihack y anticheat no invasivo",
+            "🎯 Torneos organizados por la comunidad",
+            "🏰 Castle Siege con características únicas",
+            "🎯 Dummys distribuidos en ciudades principales"
           ]
         },
         {
-          title: "Características Especiales",
+          title: "Economía del servidor",
           content: [
-            "🎨 Motor gráfico modernizado",
-            "🔧 Sistema de rareza de items",
-            "🏰 Dungeons exclusivos",
-            "🎪 Eventos automáticos",
-            "💳 Sistema WCoins integrado",
-            "📱 Panel web completo",
-            "🔒 Seguridad avanzada",
-            "🌐 Soporte multiidioma"
-          ]
-        },
-        {
-          title: "Economía del Servidor",
-          content: [
-            "💰 Economía balanceada y estable",
-            "🏪 Sistema de comercio seguro",
-            "💎 WCoins para items premium",
-            "🎁 Eventos con recompensas",
-            "📊 Market dinámico",
-            "🔄 Sistema de intercambio",
-            "💸 Sin pay-to-win",
-            "⚖️ Precios equilibrados"
+            "🚫 Sin Pay 2 Win, solo podrás adquirir consumibles",
+            "🏪 Nueva casa de subastas con características avanzadas",
+            "💰 Comercio de WCoin disponible entre usuarios",
+            "👹 Tienda de Goblin Points con consumibles únicos",
+            "🎮 Obtén Goblin Points participando en eventos",
+            "📈 Recibe recompensas progresivas y escalables",
+            "🏛️ Recibe recompensas por participación en eventos de Guild"
           ]
         }
       ]
@@ -88,66 +71,49 @@ export default function ServerInfoCarousel({ lang }: ServerInfoCarouselProps) {
         {
           title: "General Information",
           content: [
-            "🎮 Version: Season 6 Episode 3",
-            "⚡ Experience: 9999x",
-            "💰 Drop: 80%",
-            "🏆 Zen: 60%",
-            "🔥 Maximum Reset: 50",
-            "⭐ Maximum Grand Reset: 20",
-            "🎯 Maximum Level: 400",
-            "💎 Maximum Stats: 32,767"
+            "🎮 Version: Season 6",
+            "⚡ Experience: 10x (Dynamic)",
+            "💰 Drop: 30%",
+            "🏆 Zen: Low",
+            "🔥 Server Type: No Reset",
+            "🎯 Max Level: 400",
+            "💎 Max Accounts per PC: 5"
           ]
         },
         {
-          title: "Reset System",
+          title: "Special Features in Etereal Mu!",
           content: [
-            "🔄 Reset available from level 400",
-            "📈 Each reset grants additional points",
-            "🌟 Grand Reset available after 50 resets",
-            "💪 Special bonuses per Grand Reset",
-            "🎁 Exclusive milestone rewards",
-            "⚔️ Access to high-level content",
-            "🏅 Special titles for achievements",
-            "🔮 Unique items through progression"
+            "⚡ Updated graphics engine, unique fluidity!",
+            "🎨 Modernized interface",
+            "🌍 100% functional multilanguage system in Spanish, English, Portuguese.",
+            "💎 New item rarity system (Legendary, Epic, Rare, Uncommon)",
+            "🏰 New Dungeons system",
+            "🗺️ New continent",
+            "🚁 Exclusive Airship system to discover new continents"
           ]
         },
         {
           title: "PvP System",
           content: [
-            "⚔️ Balanced and competitive PvP",
-            "🏟️ Regular PvP events",
-            "🏆 Rankings and tournaments",
-            "💀 Enhanced duel system",
-            "🛡️ Active anti-hack and anti-cheat",
-            "🎯 Specialized PvP zones",
-            "👑 Victory rewards",
-            "🔥 Advanced guild system"
-          ]
-        },
-        {
-          title: "Special Features",
-          content: [
-            "🎨 Modernized graphic engine",
-            "🔧 Item rarity system",
-            "🏰 Exclusive dungeons",
-            "🎪 Automatic events",
-            "💳 Integrated WCoins system",
-            "📱 Complete web panel",
-            "🔒 Advanced security",
-            "🌐 Multi-language support"
+            "⚔️ New PvP Battlegrounds event",
+            "🏆 Ranking system based on your event results!",
+            "✨ Improved and modified skills for all races",
+            "🛡️ Non-invasive antihack and anticheat",
+            "🎯 Community-organized tournaments",
+            "🏰 Castle Siege with unique features",
+            "🎯 Dummies distributed in main cities"
           ]
         },
         {
           title: "Server Economy",
           content: [
-            "💰 Balanced and stable economy",
-            "🏪 Secure trading system",
-            "💎 WCoins for premium items",
-            "🎁 Events with rewards",
-            "📊 Dynamic market",
-            "🔄 Exchange system",
-            "💸 No pay-to-win",
-            "⚖️ Balanced prices"
+            "🚫 No Pay 2 Win, you can only acquire consumables",
+            "🏪 New auction house with advanced features",
+            "💰 WCoin trading available between users",
+            "👹 Goblin Points store with unique consumables",
+            "🎮 Earn Goblin Points by participating in events",
+            "📈 Receive progressive and scalable rewards",
+            "🏛️ Receive rewards for participating in Guild events"
           ]
         }
       ]
@@ -156,66 +122,49 @@ export default function ServerInfoCarousel({ lang }: ServerInfoCarouselProps) {
         {
           title: "Informações Gerais",
           content: [
-            "🎮 Versão: Season 6 Episode 3",
-            "⚡ Experiência: 9999x",
-            "💰 Drop: 80%",
-            "🏆 Zen: 60%",
-            "🔥 Reset Máximo: 50",
-            "⭐ Grand Reset Máximo: 20",
-            "🎯 Nível Máximo: 400",
-            "💎 Stats Máximos: 32.767"
+            "🎮 Versão: Season 6",
+            "⚡ Experiência: 10x (Dinâmica)",
+            "💰 Drop: 30%",
+            "🏆 Zen: Low",
+            "🔥 Tipo de Servidor: No Reset",
+            "🎯 Nível máximo: 400",
+            "💎 Contas máximas por PC: 5"
           ]
         },
         {
-          title: "Sistema de Reset",
+          title: "Características Especiais no Etereal Mu!",
           content: [
-            "🔄 Reset disponível a partir do nível 400",
-            "📈 Cada reset concede pontos adicionais",
-            "🌟 Grand Reset disponível após 50 resets",
-            "💪 Bônus especiais por Grand Reset",
-            "🎁 Recompensas exclusivas por marco",
-            "⚔️ Acesso a conteúdo de alto nível",
-            "🏅 Títulos especiais por conquistas",
-            "🔮 Itens únicos por progressão"
+            "⚡ Motor gráfico atualizado, fluidez única!",
+            "🎨 Interface modernizada",
+            "🌍 Sistema multilíngue 100% funcional em Espanhol, Inglês, Português.",
+            "💎 Novo sistema de raridade de itens (Legendary, Epic, Rare, Uncommon)",
+            "🏰 Novo sistema de Dungeons",
+            "🗺️ Novo continente",
+            "🚁 Sistema de Dirigíveis exclusivo para descobrir novos continentes"
           ]
         },
         {
           title: "Sistema PvP",
           content: [
-            "⚔️ PvP balanceado e competitivo",
-            "🏟️ Eventos PvP regulares",
-            "🏆 Rankings e torneios",
-            "💀 Sistema de duelos aprimorado",
-            "🛡️ Anti-hack e anti-cheat ativo",
-            "🎯 Zonas PvP especializadas",
-            "👑 Recompensas por vitórias",
-            "🔥 Sistema de guildas avançado"
+            "⚔️ Novo evento PvP Battlegrounds",
+            "🏆 Sistema de classificações baseado nos seus resultados em eventos!",
+            "✨ Habilidades melhoradas e modificadas em todas as raças",
+            "🛡️ Antihack e anticheat não invasivo",
+            "🎯 Torneios organizados pela comunidade",
+            "🏰 Castle Siege com características únicas",
+            "🎯 Dummies distribuídos nas cidades principais"
           ]
         },
         {
-          title: "Características Especiais",
+          title: "Economia do servidor",
           content: [
-            "🎨 Motor gráfico modernizado",
-            "🔧 Sistema de raridade de itens",
-            "🏰 Dungeons exclusivas",
-            "🎪 Eventos automáticos",
-            "💳 Sistema WCoins integrado",
-            "📱 Painel web completo",
-            "🔒 Segurança avançada",
-            "🌐 Suporte multi-idioma"
-          ]
-        },
-        {
-          title: "Economia do Servidor",
-          content: [
-            "💰 Economia balanceada e estável",
-            "🏪 Sistema de comércio seguro",
-            "💎 WCoins para itens premium",
-            "🎁 Eventos com recompensas",
-            "📊 Mercado dinâmico",
-            "🔄 Sistema de troca",
-            "💸 Sem pay-to-win",
-            "⚖️ Preços equilibrados"
+            "🚫 Sem Pay 2 Win, você só pode adquirir consumíveis",
+            "🏪 Nova casa de leilões com características avançadas",
+            "💰 Comércio de WCoin disponível entre usuários",
+            "👹 Loja de Goblin Points com consumíveis únicos",
+            "🎮 Ganhe Goblin Points participando de eventos",
+            "📈 Receba recompensas progressivas e escaláveis",
+            "🏛️ Receba recompensas por participação em eventos de Guild"
           ]
         }
       ]

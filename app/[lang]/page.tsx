@@ -260,6 +260,9 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
             </div>
           </div>
         </section>
+
+        {/* Divisor después de CTA section - como elemento independiente */}
+        <SectionDivider />
       </div>
 
       {/* Client Download Button */}
