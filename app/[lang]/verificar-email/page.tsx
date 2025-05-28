@@ -37,7 +37,7 @@ const texts: Record<string, VerificationTexts> = {
     success: {
       title: "¡Cuenta Verificada!",
       description: "Tu cuenta ha sido verificada exitosamente. Ya puedes iniciar sesión.",
-      button: "Ir al Login"
+      button: "Ir al Inicio de Sesión"
     },
     error: {
       title: "Error de Verificación",
@@ -130,9 +130,9 @@ export default function VerificarEmailPage({ params }: { params: { lang: string 
         if (response.ok && data.success) {
           setState("success")
           setMessage(data.message || "")
-          // Redirigir al login después de 3 segundos
+          // Redirigir al inicio de sesión después de 3 segundos
           setTimeout(() => {
-            router.push(`/${lang}/login`)
+            router.push(`/${lang}/inicio-sesion`)
           }, 3000)
         } else {
           setState("error")
@@ -151,7 +151,7 @@ export default function VerificarEmailPage({ params }: { params: { lang: string 
   const handleButtonClick = () => {
     switch (state) {
       case "success":
-        router.push(`/${lang}/login`)
+        router.push(`/${lang}/inicio-sesion`)
         break
       case "error":
         router.push(`/${lang}/registro`)
