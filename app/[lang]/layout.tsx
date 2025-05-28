@@ -9,6 +9,7 @@ import type { Locale } from "@/i18n/config"
 import { PreloaderWrapper } from "@/components/preloader-wrapper"
 import StreamsBox from "@/components/streams-box"
 import { StructuredData } from "@/components/structured-data"
+import { DiscordFloatButton } from "@/components/discord-float-button"
 
 // Importar la función de precarga
 import { preloadCommonDictionaries } from "@/i18n/config"
@@ -108,6 +109,7 @@ export default function Layout({ children, params }: LayoutProps) {
               </main>
               <Footer lang={lang} />
               <StreamsBox />
+              <DiscordFloatButton lang={lang} />
             </PreloaderWrapper>
           </ErrorBoundary>
         </ThemeProvider>

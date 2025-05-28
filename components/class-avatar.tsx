@@ -8,7 +8,25 @@ interface ClassAvatarProps {
 export function ClassAvatar({ classId, size = 24 }: ClassAvatarProps) {
   // Mapeo de classId a la URL de Blob correspondiente
   const getAvatarSrc = (classId: number): string => {
-    // Usamos el ID base (múltiplos de 16) para todas las evoluciones
+    // Mapeo específico para clases individuales
+    const specificClassMap: Record<number, string> = {
+      // Magic Gladiator específicos
+      48: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/mg.jpg-bkkiwrrsyjHhIXuyR50Rei23E879yW.jpeg",
+      49: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/mg.jpg-bkkiwrrsyjHhIXuyR50Rei23E879yW.jpeg",
+      50: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/mg.jpg-bkkiwrrsyjHhIXuyR50Rei23E879yW.jpeg",
+      
+      // Summoner específicos
+      80: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sum.jpg-UmhIyXcNSr6vTVpKJfZE57kmEXAeG0.jpeg",
+      81: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sum.jpg-UmhIyXcNSr6vTVpKJfZE57kmEXAeG0.jpeg",
+      82: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sum.jpg-UmhIyXcNSr6vTVpKJfZE57kmEXAeG0.jpeg",
+    }
+
+    // Verificar si hay un mapeo específico para esta clase
+    if (specificClassMap[classId]) {
+      return specificClassMap[classId]
+    }
+
+    // Usar el ID base (múltiplos de 16) para otras clases
     const baseClassId = Math.floor(classId / 16) * 16
 
     switch (baseClassId) {
@@ -18,7 +36,7 @@ export function ClassAvatar({ classId, size = 24 }: ClassAvatarProps) {
         return "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dk.jpg-bLSXhg4sec0pYmRMPvW3Z0FIBr3oat.jpeg" // dk.jpg
       case 32: // Fairy Elf y evoluciones (32, 33, 34)
         return "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/elf.jpg-Ye9WiXMixJNOE55jwm499hojviQQxD.jpeg" // elf.jpg
-      case 48: // Magic Gladiator y evoluciones (48, 49)
+      case 48: // Magic Gladiator y evoluciones (48, 49, 50)
         return "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/mg.jpg-bkkiwrrsyjHhIXuyR50Rei23E879yW.jpeg" // mg.jpg
       case 64: // Dark Lord y evoluciones (64, 65)
         return "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dl.jpg-elq1oySJFF79Mo68dUqW0a8UjP60L8.jpeg" // dl.jpg

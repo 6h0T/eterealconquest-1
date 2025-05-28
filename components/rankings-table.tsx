@@ -138,7 +138,6 @@ export function RankingsTable({ type = "resets", lang = "es" }: RankingsTablePro
 
   const t = translations[lang as keyof typeof translations]
 
-  // Asegurarse de que el mapeo de classNames esté completo y correcto
   // Mapeo de clases para mostrar nombres legibles
   const classNames: Record<number, string> = {
     0: "Dark Wizard",
@@ -151,12 +150,13 @@ export function RankingsTable({ type = "resets", lang = "es" }: RankingsTablePro
     33: "Muse Elf",
     34: "High Elf", // Añadido
     48: "Magic Gladiator",
-    49: "Duel Master", // Añadido
+    49: "Magic Gladiator",
+    50: "Duel Master",
     64: "Dark Lord",
     65: "Lord Emperor", // Añadido
     80: "Summoner",
-    81: "Bloody Summoner", // Añadido
-    82: "Dimension Master", // Añadido
+    81: "Bloody Summoner",
+    82: "Dimension Master",
     96: "Rage Fighter",
     97: "Fist Master", // Añadido
     98: "Fist Blazer", // Añadido

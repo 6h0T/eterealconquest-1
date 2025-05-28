@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
 import { Facebook, Instagram } from "lucide-react"
 import { FaDiscord } from "react-icons/fa"
 import type { Locale } from "@/i18n/config"
@@ -14,6 +15,8 @@ export function Footer({ lang }: FooterProps) {
   const year = new Date().getFullYear()
   const [dictionary, setDictionary] = useState<any>({})
   const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
+  const pathname = usePathname()
 
   // Cargar el diccionario directamente en el componente
   useEffect(() => {
@@ -31,6 +34,59 @@ export function Footer({ lang }: FooterProps) {
 
     loadDictionary()
   }, [lang])
+
+  // Función para manejar la navegación igual que en el navbar
+  const handleNavigation = (href: string, isAnchor: boolean, isCenteredSection = false) => {
+    // Si es un enlace con ancla
+    if (isAnchor) {
+      const isHomePage = pathname === `/${lang}` || pathname === `/${lang}/`
+
+      // Si estamos en la página principal y queremos ir a una sección de la misma página
+      if (isHomePage) {
+        const sectionId = href.split("#")[1]
+        const section = document.getElementById(sectionId)
+
+        if (section) {
+          // Si es la sección de descargas, usar un desplazamiento personalizado para centrarla
+          if (isCenteredSection) {
+            // Obtener la altura del viewport
+            const viewportHeight = window.innerHeight
+            // Obtener la posición y altura de la sección
+            const rect = section.getBoundingClientRect()
+            const sectionHeight = rect.height
+            // Calcular la posición de desplazamiento para centrar la sección
+            const scrollPosition = window.scrollY + rect.top - viewportHeight / 2 + sectionHeight / 2
+
+            // Desplazarse a la posición calculada
+            window.scrollTo({
+              top: scrollPosition - 100, // Ajuste adicional para mejorar la posición
+              behavior: "smooth",
+            })
+          } else {
+            // Para otras secciones, usar el comportamiento normal
+            section.scrollIntoView({ behavior: "smooth" })
+          }
+        }
+        return
+      }
+
+      // Si estamos en otra página y queremos ir a una sección de la página principal
+      router.push(href)
+      return
+    }
+
+    // Si es un enlace normal (sin ancla)
+    router.push(href)
+  }
+
+  // Enlaces rápidos con la misma configuración que el navbar
+  const quickLinks = dictionary && dictionary.navbar ? [
+    { name: dictionary.navbar.home, href: `/${lang}`, isAnchor: false },
+    { name: dictionary.navbar.features, href: `/${lang}#info-section`, isAnchor: true },
+    { name: dictionary.navbar.news, href: `/${lang}#news-section`, isAnchor: true },
+    { name: dictionary.navbar.download, href: `/${lang}#cta-section`, isAnchor: true, isCenteredSection: true },
+    { name: dictionary.navbar.ranking, href: `/${lang}/ranking`, isAnchor: false },
+  ] : []
 
   // Renderizar un footer simplificado mientras se cargan las traducciones
   if (isLoading) {
@@ -53,31 +109,20 @@ export function Footer({ lang }: FooterProps) {
               {dictionary.footer?.quickLinks}
             </h3>
             <ul className="space-y-2">
-              <li>
-                <Link href={`/${lang}`} className="text-gold-100 hover:text-gold-300 transition-colors">
-                  {dictionary.navbar?.home}
-                </Link>
-              </li>
-              <li>
-                <Link href={`/${lang}/features`} className="text-gold-100 hover:text-gold-300 transition-colors">
-                  {dictionary.navbar?.features}
-                </Link>
-              </li>
-              <li>
-                <Link href={`/${lang}/noticias`} className="text-gold-100 hover:text-gold-300 transition-colors">
-                  {dictionary.navbar?.news}
-                </Link>
-              </li>
-              <li>
-                <Link href={`/${lang}/download`} className="text-gold-100 hover:text-gold-300 transition-colors">
-                  {dictionary.navbar?.download}
-                </Link>
-              </li>
-              <li>
-                <Link href={`/${lang}/ranking`} className="text-gold-100 hover:text-gold-300 transition-colors">
-                  {dictionary.navbar?.ranking}
-                </Link>
-              </li>
+              {quickLinks.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleNavigation(link.href, link.isAnchor, link.isCenteredSection)
+                    }}
+                    className="text-gold-100 hover:text-gold-300 transition-colors cursor-pointer"
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
           
@@ -118,7 +163,7 @@ export function Footer({ lang }: FooterProps) {
         </div>
 
         {/* Layout para móvil - una sola línea */}
-        <div className="md:hidden">
+        <div className="block md:hidden">
           {/* Contenido en una línea con títulos alineados */}
           <div className="flex justify-between items-start gap-4">
             {/* Enlaces rápidos */}
@@ -127,31 +172,20 @@ export function Footer({ lang }: FooterProps) {
                 {dictionary.footer?.quickLinks}
               </h3>
               <ul className="space-y-1">
-                <li>
-                  <Link href={`/${lang}`} className="text-gold-100 hover:text-gold-300 transition-colors text-sm">
-                    {dictionary.navbar?.home}
-                  </Link>
-                </li>
-                <li>
-                  <Link href={`/${lang}/features`} className="text-gold-100 hover:text-gold-300 transition-colors text-sm">
-                    {dictionary.navbar?.features}
-                  </Link>
-                </li>
-                <li>
-                  <Link href={`/${lang}/noticias`} className="text-gold-100 hover:text-gold-300 transition-colors text-sm">
-                    {dictionary.navbar?.news}
-                  </Link>
-                </li>
-                <li>
-                  <Link href={`/${lang}/download`} className="text-gold-100 hover:text-gold-300 transition-colors text-sm">
-                    {dictionary.navbar?.download}
-                  </Link>
-                </li>
-                <li>
-                  <Link href={`/${lang}/ranking`} className="text-gold-100 hover:text-gold-300 transition-colors text-sm">
-                    {dictionary.navbar?.ranking}
-                  </Link>
-                </li>
+                {quickLinks.map((link) => (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        handleNavigation(link.href, link.isAnchor, link.isCenteredSection)
+                      }}
+                      className="text-gold-100 hover:text-gold-300 transition-colors text-sm cursor-pointer"
+                    >
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
 
@@ -194,7 +228,7 @@ export function Footer({ lang }: FooterProps) {
         </div>
         
         {/* Copyright - igual para ambas versiones */}
-        <div className="mt-8 pt-8 border-t border-bunker-700 text-center">
+        <div className="text-center mt-8 pt-8 border-t border-gold-700/30">
           <p className="text-gold-200 text-sm">
             &copy; {year} ETEREALCONQUEST. {dictionary.footer?.allRightsReserved}.
           </p>

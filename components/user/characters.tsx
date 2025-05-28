@@ -82,7 +82,12 @@ export function UserCharacters({ username, lang }: UserCharactersProps) {
       magicGladiator: "Magic Gladiator",
       darkLord: "Dark Lord",
       summoner: "Summoner",
+      bloodySummoner: "Bloody Summoner",
       rageFighter: "Rage Fighter",
+      duelMaster: "Duel Master",
+      dimensionMaster: "Dimension Master",
+      lordEmperor: "Lord Emperor",
+      fistMaster: "Fist Master",
       accountDisconnected: "Para interactuar con estas opciones, la cuenta debe estar desconectada del juego.",
     },
     en: {
@@ -130,7 +135,12 @@ export function UserCharacters({ username, lang }: UserCharactersProps) {
       magicGladiator: "Magic Gladiator",
       darkLord: "Dark Lord",
       summoner: "Summoner",
+      bloodySummoner: "Bloody Summoner",
       rageFighter: "Rage Fighter",
+      duelMaster: "Duel Master",
+      dimensionMaster: "Dimension Master",
+      lordEmperor: "Lord Emperor",
+      fistMaster: "Fist Master",
       accountDisconnected: "To interact with these options, the account must be disconnected from the game.",
     },
     pt: {
@@ -178,7 +188,12 @@ export function UserCharacters({ username, lang }: UserCharactersProps) {
       magicGladiator: "Magic Gladiator",
       darkLord: "Dark Lord",
       summoner: "Summoner",
+      bloodySummoner: "Bloody Summoner",
       rageFighter: "Rage Fighter",
+      duelMaster: "Duel Master",
+      dimensionMaster: "Dimension Master",
+      lordEmperor: "Lord Emperor",
+      fistMaster: "Fist Master",
       accountDisconnected: "Para interagir com estas opções, la cuenta debe estar desconectada del juego.",
     },
   }
@@ -194,9 +209,15 @@ export function UserCharacters({ username, lang }: UserCharactersProps) {
     32: t.fairyElf,
     33: t.museElf,
     48: t.magicGladiator,
+    49: t.magicGladiator,
+    50: t.duelMaster,
     64: t.darkLord,
+    65: t.lordEmperor, // Lord Emperor (evolución de Dark Lord)
     80: t.summoner,
+    81: t.bloodySummoner, // Bloody Summoner (evolución de Summoner)
+    82: t.dimensionMaster, // Dimension Master (evolución de Summoner)
     96: t.rageFighter,
+    97: t.fistMaster, // Fist Master (evolución de Rage Fighter)
   }
 
   // Mapeo de clases a imágenes de avatar
@@ -208,9 +229,15 @@ export function UserCharacters({ username, lang }: UserCharactersProps) {
     32: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/elf.jpg-yn25xRDcio5xJR3L6EwjFKp8r8VqUK.jpeg", // Fairy Elf
     33: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/elf.jpg-yn25xRDcio5xJR3L6EwjFKp8r8VqUK.jpeg", // Muse Elf (misma imagen que Fairy Elf)
     48: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/mg.jpg-DElqcuXpSD73S72zpKWhpx77TSia2N.jpeg", // Magic Gladiator
+    49: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/mg.jpg-DElqcuXpSD73S72zpKWhpx77TSia2N.jpeg", // Duel Master
+    50: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/mg.jpg-DElqcuXpSD73S72zpKWhpx77TSia2N.jpeg", // Magic Gladiator alternativo
     64: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dl.jpg-dPtAXSjZyBKQm2yrVVIYKXV3Bkqmt0.jpeg", // Dark Lord
+    65: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dl.jpg-dPtAXSjZyBKQm2yrVVIYKXV3Bkqmt0.jpeg", // Lord Emperor
     80: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sum.jpg-5rFMeWrNA4MzzqpjJSZ2Zmco4uPUcz.jpeg", // Summoner
+    81: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sum.jpg-5rFMeWrNA4MzzqpjJSZ2Zmco4uPUcz.jpeg", // Bloody Summoner
+    82: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sum.jpg-5rFMeWrNA4MzzqpjJSZ2Zmco4uPUcz.jpeg", // Dimension Master
     96: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/rf.jpg-bv9A64BaE5LBBUm2XLZeycXfUD9vBs.jpeg", // Rage Fighter
+    97: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/rf.jpg-bv9A64BaE5LBBUm2XLZeycXfUD9vBs.jpeg", // Fist Master
   }
 
   // Cargar personajes del usuario

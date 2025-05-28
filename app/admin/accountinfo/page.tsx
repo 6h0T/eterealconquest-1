@@ -38,10 +38,15 @@ const classNames: Record<number, string> = {
   32: "Fairy Elf",
   33: "Muse Elf",
   48: "Magic Gladiator",
+  49: "Magic Gladiator",
+  50: "Duel Master",
   64: "Dark Lord",
+  65: "Lord Emperor",
   80: "Summoner",
+  81: "Bloody Summoner",
+  82: "Dimension Master",
   96: "Rage Fighter",
-  // Añadir más clases según sea necesario
+  97: "Fist Master",
 }
 
 export default function AccountInfoPage() {

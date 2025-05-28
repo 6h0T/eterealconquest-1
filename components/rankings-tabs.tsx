@@ -272,7 +272,7 @@ export function RankingsTabs() {
 
       // Magic Gladiator (MG)
       48: "Magic Gladiator",
-      49: "Duel Master",
+      49: "Magic Gladiator",
       50: "Duel Master",
 
       // Dark Lord (DL)
