@@ -172,7 +172,7 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
         <section id="info-section" className="py-16 relative">
           {/* Fondo con video para escritorio */}
           <div className="hidden md:block absolute inset-0">
-            <VimeoBackground videoId="1074464598" fallbackId="1074465089" />
+          <VimeoBackground videoId="1074464598" fallbackId="1074465089" />
           </div>
           {/* Fondo con imagen para móvil */}
           <div className="block md:hidden absolute inset-0">
@@ -188,7 +188,7 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
 
             {/* Arrow Carousel para escritorio */}
             <div className="hidden md:block">
-              <ArrowCarousel items={galleryItems} />
+            <ArrowCarousel items={galleryItems} />
             </div>
 
             {/* Server Info Carousel para móvil */}
@@ -215,7 +215,7 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
         <section id="news-section" className="py-16 relative">
           {/* Fondo con video para escritorio */}
           <div className="hidden md:block absolute inset-0">
-            <VimeoBackground videoId="1074465089" />
+          <VimeoBackground videoId="1074465089" />
           </div>
           {/* Fondo con imagen para móvil */}
           <div className="block md:hidden absolute inset-0">
@@ -243,7 +243,7 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
         <section id="cta-section" className="min-h-[500px] flex items-center justify-center relative">
           {/* Fondo con video para escritorio */}
           <div className="hidden md:block absolute inset-0">
-            <VimeoBackground videoId="1074465089" />
+          <VimeoBackground videoId="1074465089" />
           </div>
           {/* Fondo con imagen para móvil */}
           <div className="block md:hidden absolute inset-0">

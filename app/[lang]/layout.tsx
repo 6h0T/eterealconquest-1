@@ -102,16 +102,16 @@ export default function Layout({ children, params }: LayoutProps) {
           disableTransitionOnChange
         >
           <ErrorBoundary>
-            <PreloaderWrapper>
-              <Navbar lang={lang} />
+          <PreloaderWrapper>
+                <Navbar lang={lang} />
               <main className="min-h-screen">
                 {children}
               </main>
-              <Footer lang={lang} />
-              <StreamsBox />
+                <Footer lang={lang} />
+                <StreamsBox />
               <DiscordFloatButton lang={lang} />
             </PreloaderWrapper>
-          </ErrorBoundary>
+            </ErrorBoundary>
         </ThemeProvider>
       </body>
     </html>

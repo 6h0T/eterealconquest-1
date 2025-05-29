@@ -748,7 +748,7 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
                   {/* Selector horizontal para móvil - en la parte superior */}
                   <AnimatePresence>
                     {showSelector && (
-                      <motion.div
+                  <motion.div
                         className="md:hidden absolute top-4 left-0 right-0 z-40 px-4"
                         variants={selectorVariants}
                         initial="hidden"

@@ -52,19 +52,38 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "El usuario ya existe" }, { status: 400 })
       }
 
-      // Verificar si ya existe una cuenta pendiente con el mismo usuario (no email)
+      // Verificar si el email ya existe en MEMB_INFO
+      const emailCheckResult = await pool
+        .request()
+        .input("email", email)
+        .query("SELECT mail_addr FROM MEMB_INFO WHERE mail_addr = @email")
+
+      if (emailCheckResult.recordset.length > 0) {
+        return NextResponse.json({ error: "El correo electrónico ya está registrado" }, { status: 400 })
+      }
+
+      // Verificar si ya existe una cuenta pendiente con el mismo usuario o email
       const pendingUserResult = await pool
         .request()
         .input("username", username)
+        .input("email", email)
         .query(`
-          SELECT username FROM PendingAccounts 
-          WHERE username = @username
+          SELECT username, email FROM PendingAccounts 
+          WHERE username = @username OR email = @email
         `)
 
       if (pendingUserResult.recordset.length > 0) {
-        return NextResponse.json({ 
-          error: "Ya existe un registro pendiente para este usuario. Revisa tu email para verificar tu cuenta." 
-        }, { status: 400 })
+        const existingRecord = pendingUserResult.recordset[0]
+        if (existingRecord.username === username) {
+          return NextResponse.json({ 
+            error: "Ya existe un registro pendiente para este usuario. Revisa tu email para verificar tu cuenta." 
+          }, { status: 400 })
+        }
+        if (existingRecord.email === email) {
+          return NextResponse.json({ 
+            error: "Ya existe un registro pendiente para este email. Revisa tu email para verificar tu cuenta." 
+          }, { status: 400 })
+        }
       }
 
       // Generar token de verificación

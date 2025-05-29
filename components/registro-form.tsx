@@ -303,6 +303,8 @@ export function RegistroForm({ lang }: RegistroFormProps) {
           setSubmitError(t.validationError)
         } else if (result.error === "El usuario ya existe") {
           setSubmitError(t.userExists)
+        } else if (result.error === "El correo electrónico ya está registrado") {
+          setSubmitError("El correo electrónico ya está registrado")
         } else if (result.error === "Error en la base de datos") {
           console.error("Error de base de datos:", result.details)
           setSubmitError(`${t.serverError} (${result.details})`)
