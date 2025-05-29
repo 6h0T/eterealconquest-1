@@ -235,10 +235,7 @@ export function UserSettings({ username, lang }: UserSettingsProps) {
       }
 
       if (!data?.success) {
-        // Manejar específicamente el caso de correo electrónico en uso
-        if (data?.error && data.error.includes("correo electrónico ya está en uso")) {
-          throw new Error(t.emailInUse)
-        }
+        // Manejar otros errores de manera genérica
         throw new Error(data?.error || t.unknownError)
       }
 

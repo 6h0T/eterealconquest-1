@@ -73,23 +73,6 @@ export async function POST(req: Request) {
       )
     }
 
-    // Verificar si el nuevo email ya está en uso
-    const emailCheckResult = await pool
-      .request()
-      .input("email", newEmail)
-      .input("username", username)
-      .query("SELECT memb___id FROM MEMB_INFO WHERE mail_addr = @email AND memb___id <> @username")
-
-    if (emailCheckResult.recordset.length > 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "El correo electrónico ya está en uso por otra cuenta",
-        },
-        { status: 400 },
-      )
-    }
-
     // Verificar si el email actual es el mismo que el nuevo
     const currentEmailResult = await pool
       .request()

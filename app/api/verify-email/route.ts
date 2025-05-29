@@ -91,26 +91,26 @@ export async function POST(req: Request) {
         }, { status: 400 })
       }
 
-      // Verificar si el email ya existe en MEMB_INFO
-      const existingEmailResult = await pool
-        .request()
-        .input("email", pendingAccount.email)
-        .query("SELECT mail_addr FROM MEMB_INFO WHERE mail_addr = @email")
+      // COMENTADO: Verificación de email único - ahora permitimos múltiples cuentas con el mismo email
+      // const existingEmailResult = await pool
+      //   .request()
+      //   .input("email", pendingAccount.email)
+      //   .query("SELECT mail_addr FROM MEMB_INFO WHERE mail_addr = @email")
 
-      if (existingEmailResult.recordset.length > 0) {
-        console.log("Email ya existe en MEMB_INFO")
-        
-        // Eliminar la cuenta pendiente
-        await pool
-          .request()
-          .input("token", token)
-          .query("DELETE FROM PendingAccounts WHERE verification_token = @token")
+      // if (existingEmailResult.recordset.length > 0) {
+      //   console.log("Email ya existe en MEMB_INFO")
+      //   
+      //   // Eliminar la cuenta pendiente
+      //   await pool
+      //     .request()
+      //     .input("token", token)
+      //     .query("DELETE FROM PendingAccounts WHERE verification_token = @token")
 
-        return NextResponse.json({ 
-          success: false, 
-          error: "Este correo electrónico ya está registrado en otra cuenta" 
-        }, { status: 400 })
-      }
+      //   return NextResponse.json({ 
+      //     success: false, 
+      //     error: "Este correo electrónico ya está registrado en otra cuenta" 
+      //   }, { status: 400 })
+      // }
 
       // Crear la cuenta en MEMB_INFO
       await pool
