@@ -13,6 +13,7 @@ type VerificationState = "loading" | "success" | "error" | "invalid"
 interface VerificationTexts {
   title: string
   verifying: string
+  retrying: string
   success: {
     title: string
     description: string
@@ -34,6 +35,7 @@ const texts: Record<string, VerificationTexts> = {
   es: {
     title: "Verificación de Email",
     verifying: "Verificando tu cuenta...",
+    retrying: "Reintentando verificación...",
     success: {
       title: "¡Cuenta Verificada!",
       description: "Tu cuenta ha sido verificada exitosamente. Ya puedes iniciar sesión.",
@@ -53,6 +55,7 @@ const texts: Record<string, VerificationTexts> = {
   en: {
     title: "Email Verification",
     verifying: "Verifying your account...",
+    retrying: "Retrying verification...",
     success: {
       title: "Account Verified!",
       description: "Your account has been successfully verified. You can now log in.",
@@ -72,6 +75,7 @@ const texts: Record<string, VerificationTexts> = {
   pt: {
     title: "Verificação de Email",
     verifying: "Verificando sua conta...",
+    retrying: "Tentando verificação novamente...",
     success: {
       title: "Conta Verificada!",
       description: "Sua conta foi verificada com sucesso. Agora você pode fazer login.",
@@ -90,9 +94,14 @@ const texts: Record<string, VerificationTexts> = {
   }
 }
 
+// Función para esperar con delay
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
 export default function VerificarEmailPage({ params }: { params: { lang: string } }) {
   const [state, setState] = useState<VerificationState>("loading")
   const [message, setMessage] = useState("")
+  const [currentAttempt, setCurrentAttempt] = useState(1)
+  const [maxAttempts] = useState(3)
   const searchParams = useSearchParams()
   const router = useRouter()
   const token = searchParams.get("token")
@@ -100,52 +109,92 @@ export default function VerificarEmailPage({ params }: { params: { lang: string 
   const lang = params.lang || "es"
   const t = texts[lang] || texts.es
 
-  useEffect(() => {
-    console.log("Token recibido:", token)
-    console.log("URL completa:", window.location.href)
-    console.log("Search params:", window.location.search)
-    
-    if (!token) {
-      console.log("No se encontró token en la URL")
-      setState("invalid")
-      return
-    }
+  // Función para verificar email con reintentos
+  const verifyEmailWithRetry = async (token: string, attempt: number = 1): Promise<void> => {
+    try {
+      console.log(`[FRONTEND] Intento de verificación ${attempt}/${maxAttempts}`)
+      setCurrentAttempt(attempt)
+      
+      const response = await fetch("/api/verify-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token }),
+      })
 
-    const verifyEmail = async () => {
-      try {
-        console.log("Enviando token a la API:", token)
-        
-        const response = await fetch("/api/verify-email", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ token }),
-        })
+      console.log(`[FRONTEND] Respuesta intento ${attempt}:`, response.status, response.statusText)
+      const data = await response.json()
+      console.log(`[FRONTEND] Datos respuesta intento ${attempt}:`, data)
 
-        console.log("Respuesta de la API:", response.status, response.statusText)
-        const data = await response.json()
-        console.log("Datos de respuesta:", data)
+      if (response.ok && data.success) {
+        console.log(`[FRONTEND] Verificación exitosa en intento ${attempt}`)
+        setState("success")
+        setMessage(data.message || "")
+        // Redirigir al inicio de sesión después de 3 segundos
+        setTimeout(() => {
+          router.push(`/${lang}/inicio-sesion`)
+        }, 3000)
+        return
+      } else {
+        // Si es un error específico que no debe reintentarse, fallar inmediatamente
+        if (data.error && (
+          data.error.includes("expirado") || 
+          data.error.includes("expired") ||
+          data.error.includes("inválido") ||
+          data.error.includes("invalid") ||
+          data.error.includes("ya ha sido verificada") ||
+          data.error.includes("already been verified") ||
+          data.error.includes("já foi verificada")
+        )) {
+          console.log(`[FRONTEND] Error no recuperable:`, data.error)
+          setState("error")
+          setMessage(data.error)
+          return
+        }
 
-        if (response.ok && data.success) {
-          setState("success")
-          setMessage(data.message || "")
-          // Redirigir al inicio de sesión después de 3 segundos
-          setTimeout(() => {
-            router.push(`/${lang}/inicio-sesion`)
-          }, 3000)
+        // Si es un error de conexión o temporal, reintentar
+        if (attempt < maxAttempts) {
+          console.log(`[FRONTEND] Error temporal en intento ${attempt}, reintentando...`)
+          const delayMs = Math.pow(2, attempt - 1) * 1000 // 1s, 2s, 4s
+          await delay(delayMs)
+          return verifyEmailWithRetry(token, attempt + 1)
         } else {
+          console.log(`[FRONTEND] Todos los intentos fallaron`)
           setState("error")
           setMessage(data.error || "Error desconocido")
         }
-      } catch (error) {
-        console.error("Error al verificar email:", error)
+      }
+    } catch (error) {
+      console.error(`[FRONTEND] Error en intento ${attempt}:`, error)
+      
+      // Si es un error de red y no es el último intento, reintentar
+      if (attempt < maxAttempts) {
+        console.log(`[FRONTEND] Error de red en intento ${attempt}, reintentando...`)
+        const delayMs = Math.pow(2, attempt - 1) * 1000 // 1s, 2s, 4s
+        await delay(delayMs)
+        return verifyEmailWithRetry(token, attempt + 1)
+      } else {
+        console.log(`[FRONTEND] Todos los intentos de conexión fallaron`)
         setState("error")
         setMessage("Error de conexión")
       }
     }
+  }
 
-    verifyEmail()
+  useEffect(() => {
+    console.log("[FRONTEND] Token recibido:", token)
+    console.log("[FRONTEND] URL completa:", window.location.href)
+    console.log("[FRONTEND] Search params:", window.location.search)
+    
+    if (!token) {
+      console.log("[FRONTEND] No se encontró token en la URL")
+      setState("invalid")
+      return
+    }
+
+    // Iniciar verificación con reintentos
+    verifyEmailWithRetry(token)
   }, [token, router, lang])
 
   const handleButtonClick = () => {
@@ -178,8 +227,10 @@ export default function VerificarEmailPage({ params }: { params: { lang: string 
     switch (state) {
       case "loading":
         return {
-          title: t.verifying,
-          description: "Por favor espera mientras verificamos tu cuenta...",
+          title: currentAttempt > 1 ? t.retrying : t.verifying,
+          description: currentAttempt > 1 
+            ? `Intento ${currentAttempt} de ${maxAttempts}. Por favor espera...`
+            : "Por favor espera mientras verificamos tu cuenta...",
           showButton: false
         }
       case "success":
@@ -235,7 +286,8 @@ export default function VerificarEmailPage({ params }: { params: { lang: string 
               {t.title}
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-center space-y-4">
+          
+          <CardContent className="text-center">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -273,6 +325,17 @@ export default function VerificarEmailPage({ params }: { params: { lang: string 
                 className="text-sm text-gold-400 mt-4"
               >
                 Serás redirigido automáticamente en unos segundos...
+              </motion.p>
+            )}
+
+            {state === "loading" && currentAttempt > 1 && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="text-sm text-gold-400 mt-4"
+              >
+                El sistema está reintentando automáticamente...
               </motion.p>
             )}
           </CardContent>

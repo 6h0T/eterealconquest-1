@@ -10,35 +10,116 @@ const config = {
   options: {
     encrypt: false,
     trustServerCertificate: true,
+    enableArithAbort: true,
   },
   pool: {
-    max: 10,
-    min: 0,
-    idleTimeoutMillis: 30000,
+    max: 20, // Aumentar el pool máximo
+    min: 2,  // Mantener conexiones mínimas
+    idleTimeoutMillis: 60000, // Aumentar timeout de idle
+    acquireTimeoutMillis: 60000, // Timeout para adquirir conexión
   },
-  connectionTimeout: 30000, // Aumentar el tiempo de espera de conexión
-  requestTimeout: 30000, // Aumentar el tiempo de espera de solicitud
+  connectionTimeout: 60000, // Aumentar timeout de conexión
+  requestTimeout: 60000,     // Aumentar timeout de request
 }
 
-// Implementar un enfoque diferente para la gestión de conexiones
-// En lugar de mantener un pool global, crearemos una nueva conexión para cada solicitud
-export async function connectToDB() {
-  try {
-    console.log("[SERVER] Creando nueva conexión a la base de datos...")
-    const newPool = await sql.connect(config)
-    console.log("[SERVER] Conexión exitosa a la base de datos")
-    return newPool
-  } catch (error: any) {
-    console.error("[SERVER] Database connection error:", error)
-    throw new Error(`No se pudo conectar a la base de datos: ${error.message}`)
+// Función para esperar con delay exponencial
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
+// Función de conexión con reintentos automáticos
+export async function connectToDB(maxRetries = 3) {
+  let lastError: any = null
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`[SERVER] Intento de conexión ${attempt}/${maxRetries}...`)
+      
+      // Crear nueva conexión
+      const newPool = new sql.ConnectionPool(config)
+      
+      // Conectar con timeout
+      await newPool.connect()
+      
+      console.log(`[SERVER] Conexión exitosa en intento ${attempt}`)
+      return newPool
+      
+    } catch (error: any) {
+      lastError = error
+      console.error(`[SERVER] Error en intento ${attempt}:`, error.message)
+      
+      // Si no es el último intento, esperar antes de reintentar
+      if (attempt < maxRetries) {
+        const delayMs = Math.pow(2, attempt - 1) * 1000 // Delay exponencial: 1s, 2s, 4s
+        console.log(`[SERVER] Esperando ${delayMs}ms antes del siguiente intento...`)
+        await delay(delayMs)
+      }
+    }
   }
+  
+  // Si llegamos aquí, todos los intentos fallaron
+  console.error(`[SERVER] Todos los intentos de conexión fallaron. Último error:`, lastError)
+  throw new Error(`No se pudo conectar a la base de datos después de ${maxRetries} intentos: ${lastError?.message || 'Error desconocido'}`)
 }
 
-export async function executeQuery(query: string, params = {}) {
-  let pool = null
-  try {
-    pool = await connectToDB()
+// Función para ejecutar queries con reintentos
+export async function executeQueryWithRetry(queryFn: (pool: sql.ConnectionPool) => Promise<any>, maxRetries = 3) {
+  let pool: sql.ConnectionPool | null = null
+  let lastError: any = null
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`[SERVER] Ejecutando query - intento ${attempt}/${maxRetries}`)
+      
+      // Obtener conexión
+      pool = await connectToDB(2) // Menos reintentos para conexión individual
+      
+      // Ejecutar la función de query
+      const result = await queryFn(pool)
+      
+      console.log(`[SERVER] Query ejecutada exitosamente en intento ${attempt}`)
+      return result
+      
+    } catch (error: any) {
+      lastError = error
+      console.error(`[SERVER] Error en query intento ${attempt}:`, error.message)
+      
+      // Cerrar pool si existe
+      if (pool) {
+        try {
+          await pool.close()
+          console.log(`[SERVER] Pool cerrado después del error en intento ${attempt}`)
+        } catch (closeErr) {
+          console.error(`[SERVER] Error cerrando pool:`, closeErr)
+        }
+        pool = null
+      }
+      
+      // Si no es el último intento, esperar antes de reintentar
+      if (attempt < maxRetries) {
+        const delayMs = Math.pow(2, attempt - 1) * 500 // Delay más corto para queries: 500ms, 1s, 2s
+        console.log(`[SERVER] Esperando ${delayMs}ms antes del siguiente intento de query...`)
+        await delay(delayMs)
+      }
+    } finally {
+      // Asegurar que el pool se cierre
+      if (pool && attempt === maxRetries) {
+        try {
+          await pool.close()
+          console.log(`[SERVER] Pool cerrado correctamente`)
+        } catch (closeErr) {
+          console.error(`[SERVER] Error al cerrar pool final:`, closeErr)
+        }
+      }
+    }
+  }
+  
+  // Si llegamos aquí, todos los intentos fallaron
+  console.error(`[SERVER] Todos los intentos de query fallaron. Último error:`, lastError)
+  throw new Error(`Error ejecutando query después de ${maxRetries} intentos: ${lastError?.message || 'Error desconocido'}`)
+}
 
+// Función legacy para compatibilidad (ahora con reintentos)
+export async function executeQuery(query: string, params = {}) {
+  return executeQueryWithRetry(async (pool) => {
     // Crear una solicitud
     let request = pool.request()
 
@@ -49,22 +130,8 @@ export async function executeQuery(query: string, params = {}) {
 
     // Ejecutar la consulta
     const result = await request.query(query)
-
     return result
-  } catch (error: any) {
-    console.error("[SERVER] Error executing query:", error)
-    throw error
-  } finally {
-    // Siempre cerrar la conexión después de usarla
-    if (pool) {
-      try {
-        await pool.close()
-        console.log("[SERVER] Conexión cerrada correctamente")
-      } catch (closeErr) {
-        console.error("[SERVER] Error al cerrar la conexión:", closeErr)
-      }
-    }
-  }
+  })
 }
 
 export { sql }

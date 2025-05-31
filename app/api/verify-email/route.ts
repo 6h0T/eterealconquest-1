@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server"
-import { connectToDB } from "@/lib/db"
+import { connectToDB, executeQueryWithRetry } from "@/lib/db"
 
 export async function POST(req: Request) {
-  let pool = null
   try {
     const { token } = await req.json()
 
@@ -15,9 +14,8 @@ export async function POST(req: Request) {
 
     console.log("Verificando token de email:", token.substring(0, 10) + "...")
 
-    try {
-      // Conectar a la base de datos
-      pool = await connectToDB()
+    // Usar la nueva función con reintentos automáticos
+    const result = await executeQueryWithRetry(async (pool) => {
       console.log("Conexión exitosa, buscando cuenta pendiente...")
 
       // Buscar la cuenta pendiente con el token
@@ -32,10 +30,7 @@ export async function POST(req: Request) {
 
       if (pendingResult.recordset.length === 0) {
         console.log("Token no encontrado")
-        return NextResponse.json({ 
-          success: false, 
-          error: "Token de verificación inválido o expirado" 
-        }, { status: 400 })
+        throw new Error("TOKEN_NOT_FOUND")
       }
 
       const pendingAccount = pendingResult.recordset[0]
@@ -64,10 +59,7 @@ export async function POST(req: Request) {
             VALUES (@email, @username, @action, @details)
           `)
 
-        return NextResponse.json({ 
-          success: false, 
-          error: "El token de verificación ha expirado. Por favor, regístrate nuevamente." 
-        }, { status: 400 })
+        throw new Error("TOKEN_EXPIRED")
       }
 
       // Verificar si el usuario ya existe en MEMB_INFO (por si acaso)
@@ -85,10 +77,7 @@ export async function POST(req: Request) {
           .input("token", token)
           .query("DELETE FROM PendingAccounts WHERE verification_token = @token")
 
-        return NextResponse.json({ 
-          success: false, 
-          error: "Esta cuenta ya ha sido verificada anteriormente" 
-        }, { status: 400 })
+        throw new Error("USER_ALREADY_EXISTS")
       }
 
       // Verificar si el email ya existe en MEMB_INFO
@@ -106,10 +95,7 @@ export async function POST(req: Request) {
           .input("token", token)
           .query("DELETE FROM PendingAccounts WHERE verification_token = @token")
 
-        return NextResponse.json({ 
-          success: false, 
-          error: "Este correo electrónico ya está registrado en otra cuenta" 
-        }, { status: 400 })
+        throw new Error("EMAIL_ALREADY_EXISTS")
       }
 
       // Crear la cuenta en MEMB_INFO
@@ -148,51 +134,65 @@ export async function POST(req: Request) {
 
       console.log("Cuenta verificada y creada exitosamente:", pendingAccount.username)
 
-      return NextResponse.json({ 
-        success: true, 
+      return {
+        success: true,
         message: "¡Cuenta verificada exitosamente! Ya puedes iniciar sesión.",
         username: pendingAccount.username
-      })
-
-    } catch (err: any) {
-      console.error("Error detallado en verificación de email:", err)
-
-      // Mensaje de error más descriptivo para el cliente
-      let errorMessage = "Error en la base de datos"
-      if (err.message && err.message.includes("Failed to connect")) {
-        errorMessage = "No se pudo conectar a la base de datos. Por favor, inténtalo más tarde."
-      } else if (err.message && err.message.includes("Login failed")) {
-        errorMessage = "Error de autenticación con la base de datos. Contacta al administrador."
       }
+    })
 
-      return NextResponse.json(
-        {
-          success: false,
-          error: errorMessage,
-          details: err.message,
-          code: err.code || "UNKNOWN",
-        },
-        { status: 500 },
-      )
-    } finally {
-      if (pool) {
-        try {
-          await pool.close()
-          console.log("Conexión a la base de datos cerrada correctamente en verificación")
-        } catch (closeErr) {
-          console.error("Error al cerrar la conexión en verificación:", closeErr)
-        }
-      }
-    }
+    return NextResponse.json(result)
+
   } catch (err: any) {
-    console.error("Error al procesar la solicitud de verificación:", err)
+    console.error("Error en verificación de email:", err)
+
+    // Manejo específico de errores conocidos
+    if (err.message === "TOKEN_NOT_FOUND") {
+      return NextResponse.json({ 
+        success: false, 
+        error: "Token de verificación inválido o expirado" 
+      }, { status: 400 })
+    }
+
+    if (err.message === "TOKEN_EXPIRED") {
+      return NextResponse.json({ 
+        success: false, 
+        error: "El token de verificación ha expirado. Por favor, regístrate nuevamente." 
+      }, { status: 400 })
+    }
+
+    if (err.message === "USER_ALREADY_EXISTS") {
+      return NextResponse.json({ 
+        success: false, 
+        error: "Esta cuenta ya ha sido verificada anteriormente" 
+      }, { status: 400 })
+    }
+
+    if (err.message === "EMAIL_ALREADY_EXISTS") {
+      return NextResponse.json({ 
+        success: false, 
+        error: "Este correo electrónico ya está registrado en otra cuenta" 
+      }, { status: 400 })
+    }
+
+    // Mensaje de error más descriptivo para errores de conexión
+    let errorMessage = "Error en la base de datos"
+    if (err.message && err.message.includes("Failed to connect")) {
+      errorMessage = "No se pudo conectar a la base de datos. Por favor, inténtalo más tarde."
+    } else if (err.message && err.message.includes("Login failed")) {
+      errorMessage = "Error de autenticación con la base de datos. Contacta al administrador."
+    } else if (err.message && err.message.includes("después de") && err.message.includes("intentos")) {
+      errorMessage = "Error de conexión temporal. El sistema reintentó automáticamente pero no pudo completar la operación."
+    }
+
     return NextResponse.json(
       {
         success: false,
-        error: "Error al procesar la solicitud",
+        error: errorMessage,
         details: err.message,
+        code: err.code || "UNKNOWN",
       },
-      { status: 400 },
+      { status: 500 },
     )
   }
 } 

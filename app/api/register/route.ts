@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { connectToDB } from "@/lib/db"
+import { connectToDB, executeQueryWithRetry } from "@/lib/db"
 import { sendEmail } from "@/lib/resend"
 import crypto from "crypto"
 
@@ -18,7 +18,6 @@ function generateVerificationToken() {
 }
 
 export async function POST(req: Request) {
-  let pool = null
   try {
     const data = await req.json()
     console.log("Datos recibidos en registro:", JSON.stringify(data, null, 2))
@@ -36,10 +35,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Las contraseñas no coinciden" }, { status: 400 })
     }
 
-    try {
-      // Conectar a la base de datos con manejo de errores mejorado
-      console.log("Intentando conectar a la base de datos para registro...")
-      pool = await connectToDB()
+    // Obtener información de la request fuera del scope de la función
+    const ipAddress = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown"
+    const userAgent = req.headers.get("user-agent") || "unknown"
+
+    // Usar la nueva función con reintentos automáticos
+    const result = await executeQueryWithRetry(async (pool) => {
       console.log("Conexión exitosa, verificando usuario existente...")
 
       // Verificar si el usuario ya existe en MEMB_INFO
@@ -49,7 +50,7 @@ export async function POST(req: Request) {
         .query("SELECT memb___id FROM MEMB_INFO WHERE memb___id = @username")
 
       if (userResult.recordset.length > 0) {
-        return NextResponse.json({ error: "El usuario ya existe" }, { status: 400 })
+        throw new Error("USER_EXISTS")
       }
 
       // Verificar si el email ya existe en MEMB_INFO
@@ -59,7 +60,7 @@ export async function POST(req: Request) {
         .query("SELECT mail_addr FROM MEMB_INFO WHERE mail_addr = @email")
 
       if (emailCheckResult.recordset.length > 0) {
-        return NextResponse.json({ error: "El correo electrónico ya está registrado" }, { status: 400 })
+        throw new Error("EMAIL_EXISTS")
       }
 
       // Verificar si ya existe una cuenta pendiente con el mismo usuario o email
@@ -75,22 +76,16 @@ export async function POST(req: Request) {
       if (pendingUserResult.recordset.length > 0) {
         const existingRecord = pendingUserResult.recordset[0]
         if (existingRecord.username === username) {
-          return NextResponse.json({ 
-            error: "Ya existe un registro pendiente para este usuario. Revisa tu email para verificar tu cuenta." 
-          }, { status: 400 })
+          throw new Error("PENDING_USER_EXISTS")
         }
         if (existingRecord.email === email) {
-          return NextResponse.json({ 
-            error: "Ya existe un registro pendiente para este email. Revisa tu email para verificar tu cuenta." 
-          }, { status: 400 })
+          throw new Error("PENDING_EMAIL_EXISTS")
         }
       }
 
       // Generar token de verificación
       const verificationToken = generateVerificationToken()
       const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 horas
-      const ipAddress = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown"
-      const userAgent = req.headers.get("user-agent") || "unknown"
 
       // Guardar la cuenta pendiente
       await pool
@@ -107,87 +102,90 @@ export async function POST(req: Request) {
           VALUES (@username, @password, @email, @verificationToken, @expiresAt, @ipAddress, @userAgent)
         `)
 
-      // Registrar el envío del email en el log
+      return {
+        verificationToken,
+        username,
+        email
+      }
+    })
+
+    // Continuar con el envío de email fuera de la transacción de BD
+    const { verificationToken, username: registeredUsername, email: registeredEmail } = result
+
+    // Detectar idioma del usuario
+    const referer = req.headers.get("referer") || ""
+    let userLang = "es" // idioma por defecto
+    
+    if (referer.includes("/en/")) {
+      userLang = "en"
+    } else if (referer.includes("/pt/")) {
+      userLang = "pt"
+    }
+
+    // Crear enlace de verificación
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+    const verificationLink = `${baseUrl}/${userLang}/verificar-email?token=${verificationToken}`
+
+    // Registrar el envío del email en el log
+    await executeQueryWithRetry(async (pool) => {
       await pool
         .request()
-        .input("email", email)
-        .input("username", username)
+        .input("email", registeredEmail)
+        .input("username", registeredUsername)
         .input("action", "sent")
         .input("ipAddress", ipAddress)
         .input("userAgent", userAgent)
-        .input("details", `Token de verificación enviado para registro`)
+        .input("details", "Email de verificación enviado")
         .query(`
           INSERT INTO EmailVerificationLog (email, username, action, ip_address, user_agent, details)
           VALUES (@email, @username, @action, @ipAddress, @userAgent, @details)
         `)
+    })
 
-      // Detectar el idioma del usuario desde el referer o headers
-      const referer = req.headers.get("referer") || ""
-      const acceptLanguage = req.headers.get("accept-language") || ""
-      
-      let userLang = "es" // idioma por defecto
-      
-      // Primero intentar detectar desde la URL de referer
-      if (referer.includes("/en/")) {
-        userLang = "en"
-      } else if (referer.includes("/pt/")) {
-        userLang = "pt"
-      } else if (referer.includes("/es/")) {
-        userLang = "es"
-      } else {
-        // Si no se detecta desde referer, usar accept-language
-        userLang = acceptLanguage.includes("en") ? "en" : 
-                  acceptLanguage.includes("pt") ? "pt" : "es"
+    // Contenido del email según el idioma
+    const emailContent = {
+      es: {
+        subject: "Verifica tu cuenta - Etereal Conquest",
+        greeting: "¡Hola",
+        welcome: "¡Bienvenido a Etereal Conquest! Para completar tu registro, necesitas verificar tu dirección de correo electrónico.",
+        button: "✅ Verificar mi cuenta",
+        fallback: "Si el botón no funciona, copia y pega este enlace en tu navegador:",
+        expiry: "Este enlace expirará en 24 horas por razones de seguridad.",
+        ignore: "Si no creaste esta cuenta, puedes ignorar este mensaje.",
+        copyright: "© 2024 Etereal Conquest. Todos los derechos reservados."
+      },
+      en: {
+        subject: "Verify your account - Etereal Conquest",
+        greeting: "Hello",
+        welcome: "Welcome to Etereal Conquest! To complete your registration, you need to verify your email address.",
+        button: "✅ Verify my account",
+        fallback: "If the button doesn't work, copy and paste this link in your browser:",
+        expiry: "This link will expire in 24 hours for security reasons.",
+        ignore: "If you didn't create this account, you can ignore this message.",
+        copyright: "© 2024 Etereal Conquest. All rights reserved."
+      },
+      pt: {
+        subject: "Verifique sua conta - Etereal Conquest",
+        greeting: "Olá",
+        welcome: "Bem-vindo ao Etereal Conquest! Para completar seu registro, você precisa verificar seu endereço de email.",
+        button: "✅ Verificar minha conta",
+        fallback: "Se o botão não funcionar, copie e cole este link no seu navegador:",
+        expiry: "Este link expirará em 24 horas por razões de segurança.",
+        ignore: "Se você não criou esta conta, pode ignorar esta mensagem.",
+        copyright: "© 2024 Etereal Conquest. Todos os direitos reservados."
       }
-      
-      // Generar el enlace de verificación con el idioma correcto
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001"
-      const verificationLink = `${baseUrl}/${userLang}/verificar-email?token=${verificationToken}`
+    }
 
-      // Contenido del email según el idioma
-      const emailContent = {
-        es: {
-          subject: "Verifica tu cuenta - Etereal Conquest",
-          greeting: "¡Hola",
-          welcome: "¡Bienvenido a Etereal Conquest! Para completar tu registro, necesitas verificar tu dirección de correo electrónico.",
-          button: "✅ Verificar mi cuenta",
-          fallback: "Si el botón no funciona, copia y pega este enlace en tu navegador:",
-          expiry: "Este enlace expirará en 24 horas por razones de seguridad.",
-          ignore: "Si no creaste esta cuenta, puedes ignorar este mensaje.",
-          copyright: "© 2024 Etereal Conquest. Todos los derechos reservados."
-        },
-        en: {
-          subject: "Verify your account - Etereal Conquest",
-          greeting: "Hello",
-          welcome: "Welcome to Etereal Conquest! To complete your registration, you need to verify your email address.",
-          button: "✅ Verify my account",
-          fallback: "If the button doesn't work, copy and paste this link in your browser:",
-          expiry: "This link will expire in 24 hours for security reasons.",
-          ignore: "If you didn't create this account, you can ignore this message.",
-          copyright: "© 2024 Etereal Conquest. All rights reserved."
-        },
-        pt: {
-          subject: "Verifique sua conta - Etereal Conquest",
-          greeting: "Olá",
-          welcome: "Bem-vindo ao Etereal Conquest! Para completar seu registro, você precisa verificar seu endereço de email.",
-          button: "✅ Verificar minha conta",
-          fallback: "Se o botão não funcionar, copie e cole este link no seu navegador:",
-          expiry: "Este link expirará em 24 horas por razões de segurança.",
-          ignore: "Se você não criou esta conta, pode ignorar esta mensagem.",
-          copyright: "© 2024 Etereal Conquest. Todos os direitos reservados."
-        }
-      }
+    const content = emailContent[userLang as keyof typeof emailContent] || emailContent.es
 
-      const content = emailContent[userLang as keyof typeof emailContent] || emailContent.es
+    console.log(`Idioma detectado para ${registeredUsername}: ${userLang} (referer: ${referer})`)
 
-      console.log(`Idioma detectado para ${username}: ${userLang} (referer: ${referer})`)
-
-      // Enviar email de verificación
-      const emailSendResult = await sendEmail({
-        to: email,
-        subject: content.subject,
-        from: "Etereal Conquest <noreply@eterealconquest.com>",
-        html: `
+    // Enviar email de verificación
+    const emailSendResult = await sendEmail({
+      to: registeredEmail,
+      subject: content.subject,
+      from: "Etereal Conquest <noreply@eterealconquest.com>",
+      html: `
 <!DOCTYPE html>
 <html>
 <head>
@@ -212,7 +210,7 @@ export async function POST(req: Request) {
         <h1>🏰 ETEREAL CONQUEST</h1>
       </div>
       
-      <p>${content.greeting} <span class="user-id">${username}</span>!</p>
+      <p>${content.greeting} <span class="user-id">${registeredUsername}</span>!</p>
       <p>${content.welcome}</p>
       
       <div style="text-align: center;">
@@ -239,66 +237,72 @@ export async function POST(req: Request) {
   </div>
 </body>
 </html>
-        `,
-      })
+      `,
+    })
 
-             if (!emailSendResult.success) {
-         console.error("Error al enviar email de verificación:", emailSendResult.error)
-        // Eliminar la cuenta pendiente si no se pudo enviar el email
+    if (!emailSendResult.success) {
+      console.error("Error al enviar email de verificación:", emailSendResult.error)
+      // Eliminar la cuenta pendiente si no se pudo enviar el email
+      await executeQueryWithRetry(async (pool) => {
         await pool
           .request()
-          .input("username", username)
+          .input("username", registeredUsername)
           .query("DELETE FROM PendingAccounts WHERE username = @username")
-        
-        return NextResponse.json({ 
-          error: "Error al enviar el correo de verificación. Por favor, inténtalo de nuevo." 
-        }, { status: 500 })
-      }
-
-      console.log("Cuenta pendiente creada y email de verificación enviado:", username)
-      return NextResponse.json({ 
-        success: true, 
-        message: "Registro iniciado. Revisa tu correo electrónico para verificar tu cuenta.",
-        requiresVerification: true
       })
-
-    } catch (err: any) {
-      console.error("Error detallado en el registro:", err)
-
-      // Mensaje de error más descriptivo para el cliente
-      let errorMessage = "Error en la base de datos"
-      if (err.message && err.message.includes("Failed to connect")) {
-        errorMessage = "No se pudo conectar a la base de datos. Por favor, inténtalo más tarde."
-      } else if (err.message && err.message.includes("Login failed")) {
-        errorMessage = "Error de autenticación con la base de datos. Contacta al administrador."
-      }
-
-      return NextResponse.json(
-        {
-          error: errorMessage,
-          details: err.message,
-          code: err.code || "UNKNOWN",
-        },
-        { status: 500 },
-      )
-    } finally {
-      if (pool) {
-        try {
-          await pool.close()
-          console.log("Conexión a la base de datos cerrada correctamente en registro")
-        } catch (closeErr) {
-          console.error("Error al cerrar la conexión en registro:", closeErr)
-        }
-      }
+      
+      return NextResponse.json({ 
+        error: "Error al enviar el correo de verificación. Por favor, inténtalo de nuevo." 
+      }, { status: 500 })
     }
+
+    console.log("Cuenta pendiente creada y email de verificación enviado:", registeredUsername)
+    return NextResponse.json({ 
+      success: true, 
+      message: "Registro iniciado. Revisa tu correo electrónico para verificar tu cuenta.",
+      requiresVerification: true
+    })
+
   } catch (err: any) {
-    console.error("Error al procesar la solicitud de registro:", err)
+    console.error("Error en registro:", err)
+
+    // Manejo específico de errores conocidos
+    if (err.message === "USER_EXISTS") {
+      return NextResponse.json({ error: "El usuario ya existe" }, { status: 400 })
+    }
+
+    if (err.message === "EMAIL_EXISTS") {
+      return NextResponse.json({ error: "El correo electrónico ya está registrado" }, { status: 400 })
+    }
+
+    if (err.message === "PENDING_USER_EXISTS") {
+      return NextResponse.json({ 
+        error: "Ya existe un registro pendiente para este usuario. Revisa tu email para verificar tu cuenta." 
+      }, { status: 400 })
+    }
+
+    if (err.message === "PENDING_EMAIL_EXISTS") {
+      return NextResponse.json({ 
+        error: "Ya existe un registro pendiente para este email. Revisa tu email para verificar tu cuenta." 
+      }, { status: 400 })
+    }
+
+    // Mensaje de error más descriptivo para errores de conexión
+    let errorMessage = "Error en la base de datos"
+    if (err.message && err.message.includes("Failed to connect")) {
+      errorMessage = "No se pudo conectar a la base de datos. Por favor, inténtalo más tarde."
+    } else if (err.message && err.message.includes("Login failed")) {
+      errorMessage = "Error de autenticación con la base de datos. Contacta al administrador."
+    } else if (err.message && err.message.includes("después de") && err.message.includes("intentos")) {
+      errorMessage = "Error de conexión temporal. El sistema reintentó automáticamente pero no pudo completar la operación."
+    }
+
     return NextResponse.json(
       {
-        error: "Error al procesar la solicitud",
+        error: errorMessage,
         details: err.message,
+        code: err.code || "UNKNOWN",
       },
-      { status: 400 },
+      { status: 500 },
     )
   }
 }
