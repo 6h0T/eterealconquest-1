@@ -111,7 +111,19 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
         body: JSON.stringify({ email: data.email }),
       })
 
+      console.log("[RESEND-PAGE] Respuesta recibida:", response.status, response.statusText)
+      console.log("[RESEND-PAGE] Content-Type:", response.headers.get("content-type"))
+
+      // Verificar si la respuesta es JSON
+      const contentType = response.headers.get("content-type")
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text()
+        console.error("[RESEND-PAGE] Respuesta no es JSON:", text.substring(0, 200))
+        throw new Error("Respuesta del servidor no válida")
+      }
+
       const result = await response.json()
+      console.log("[RESEND-PAGE] JSON parseado:", result)
 
       if (!response.ok) {
         // Manejar diferentes tipos de errores
@@ -132,8 +144,15 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
       console.log("[RESEND-PAGE] Email reenviado exitosamente")
 
     } catch (error: any) {
-      console.error("[RESEND-PAGE] Error:", error)
-      setSubmitError("Error de conexión. Inténtalo más tarde.")
+      console.error("[RESEND-PAGE] Error capturado:", error)
+      console.error("[RESEND-PAGE] Tipo de error:", error.constructor.name)
+      console.error("[RESEND-PAGE] Mensaje:", error.message)
+      
+      if (error.message.includes("JSON")) {
+        setSubmitError("Error de comunicación con el servidor. Inténtalo más tarde.")
+      } else {
+        setSubmitError(error.message || "Error de conexión. Inténtalo más tarde.")
+      }
     } finally {
       setIsSubmitting(false)
     }
