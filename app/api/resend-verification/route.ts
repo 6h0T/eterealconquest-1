@@ -25,12 +25,16 @@ setInterval(() => {
 
 export async function POST(req: Request) {
   try {
+    console.log("[RESEND] === INICIO DE SOLICITUD ===")
+    
     const data = await req.json()
+    console.log("[RESEND] Datos recibidos:", data)
     console.log("[RESEND] Solicitud de reenvío para:", data.email)
 
     // Validar datos
     const parsed = schema.safeParse(data)
     if (!parsed.success) {
+      console.log("[RESEND] Error de validación:", parsed.error)
       return NextResponse.json({ 
         success: false,
         error: "Email inválido" 
@@ -41,11 +45,15 @@ export async function POST(req: Request) {
     const emailKey = `resend_${email.toLowerCase()}`
     const now = Date.now()
 
+    console.log("[RESEND] Email validado:", email)
+    console.log("[RESEND] Verificando cooldown...")
+
     // Verificar cooldown
     if (recentResends.has(emailKey)) {
       const lastResend = recentResends.get(emailKey)!
       const timeLeft = RESEND_COOLDOWN - (now - lastResend)
       if (timeLeft > 0) {
+        console.log("[RESEND] Cooldown activo, tiempo restante:", timeLeft)
         return NextResponse.json({ 
           success: false,
           error: `Debes esperar ${Math.ceil(timeLeft / 1000)} segundos antes de reenviar` 
@@ -53,19 +61,29 @@ export async function POST(req: Request) {
       }
     }
 
+    console.log("[RESEND] Cooldown OK, ejecutando consulta BD...")
+
     const result = await executeQueryWithRetry(async (pool) => {
+      console.log("[RESEND] Conectado a BD, buscando cuenta pendiente...")
+      
       // Verificar si existe una cuenta pendiente para este email
       const pendingResult = await pool
         .request()
         .input("email", email)
         .query("SELECT username, password, verification_token, expires_at FROM PendingAccounts WHERE email = @email")
 
+      console.log("[RESEND] Resultado búsqueda pendiente:", pendingResult.recordset.length, "registros")
+
       if (pendingResult.recordset.length === 0) {
+        console.log("[RESEND] No hay cuenta pendiente, verificando si ya está registrado...")
+        
         // Verificar si ya está registrado
         const existingResult = await pool
           .request()
           .input("email", email)
           .query("SELECT memb___id FROM MEMB_INFO WHERE mail_addr = @email")
+
+        console.log("[RESEND] Resultado búsqueda existente:", existingResult.recordset.length, "registros")
 
         if (existingResult.recordset.length > 0) {
           throw new Error("EMAIL_ALREADY_VERIFIED")
@@ -75,15 +93,21 @@ export async function POST(req: Request) {
       }
 
       const pendingAccount = pendingResult.recordset[0]
+      console.log("[RESEND] Cuenta pendiente encontrada:", pendingAccount.username)
 
       // Verificar si el token actual ha expirado
       const now = new Date()
       const expiresAt = new Date(pendingAccount.expires_at)
+      console.log("[RESEND] Verificando expiración. Ahora:", now, "Expira:", expiresAt)
 
       if (now > expiresAt) {
+        console.log("[RESEND] Token expirado, generando nuevo...")
+        
         // Token expirado, generar uno nuevo
         const newToken = crypto.randomBytes(32).toString("hex")
         const newExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 horas
+
+        console.log("[RESEND] Nuevo token generado, actualizando BD...")
 
         await pool
           .request()
@@ -96,12 +120,16 @@ export async function POST(req: Request) {
             WHERE email = @email
           `)
 
+        console.log("[RESEND] BD actualizada con nuevo token")
+
         return {
           username: pendingAccount.username,
           email: email,
           verificationToken: newToken
         }
       } else {
+        console.log("[RESEND] Token aún válido, usando existente")
+        
         // Token aún válido, usar el existente
         return {
           username: pendingAccount.username,
@@ -111,11 +139,27 @@ export async function POST(req: Request) {
       }
     })
 
+    console.log("[RESEND] Consulta BD completada, resultado:", result.username)
+
     // Marcar como reenviado para prevenir spam
     recentResends.set(emailKey, now)
 
+    console.log("[RESEND] Preparando envío de email...")
+
+    // Verificar variables de entorno
+    if (!process.env.NEXT_PUBLIC_BASE_URL) {
+      console.error("[RESEND] ERROR: NEXT_PUBLIC_BASE_URL no está configurada")
+      throw new Error("Configuración de servidor incompleta")
+    }
+
+    if (!process.env.RESEND_API_KEY) {
+      console.error("[RESEND] ERROR: RESEND_API_KEY no está configurada")
+      throw new Error("Servicio de email no configurado")
+    }
+
     // Enviar email de verificación
     const verificationUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/es/verificar-email?token=${result.verificationToken}`
+    console.log("[RESEND] URL de verificación:", verificationUrl)
 
     const emailResult = await sendEmail({
       to: result.email,
@@ -167,6 +211,11 @@ export async function POST(req: Request) {
       `,
     })
 
+    console.log("[RESEND] Resultado envío email:", emailResult.success ? "✅ Éxito" : "❌ Error")
+    if (!emailResult.success) {
+      console.error("[RESEND] Detalles error email:", emailResult.error)
+    }
+
     if (!emailResult.success) {
       console.error("[RESEND] Error enviando email:", emailResult.error)
       return NextResponse.json({ 
@@ -175,7 +224,8 @@ export async function POST(req: Request) {
       }, { status: 500 })
     }
 
-    console.log(`[RESEND] Email reenviado exitosamente a: ${result.email}`)
+    console.log(`[RESEND] ✅ Email reenviado exitosamente a: ${result.email}`)
+    console.log("[RESEND] === FIN EXITOSO ===")
 
     return NextResponse.json({ 
       success: true,
@@ -183,10 +233,12 @@ export async function POST(req: Request) {
     })
 
   } catch (err: any) {
-    console.error("[RESEND] Error:", err)
+    console.error("[RESEND] ❌ ERROR CAPTURADO:", err)
+    console.error("[RESEND] Stack trace:", err.stack)
 
     // Manejo específico de errores
     if (err.message === "EMAIL_NOT_FOUND") {
+      console.log("[RESEND] Error específico: EMAIL_NOT_FOUND")
       return NextResponse.json({ 
         success: false,
         error: "No se encontró ningún registro pendiente para este email. Intenta registrarte nuevamente." 
@@ -194,12 +246,14 @@ export async function POST(req: Request) {
     }
 
     if (err.message === "EMAIL_ALREADY_VERIFIED") {
+      console.log("[RESEND] Error específico: EMAIL_ALREADY_VERIFIED")
       return NextResponse.json({ 
         success: false,
         error: "Esta cuenta ya ha sido verificada. Puedes iniciar sesión directamente." 
       }, { status: 400 })
     }
 
+    console.log("[RESEND] Error genérico, devolviendo 500")
     return NextResponse.json({
       success: false,
       error: "Error interno del servidor. Inténtalo más tarde.",

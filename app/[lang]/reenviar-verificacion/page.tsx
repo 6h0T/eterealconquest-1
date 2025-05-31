@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, use } from "react"
 import { useRouter } from "next/navigation"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -79,13 +79,13 @@ const texts: Record<string, ResendTexts> = {
   }
 }
 
-export default function ReenviarVerificacionPage({ params }: { params: { lang: string } }) {
+export default function ReenviarVerificacionPage({ params }: { params: Promise<{ lang: string }> }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState("")
   const router = useRouter()
   
-  const lang = params.lang || "es"
+  const { lang } = use(params)
   const t = texts[lang] || texts.es
 
   const {
