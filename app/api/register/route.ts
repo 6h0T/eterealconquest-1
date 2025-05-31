@@ -1,308 +1,145 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { connectToDB, executeQueryWithRetry } from "@/lib/db"
+import { queueRegistration, getQueueStats } from "@/lib/registration-queue"
 import { sendEmail } from "@/lib/resend"
-import crypto from "crypto"
 
-// Actualizar el esquema para que no requiera recaptchaToken
+// Esquema de validación optimizado
 const schema = z.object({
-  username: z.string().min(4).max(10),
-  password: z.string().min(6),
+  username: z.string().min(4).max(10).regex(/^[a-zA-Z0-9_]+$/, "Solo letras, números y guiones bajos"),
+  password: z.string().min(6).max(20),
   passwordConfirm: z.string().min(1),
-  email: z.string().email(),
-  recaptchaToken: z.string().optional(), // Mantener como opcional para compatibilidad
+  email: z.string().email().max(50),
+  recaptchaToken: z.string().optional(),
 })
 
-function generateVerificationToken() {
-  return crypto.randomBytes(32).toString("hex")
-}
+// Cache en memoria para prevenir registros duplicados rápidos
+const recentRegistrations = new Map<string, number>()
+const DUPLICATE_PREVENTION_TIME = 5000 // 5 segundos
+
+// Limpiar cache periódicamente
+setInterval(() => {
+  const now = Date.now()
+  for (const [key, timestamp] of recentRegistrations.entries()) {
+    if (now - timestamp > DUPLICATE_PREVENTION_TIME) {
+      recentRegistrations.delete(key)
+    }
+  }
+}, 30000) // Limpiar cada 30 segundos
 
 export async function POST(req: Request) {
+  const startTime = Date.now()
+  
   try {
-    const data = await req.json()
-    console.log("Datos recibidos en registro:", JSON.stringify(data, null, 2))
+    // Obtener estadísticas de la cola para monitoreo
+    const queueStats = getQueueStats()
+    console.log(`[REGISTER] Cola actual: ${queueStats.pending} pendientes, ${queueStats.processing} procesando`)
 
+    // Rate limiting básico por IP
+    const ipAddress = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown"
+    const ipKey = `ip_${ipAddress}`
+    const now = Date.now()
+    
+    if (recentRegistrations.has(ipKey)) {
+      const lastRequest = recentRegistrations.get(ipKey)!
+      if (now - lastRequest < DUPLICATE_PREVENTION_TIME) {
+        return NextResponse.json({ 
+          error: "Demasiadas solicitudes. Espera unos segundos antes de intentar de nuevo." 
+        }, { status: 429 })
+      }
+    }
+
+    const data = await req.json()
+    console.log(`[REGISTER] Solicitud recibida de IP: ${ipAddress}`)
+
+    // Validación rápida
     const parsed = schema.safeParse(data)
     if (!parsed.success) {
-      console.error("Error de validación:", parsed.error.format())
-      return NextResponse.json({ error: "Datos inválidos", details: parsed.error.format() }, { status: 400 })
+      console.error("[REGISTER] Error de validación:", parsed.error.format())
+      return NextResponse.json({ 
+        error: "Datos inválidos", 
+        details: parsed.error.format() 
+      }, { status: 400 })
     }
 
     const { username, password, passwordConfirm, email } = parsed.data
 
-    // Verificar que las contraseñas coincidan
+    // Verificar contraseñas
     if (password !== passwordConfirm) {
       return NextResponse.json({ error: "Las contraseñas no coinciden" }, { status: 400 })
     }
 
-    // Obtener información de la request fuera del scope de la función
-    const ipAddress = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown"
+    // Prevenir registros duplicados rápidos
+    const userKey = `user_${username.toLowerCase()}`
+    const emailKey = `email_${email.toLowerCase()}`
+    
+    if (recentRegistrations.has(userKey) || recentRegistrations.has(emailKey)) {
+      return NextResponse.json({ 
+        error: "Ya existe una solicitud reciente para este usuario o email. Espera unos segundos." 
+      }, { status: 429 })
+    }
+
+    // Marcar como procesado para prevenir duplicados
+    recentRegistrations.set(ipKey, now)
+    recentRegistrations.set(userKey, now)
+    recentRegistrations.set(emailKey, now)
+
     const userAgent = req.headers.get("user-agent") || "unknown"
 
-    // Usar la nueva función con reintentos automáticos
-    const result = await executeQueryWithRetry(async (pool) => {
-      console.log("Conexión exitosa, verificando usuario existente...")
-
-      // Verificar si el usuario ya existe en MEMB_INFO
-      const userResult = await pool
-        .request()
-        .input("username", username)
-        .query("SELECT memb___id FROM MEMB_INFO WHERE memb___id = @username")
-
-      if (userResult.recordset.length > 0) {
-        throw new Error("USER_EXISTS")
-      }
-
-      // Verificar si el email ya existe en MEMB_INFO
-      const emailCheckResult = await pool
-        .request()
-        .input("email", email)
-        .query("SELECT mail_addr FROM MEMB_INFO WHERE mail_addr = @email")
-
-      if (emailCheckResult.recordset.length > 0) {
-        throw new Error("EMAIL_EXISTS")
-      }
-
-      // Verificar si ya existe una cuenta pendiente con el mismo usuario o email
-      const pendingUserResult = await pool
-        .request()
-        .input("username", username)
-        .input("email", email)
-        .query(`
-          SELECT username, email FROM PendingAccounts 
-          WHERE username = @username OR email = @email
-        `)
-
-      if (pendingUserResult.recordset.length > 0) {
-        const existingRecord = pendingUserResult.recordset[0]
-        if (existingRecord.username === username) {
-          throw new Error("PENDING_USER_EXISTS")
-        }
-        if (existingRecord.email === email) {
-          throw new Error("PENDING_EMAIL_EXISTS")
-        }
-      }
-
-      // Generar token de verificación
-      const verificationToken = generateVerificationToken()
-      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 horas
-
-      // Guardar la cuenta pendiente
-      await pool
-        .request()
-        .input("username", username)
-        .input("password", password)
-        .input("email", email)
-        .input("verificationToken", verificationToken)
-        .input("expiresAt", expiresAt)
-        .input("ipAddress", ipAddress)
-        .input("userAgent", userAgent)
-        .query(`
-          INSERT INTO PendingAccounts (username, password, email, verification_token, expires_at, ip_address, user_agent)
-          VALUES (@username, @password, @email, @verificationToken, @expiresAt, @ipAddress, @userAgent)
-        `)
-
-      return {
-        verificationToken,
+    try {
+      // Añadir a la cola de procesamiento (respuesta inmediata)
+      const jobId = queueRegistration({
         username,
-        email
-      }
-    })
-
-    // Continuar con el envío de email fuera de la transacción de BD
-    const { verificationToken, username: registeredUsername, email: registeredEmail } = result
-
-    // Detectar idioma del usuario
-    const referer = req.headers.get("referer") || ""
-    let userLang = "es" // idioma por defecto
-    
-    if (referer.includes("/en/")) {
-      userLang = "en"
-    } else if (referer.includes("/pt/")) {
-      userLang = "pt"
-    }
-
-    // Crear enlace de verificación
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-    const verificationLink = `${baseUrl}/${userLang}/verificar-email?token=${verificationToken}`
-
-    // Registrar el envío del email en el log
-    await executeQueryWithRetry(async (pool) => {
-      await pool
-        .request()
-        .input("email", registeredEmail)
-        .input("username", registeredUsername)
-        .input("action", "sent")
-        .input("ipAddress", ipAddress)
-        .input("userAgent", userAgent)
-        .input("details", "Email de verificación enviado")
-        .query(`
-          INSERT INTO EmailVerificationLog (email, username, action, ip_address, user_agent, details)
-          VALUES (@email, @username, @action, @ipAddress, @userAgent, @details)
-        `)
-    })
-
-    // Contenido del email según el idioma
-    const emailContent = {
-      es: {
-        subject: "Verifica tu cuenta - Etereal Conquest",
-        greeting: "¡Hola",
-        welcome: "¡Bienvenido a Etereal Conquest! Para completar tu registro, necesitas verificar tu dirección de correo electrónico.",
-        button: "✅ Verificar mi cuenta",
-        fallback: "Si el botón no funciona, copia y pega este enlace en tu navegador:",
-        expiry: "Este enlace expirará en 24 horas por razones de seguridad.",
-        ignore: "Si no creaste esta cuenta, puedes ignorar este mensaje.",
-        copyright: "© 2024 Etereal Conquest. Todos los derechos reservados."
-      },
-      en: {
-        subject: "Verify your account - Etereal Conquest",
-        greeting: "Hello",
-        welcome: "Welcome to Etereal Conquest! To complete your registration, you need to verify your email address.",
-        button: "✅ Verify my account",
-        fallback: "If the button doesn't work, copy and paste this link in your browser:",
-        expiry: "This link will expire in 24 hours for security reasons.",
-        ignore: "If you didn't create this account, you can ignore this message.",
-        copyright: "© 2024 Etereal Conquest. All rights reserved."
-      },
-      pt: {
-        subject: "Verifique sua conta - Etereal Conquest",
-        greeting: "Olá",
-        welcome: "Bem-vindo ao Etereal Conquest! Para completar seu registro, você precisa verificar seu endereço de email.",
-        button: "✅ Verificar minha conta",
-        fallback: "Se o botão não funcionar, copie e cole este link no seu navegador:",
-        expiry: "Este link expirará em 24 horas por razões de segurança.",
-        ignore: "Se você não criou esta conta, pode ignorar esta mensagem.",
-        copyright: "© 2024 Etereal Conquest. Todos os direitos reservados."
-      }
-    }
-
-    const content = emailContent[userLang as keyof typeof emailContent] || emailContent.es
-
-    console.log(`Idioma detectado para ${registeredUsername}: ${userLang} (referer: ${referer})`)
-
-    // Enviar email de verificación
-    const emailSendResult = await sendEmail({
-      to: registeredEmail,
-      subject: content.subject,
-      from: "Etereal Conquest <noreply@eterealconquest.com>",
-      html: `
-<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    body { background-color: #1a1a1a; color: #ffffff; font-family: Arial, sans-serif; margin: 0; padding: 0; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .content { background-color: #1a1a1a; padding: 20px; border-radius: 5px; color: #ffffff; }
-    .button { display: inline-block; background-color: #FFD700; color: #000000 !important; text-decoration: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; margin: 20px 0; }
-    .user-id { color: #FFD700; font-weight: bold; }
-    .link { color: #FFD700; word-break: break-all; }
-    .warning-text { color: #ffffff; margin-top: 20px; }
-    .warning-icon { margin-right: 10px; }
-    p, span, div { color: #ffffff; }
-    .logo { text-align: center; margin-bottom: 20px; }
-    .logo h1 { color: #FFD700; font-size: 24px; margin: 0; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="content">
-      <div class="logo">
-        <h1>🏰 ETEREAL CONQUEST</h1>
-      </div>
-      
-      <p>${content.greeting} <span class="user-id">${registeredUsername}</span>!</p>
-      <p>${content.welcome}</p>
-      
-      <div style="text-align: center;">
-        <a href="${verificationLink}" class="button">${content.button}</a>
-      </div>
-      
-      <p>${content.fallback}</p>
-      <p class="link">${verificationLink}</p>
-      
-      <div class="warning-text">
-        <span class="warning-icon">⏰</span>
-        <span>${content.expiry}</span>
-      </div>
-      
-      <div style="margin-top: 20px;">
-        <span class="warning-icon">🔒</span>
-        <span>${content.ignore}</span>
-      </div>
-      
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; text-align: center; font-size: 12px; color: #888;">
-        <p>${content.copyright}</p>
-      </div>
-    </div>
-  </div>
-</body>
-</html>
-      `,
-    })
-
-    if (!emailSendResult.success) {
-      console.error("Error al enviar email de verificación:", emailSendResult.error)
-      // Eliminar la cuenta pendiente si no se pudo enviar el email
-      await executeQueryWithRetry(async (pool) => {
-        await pool
-          .request()
-          .input("username", registeredUsername)
-          .query("DELETE FROM PendingAccounts WHERE username = @username")
+        password,
+        email,
+        ipAddress,
+        userAgent
       })
+
+      console.log(`[REGISTER] Trabajo en cola: ${jobId} para ${username} (${Date.now() - startTime}ms)`)
+
+      // Respuesta inmediata al usuario
+      return NextResponse.json({ 
+        success: true, 
+        message: "Registro en proceso. Recibirás un email de verificación en breve.",
+        requiresVerification: true,
+        jobId, // Para tracking opcional
+        queuePosition: queueStats.pending + 1
+      })
+
+    } catch (queueError: any) {
+      console.error("[REGISTER] Error añadiendo a cola:", queueError)
+      
+      // Limpiar cache si hay error
+      recentRegistrations.delete(userKey)
+      recentRegistrations.delete(emailKey)
       
       return NextResponse.json({ 
-        error: "Error al enviar el correo de verificación. Por favor, inténtalo de nuevo." 
+        error: "Error interno del servidor. Inténtalo de nuevo." 
       }, { status: 500 })
     }
 
-    console.log("Cuenta pendiente creada y email de verificación enviado:", registeredUsername)
-    return NextResponse.json({ 
-      success: true, 
-      message: "Registro iniciado. Revisa tu correo electrónico para verificar tu cuenta.",
-      requiresVerification: true
-    })
-
   } catch (err: any) {
-    console.error("Error en registro:", err)
+    console.error("[REGISTER] Error general:", err)
+    return NextResponse.json({
+      error: "Error al procesar la solicitud",
+      details: err.message,
+    }, { status: 500 })
+  }
+}
 
-    // Manejo específico de errores conocidos
-    if (err.message === "USER_EXISTS") {
-      return NextResponse.json({ error: "El usuario ya existe" }, { status: 400 })
-    }
-
-    if (err.message === "EMAIL_EXISTS") {
-      return NextResponse.json({ error: "El correo electrónico ya está registrado" }, { status: 400 })
-    }
-
-    if (err.message === "PENDING_USER_EXISTS") {
-      return NextResponse.json({ 
-        error: "Ya existe un registro pendiente para este usuario. Revisa tu email para verificar tu cuenta." 
-      }, { status: 400 })
-    }
-
-    if (err.message === "PENDING_EMAIL_EXISTS") {
-      return NextResponse.json({ 
-        error: "Ya existe un registro pendiente para este email. Revisa tu email para verificar tu cuenta." 
-      }, { status: 400 })
-    }
-
-    // Mensaje de error más descriptivo para errores de conexión
-    let errorMessage = "Error en la base de datos"
-    if (err.message && err.message.includes("Failed to connect")) {
-      errorMessage = "No se pudo conectar a la base de datos. Por favor, inténtalo más tarde."
-    } else if (err.message && err.message.includes("Login failed")) {
-      errorMessage = "Error de autenticación con la base de datos. Contacta al administrador."
-    } else if (err.message && err.message.includes("después de") && err.message.includes("intentos")) {
-      errorMessage = "Error de conexión temporal. El sistema reintentó automáticamente pero no pudo completar la operación."
-    }
-
-    return NextResponse.json(
-      {
-        error: errorMessage,
-        details: err.message,
-        code: err.code || "UNKNOWN",
-      },
-      { status: 500 },
-    )
+// Endpoint para obtener estadísticas de la cola (opcional, para monitoreo)
+export async function GET(req: Request) {
+  try {
+    const stats = getQueueStats()
+    return NextResponse.json({
+      success: true,
+      stats,
+      timestamp: Date.now()
+    })
+  } catch (error: any) {
+    return NextResponse.json({
+      success: false,
+      error: error.message
+    }, { status: 500 })
   }
 }

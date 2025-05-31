@@ -11,66 +11,117 @@ const config = {
     encrypt: false,
     trustServerCertificate: true,
     enableArithAbort: true,
+    abortTransactionOnError: true,
   },
   pool: {
-    max: 20, // Aumentar el pool máximo
-    min: 2,  // Mantener conexiones mínimas
-    idleTimeoutMillis: 60000, // Aumentar timeout de idle
-    acquireTimeoutMillis: 60000, // Timeout para adquirir conexión
+    max: 100,          // Aumentado para alta concurrencia
+    min: 10,           // Mantener más conexiones activas
+    idleTimeoutMillis: 300000,     // 5 minutos
+    acquireTimeoutMillis: 60000,   // 1 minuto para adquirir conexión
+    createTimeoutMillis: 60000,    // Timeout para crear nueva conexión
+    destroyTimeoutMillis: 5000,    // Timeout para destruir conexión
+    reapIntervalMillis: 1000,      // Revisar conexiones cada segundo
+    createRetryIntervalMillis: 200, // Reintentar crear conexión cada 200ms
   },
-  connectionTimeout: 60000, // Aumentar timeout de conexión
-  requestTimeout: 60000,     // Aumentar timeout de request
+  connectionTimeout: 60000,
+  requestTimeout: 60000,
 }
+
+// Pool global para reutilizar conexiones
+let globalPool: sql.ConnectionPool | null = null
 
 // Función para esperar con delay exponencial
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-// Función de conexión con reintentos automáticos
+// Función para obtener o crear el pool global
+export async function getGlobalPool(): Promise<sql.ConnectionPool> {
+  if (globalPool && globalPool.connected) {
+    return globalPool
+  }
+
+  if (globalPool && globalPool.connecting) {
+    // Si ya se está conectando, esperar
+    let attempts = 0
+    while (globalPool.connecting && attempts < 30) { // Máximo 3 segundos
+      await delay(100)
+      attempts++
+    }
+    if (globalPool.connected) {
+      return globalPool
+    }
+  }
+
+  // Crear nuevo pool
+  globalPool = new sql.ConnectionPool(config)
+  
+  // Manejar eventos del pool
+  globalPool.on('connect', () => {
+    console.log('[POOL] Conexión establecida')
+  })
+  
+  globalPool.on('close', () => {
+    console.log('[POOL] Pool cerrado')
+    globalPool = null
+  })
+  
+  globalPool.on('error', (err) => {
+    console.error('[POOL] Error en el pool:', err)
+    globalPool = null
+  })
+
+  await globalPool.connect()
+  console.log(`[POOL] Pool creado con ${config.pool.max} conexiones máximas`)
+  
+  return globalPool
+}
+
+// Función de conexión con reintentos automáticos (ahora usa pool global)
 export async function connectToDB(maxRetries = 3) {
   let lastError: any = null
   
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      console.log(`[SERVER] Intento de conexión ${attempt}/${maxRetries}...`)
+      console.log(`[SERVER] Obteniendo conexión del pool - intento ${attempt}/${maxRetries}`)
       
-      // Crear nueva conexión
-      const newPool = new sql.ConnectionPool(config)
-      
-      // Conectar con timeout
-      await newPool.connect()
-      
-      console.log(`[SERVER] Conexión exitosa en intento ${attempt}`)
-      return newPool
+      const pool = await getGlobalPool()
+      console.log(`[SERVER] Conexión obtenida del pool en intento ${attempt}`)
+      return pool
       
     } catch (error: any) {
       lastError = error
       console.error(`[SERVER] Error en intento ${attempt}:`, error.message)
       
-      // Si no es el último intento, esperar antes de reintentar
+      // Reset del pool global si hay error
+      if (globalPool) {
+        try {
+          await globalPool.close()
+        } catch (closeErr) {
+          console.error('[SERVER] Error cerrando pool:', closeErr)
+        }
+        globalPool = null
+      }
+      
       if (attempt < maxRetries) {
-        const delayMs = Math.pow(2, attempt - 1) * 1000 // Delay exponencial: 1s, 2s, 4s
+        const delayMs = Math.pow(2, attempt - 1) * 1000 // 1s, 2s, 4s
         console.log(`[SERVER] Esperando ${delayMs}ms antes del siguiente intento...`)
         await delay(delayMs)
       }
     }
   }
   
-  // Si llegamos aquí, todos los intentos fallaron
-  console.error(`[SERVER] Todos los intentos de conexión fallaron. Último error:`, lastError)
   throw new Error(`No se pudo conectar a la base de datos después de ${maxRetries} intentos: ${lastError?.message || 'Error desconocido'}`)
 }
 
-// Función para ejecutar queries con reintentos
+// Función para ejecutar queries con reintentos y pool optimizado
 export async function executeQueryWithRetry(queryFn: (pool: sql.ConnectionPool) => Promise<any>, maxRetries = 3) {
-  let pool: sql.ConnectionPool | null = null
   let lastError: any = null
   
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       console.log(`[SERVER] Ejecutando query - intento ${attempt}/${maxRetries}`)
       
-      // Obtener conexión
-      pool = await connectToDB(2) // Menos reintentos para conexión individual
+      // Usar pool global (no cerrar después)
+      const pool = await connectToDB(2)
       
       // Ejecutar la función de query
       const result = await queryFn(pool)
@@ -82,56 +133,60 @@ export async function executeQueryWithRetry(queryFn: (pool: sql.ConnectionPool) 
       lastError = error
       console.error(`[SERVER] Error en query intento ${attempt}:`, error.message)
       
-      // Cerrar pool si existe
-      if (pool) {
-        try {
-          await pool.close()
-          console.log(`[SERVER] Pool cerrado después del error en intento ${attempt}`)
-        } catch (closeErr) {
-          console.error(`[SERVER] Error cerrando pool:`, closeErr)
+      // Solo resetear pool en errores de conexión graves
+      if (error.message && (
+        error.message.includes('Connection is closed') ||
+        error.message.includes('Connection lost') ||
+        error.message.includes('ECONNRESET')
+      )) {
+        console.log('[SERVER] Error de conexión grave, reseteando pool...')
+        if (globalPool) {
+          try {
+            await globalPool.close()
+          } catch (closeErr) {
+            console.error('[SERVER] Error cerrando pool:', closeErr)
+          }
+          globalPool = null
         }
-        pool = null
       }
       
-      // Si no es el último intento, esperar antes de reintentar
       if (attempt < maxRetries) {
-        const delayMs = Math.pow(2, attempt - 1) * 500 // Delay más corto para queries: 500ms, 1s, 2s
+        const delayMs = Math.pow(2, attempt - 1) * 500 // 500ms, 1s, 2s
         console.log(`[SERVER] Esperando ${delayMs}ms antes del siguiente intento de query...`)
         await delay(delayMs)
-      }
-    } finally {
-      // Asegurar que el pool se cierre
-      if (pool && attempt === maxRetries) {
-        try {
-          await pool.close()
-          console.log(`[SERVER] Pool cerrado correctamente`)
-        } catch (closeErr) {
-          console.error(`[SERVER] Error al cerrar pool final:`, closeErr)
-        }
       }
     }
   }
   
-  // Si llegamos aquí, todos los intentos fallaron
-  console.error(`[SERVER] Todos los intentos de query fallaron. Último error:`, lastError)
   throw new Error(`Error ejecutando query después de ${maxRetries} intentos: ${lastError?.message || 'Error desconocido'}`)
 }
 
-// Función legacy para compatibilidad (ahora con reintentos)
+// Función legacy para compatibilidad (ahora optimizada)
 export async function executeQuery(query: string, params = {}) {
   return executeQueryWithRetry(async (pool) => {
-    // Crear una solicitud
-    let request = pool.request()
+    const request = pool.request()
 
     // Añadir parámetros si existen
     for (const [key, value] of Object.entries(params)) {
-      request = request.input(key, value)
+      request.input(key, value)
     }
 
-    // Ejecutar la consulta
     const result = await request.query(query)
     return result
   })
+}
+
+// Función para cerrar el pool global (usar en shutdown)
+export async function closeGlobalPool() {
+  if (globalPool) {
+    try {
+      await globalPool.close()
+      console.log('[POOL] Pool global cerrado correctamente')
+    } catch (error) {
+      console.error('[POOL] Error cerrando pool global:', error)
+    }
+    globalPool = null
+  }
 }
 
 export { sql }
