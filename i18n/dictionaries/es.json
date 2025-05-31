@@ -208,6 +208,8 @@
     "login": "Iniciar sesión",
     "verificationSent": "¡Registro iniciado! Revisa tu correo electrónico para verificar tu cuenta.",
     "checkEmail": "Revisa tu bandeja de entrada y haz clic en el enlace de verificación para completar tu registro.",
+    "resendVerification": "Reenviar email de verificación",
+    "resendNotReceived": "¿No recibiste el email?",
     "termsAcceptance": "Acepto los",
     "termsAndConditions": "Términos y Condiciones",
     "termsRequired": "Debes aceptar los términos y condiciones para continuar",

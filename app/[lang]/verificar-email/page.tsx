@@ -7,6 +7,7 @@ import { CheckCircle, XCircle, Loader2, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ImageBackground } from "@/components/image-background"
+import Link from "next/link"
 
 type VerificationState = "loading" | "success" | "error" | "invalid"
 
@@ -306,6 +307,7 @@ export default function VerificarEmailPage({ params }: { params: { lang: string 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
+                className="space-y-3"
               >
                 <Button
                   onClick={handleButtonClick}
@@ -314,6 +316,21 @@ export default function VerificarEmailPage({ params }: { params: { lang: string 
                 >
                   {content.buttonText}
                 </Button>
+                
+                {state === "error" && (
+                  <div className="pt-2 border-t border-gold-700/30">
+                    <p className="text-xs text-gold-400 mb-2">
+                      ¿El enlace no funciona?
+                    </p>
+                    <Link
+                      href={`/${lang}/reenviar-verificacion`}
+                      className="inline-flex items-center text-sm text-blue-400 hover:text-blue-300 underline transition-colors"
+                    >
+                      <Mail className="h-4 w-4 mr-1" />
+                      Solicitar nuevo enlace de verificación
+                    </Link>
+                  </div>
+                )}
               </motion.div>
             )}
 

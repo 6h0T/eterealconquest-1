@@ -780,7 +780,10 @@ section + section {
 /* From Uiverse.io by elijahgummer */
 .golden-button {
   touch-action: manipulation;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   outline: none;
   font-family: var(--font-trade-winds), var(--font-rowdies), system-ui, sans-serif;
   font-size: 1em;
@@ -788,7 +791,6 @@ section + section {
   border: none;
   border-radius: 0.3em;
   height: 2.75em;
-  line-height: 2.5em;
   text-transform: uppercase;
   padding: 0 1em;
   box-shadow:
@@ -817,6 +819,11 @@ section + section {
 .golden-button:active {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(110, 80, 20, 0.4), inset 0 -2px 5px 1px #b17d10, inset 0
     -1px 1px 3px rgba(250, 227, 133, 1);
+}
+
+/* Estilos para iconos dentro de golden-button */
+.golden-button svg {
+  flex-shrink: 0;
 }
 
 /* Estilos para el video del hero */

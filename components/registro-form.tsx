@@ -548,13 +548,25 @@ export function RegistroForm({ lang }: RegistroFormProps) {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-blue-900/30 border border-blue-500/30 text-blue-300 p-4 rounded-md space-y-2"
+                className="bg-blue-900/30 border border-blue-500/30 text-blue-300 p-4 rounded-md space-y-3"
               >
                 <div className="flex items-center">
                   <Mail className="h-5 w-5 mr-2" />
                   <span className="font-medium">{t.verificationSent}</span>
                 </div>
                 <p className="text-sm text-blue-200">{t.checkEmail}</p>
+                <div className="pt-2 border-t border-blue-500/20">
+                  <p className="text-xs text-blue-200/80 mb-2">
+                    {dictionary?.registro?.resendNotReceived || "¿No recibiste el email?"}
+                  </p>
+                  <Link
+                    href={`/${lang}/reenviar-verificacion`}
+                    className="inline-flex items-center text-sm text-blue-400 hover:text-blue-300 underline transition-colors"
+                  >
+                    <Mail className="h-4 w-4 mr-1" />
+                    {dictionary?.registro?.resendVerification || "Reenviar email de verificación"}
+                  </Link>
+                </div>
               </motion.div>
             )}
 
