@@ -107,6 +107,9 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          "Accept": "application/json",
+          "Cache-Control": "no-cache",
         },
         body: JSON.stringify({ email: data.email }),
       })

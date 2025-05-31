@@ -66,7 +66,7 @@ export async function POST(req: Request) {
     const result = await executeQueryWithRetry(async (pool) => {
       console.log("[RESEND] Conectado a BD, buscando cuenta pendiente...")
       
-      // Verificar si existe una cuenta pendiente para este email
+      // PRIMERO: Verificar si existe una cuenta pendiente para este email
       const pendingResult = await pool
         .request()
         .input("email", email)
@@ -74,24 +74,28 @@ export async function POST(req: Request) {
 
       console.log("[RESEND] Resultado búsqueda pendiente:", pendingResult.recordset.length, "registros")
 
-      if (pendingResult.recordset.length === 0) {
-        console.log("[RESEND] No hay cuenta pendiente, verificando si ya está registrado...")
-        
-        // Verificar si ya está registrado
-        const existingResult = await pool
-          .request()
-          .input("email", email)
-          .query("SELECT memb___id FROM MEMB_INFO WHERE mail_addr = @email")
+      // SEGUNDO: Verificar si ya está registrado en MEMB_INFO
+      const existingResult = await pool
+        .request()
+        .input("email", email)
+        .query("SELECT memb___id FROM MEMB_INFO WHERE mail_addr = @email")
 
-        console.log("[RESEND] Resultado búsqueda existente:", existingResult.recordset.length, "registros")
+      console.log("[RESEND] Resultado búsqueda existente:", existingResult.recordset.length, "registros")
 
-        if (existingResult.recordset.length > 0) {
-          throw new Error("EMAIL_ALREADY_VERIFIED")
-        } else {
-          throw new Error("EMAIL_NOT_FOUND")
-        }
+      // ANÁLISIS DE CASOS:
+      if (existingResult.recordset.length > 0) {
+        // Caso 1: Email ya verificado y registrado
+        console.log("[RESEND] Email ya verificado en MEMB_INFO")
+        throw new Error("EMAIL_ALREADY_VERIFIED")
       }
 
+      if (pendingResult.recordset.length === 0) {
+        // Caso 2: No hay cuenta pendiente NI verificada
+        console.log("[RESEND] No hay cuenta pendiente ni verificada para este email")
+        throw new Error("EMAIL_NOT_FOUND")
+      }
+
+      // Caso 3: Hay cuenta pendiente, proceder con reenvío
       const pendingAccount = pendingResult.recordset[0]
       console.log("[RESEND] Cuenta pendiente encontrada:", pendingAccount.username)
 
@@ -241,7 +245,7 @@ export async function POST(req: Request) {
       console.log("[RESEND] Error específico: EMAIL_NOT_FOUND")
       return NextResponse.json({ 
         success: false,
-        error: "No se encontró ningún registro pendiente para este email. Intenta registrarte nuevamente." 
+        error: "No se encontró ningún registro pendiente para este email. Asegúrate de haberte registrado primero o intenta registrarte nuevamente." 
       }, { status: 404 })
     }
 
@@ -249,8 +253,24 @@ export async function POST(req: Request) {
       console.log("[RESEND] Error específico: EMAIL_ALREADY_VERIFIED")
       return NextResponse.json({ 
         success: false,
-        error: "Esta cuenta ya ha sido verificada. Puedes iniciar sesión directamente." 
+        error: "Esta cuenta ya ha sido verificada exitosamente. Puedes iniciar sesión directamente." 
       }, { status: 400 })
+    }
+
+    if (err.message === "Configuración de servidor incompleta") {
+      console.log("[RESEND] Error de configuración")
+      return NextResponse.json({ 
+        success: false,
+        error: "Error de configuración del servidor. Contacta al administrador." 
+      }, { status: 500 })
+    }
+
+    if (err.message === "Servicio de email no configurado") {
+      console.log("[RESEND] Error de servicio de email")
+      return NextResponse.json({ 
+        success: false,
+        error: "Servicio de email temporalmente no disponible. Inténtalo más tarde." 
+      }, { status: 500 })
     }
 
     console.log("[RESEND] Error genérico, devolviendo 500")

@@ -9,7 +9,7 @@ function getLocale(request: NextRequest): string {
   const negotiatorHeaders: Record<string, string> = {}
   request.headers.forEach((value, key) => (negotiatorHeaders[key] = value))
   const languages = new Negotiator({ headers: negotiatorHeaders }).languages()
-  const locales: string[] = i18n.locales as string[]
+  const locales: string[] = [...i18n.locales]
   const defaultLocale = i18n.defaultLocale
 
   const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value
@@ -75,6 +75,22 @@ export async function middleware(request: NextRequest) {
     pathname.includes("/videos/")
   ) {
     res.headers.set("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800")
+  }
+
+  // Solo aplicar a rutas de API
+  if (pathname.startsWith('/api/')) {
+    // Headers para evitar checkpoint de Vercel
+    res.headers.set('Access-Control-Allow-Origin', '*')
+    res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+    res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, User-Agent, Accept, Cache-Control')
+    res.headers.set('X-Content-Type-Options', 'nosniff')
+    res.headers.set('X-Frame-Options', 'DENY')
+    res.headers.set('X-XSS-Protection', '1; mode=block')
+    
+    // Manejar preflight requests
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { status: 200, headers: res.headers })
+    }
   }
 
   return res
