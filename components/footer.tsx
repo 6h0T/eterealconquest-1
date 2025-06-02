@@ -132,7 +132,7 @@ export function Footer({ lang }: FooterProps) {
             </h3>
             <div className="flex flex-col space-y-4">
               <a
-                href="https://discord.gg/2pF7h7uvRU"
+                href="https://discord.gg/2NTgd7837a"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center text-gold-100 hover:text-gold-400 transition-colors"
@@ -141,7 +141,7 @@ export function Footer({ lang }: FooterProps) {
                 <span>Discord</span>
               </a>
               <a
-                href="https://www.facebook.com/eterealconquest"
+                href="https://www.facebook.com/eterealmu"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center text-gold-100 hover:text-gold-400 transition-colors"
@@ -150,7 +150,7 @@ export function Footer({ lang }: FooterProps) {
                 <span>Facebook</span>
               </a>
               <a
-                href="https://www.instagram.com/eterealconquest.mu/"
+                href="https://www.instagram.com/mu.servers/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center text-gold-100 hover:text-gold-400 transition-colors"
@@ -196,7 +196,7 @@ export function Footer({ lang }: FooterProps) {
               </h3>
               <div className="flex flex-col space-y-2">
                 <a
-                  href="https://discord.gg/2pF7h7uvRU"
+                  href="https://discord.gg/2NTgd7837a"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center text-gold-100 hover:text-gold-400 transition-colors text-sm"
@@ -205,7 +205,7 @@ export function Footer({ lang }: FooterProps) {
                   <span>Discord</span>
                 </a>
                 <a
-                  href="https://www.facebook.com/eterealconquest"
+                  href="https://www.facebook.com/eterealmu"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center text-gold-100 hover:text-gold-400 transition-colors text-sm"
@@ -214,7 +214,7 @@ export function Footer({ lang }: FooterProps) {
                   <span>Facebook</span>
                 </a>
                 <a
-                  href="https://www.instagram.com/eterealconquest.mu/"
+                  href="https://www.instagram.com/mu.servers/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center text-gold-100 hover:text-gold-400 transition-colors text-sm"
