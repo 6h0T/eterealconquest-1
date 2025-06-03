@@ -98,7 +98,7 @@ class RegistrationQueue {
       const crypto = await import('crypto')
 
       await executeQueryWithRetry(async (pool) => {
-        // Verificar si el usuario ya existe
+        // Verificar si el usuario ya existe (MANTENER - username debe ser único)
         const userResult = await pool
           .request()
           .input("username", job.username)
@@ -108,24 +108,13 @@ class RegistrationQueue {
           throw new Error("USER_EXISTS")
         }
 
-        // Verificar si el email ya existe
-        const emailResult = await pool
-          .request()
-          .input("email", job.email)
-          .query("SELECT mail_addr FROM MEMB_INFO WHERE mail_addr = @email")
-
-        if (emailResult.recordset.length > 0) {
-          throw new Error("EMAIL_EXISTS")
-        }
-
-        // Verificar cuentas pendientes
+        // Verificar cuentas pendientes por USERNAME (no por email)
         const pendingResult = await pool
           .request()
           .input("username", job.username)
-          .input("email", job.email)
           .query(`
-            SELECT username, email FROM PendingAccounts 
-            WHERE username = @username OR email = @email
+            SELECT username FROM PendingAccounts 
+            WHERE username = @username
           `)
 
         if (pendingResult.recordset.length > 0) {

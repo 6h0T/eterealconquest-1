@@ -4,9 +4,10 @@ import { executeQueryWithRetry } from "@/lib/db"
 import { sendEmail } from "@/lib/resend"
 import crypto from "crypto"
 
-// Esquema de validación
+// Esquema de validación actualizado para aceptar email o username
 const schema = z.object({
-  email: z.string().email("Email inválido").max(50),
+  identifier: z.string().min(1, "Email o nombre de usuario requerido").max(50),
+  isEmail: z.boolean().optional(),
 })
 
 // Cache para prevenir spam de reenvíos
@@ -23,13 +24,17 @@ setInterval(() => {
   }
 }, 30000)
 
+// Función para detectar si es email o username
+function isEmailFormat(input: string): boolean {
+  return input.includes('@')
+}
+
 export async function POST(req: Request) {
   try {
     console.log("[RESEND] === INICIO DE SOLICITUD ===")
     
     const data = await req.json()
     console.log("[RESEND] Datos recibidos:", data)
-    console.log("[RESEND] Solicitud de reenvío para:", data.email)
 
     // Validar datos
     const parsed = schema.safeParse(data)
@@ -37,20 +42,22 @@ export async function POST(req: Request) {
       console.log("[RESEND] Error de validación:", parsed.error)
       return NextResponse.json({ 
         success: false,
-        error: "Email inválido" 
+        error: "Email o nombre de usuario inválido" 
       }, { status: 400 })
     }
 
-    const { email } = parsed.data
-    const emailKey = `resend_${email.toLowerCase()}`
+    const { identifier } = parsed.data
+    const isEmail = data.isEmail ?? isEmailFormat(identifier)
+    const keyIdentifier = isEmail ? identifier.toLowerCase() : identifier
+    const cacheKey = `resend_${keyIdentifier}`
     const now = Date.now()
 
-    console.log("[RESEND] Email validado:", email)
+    console.log("[RESEND] Identificador:", identifier, "Es email:", isEmail)
     console.log("[RESEND] Verificando cooldown...")
 
     // Verificar cooldown
-    if (recentResends.has(emailKey)) {
-      const lastResend = recentResends.get(emailKey)!
+    if (recentResends.has(cacheKey)) {
+      const lastResend = recentResends.get(cacheKey)!
       const timeLeft = RESEND_COOLDOWN - (now - lastResend)
       if (timeLeft > 0) {
         console.log("[RESEND] Cooldown activo, tiempo restante:", timeLeft)
@@ -66,45 +73,52 @@ export async function POST(req: Request) {
     const result = await executeQueryWithRetry(async (pool) => {
       console.log("[RESEND] Conectado a BD, buscando cuenta pendiente...")
       
-      // PRIMERO: Verificar si existe una cuenta pendiente para este email
-      const pendingResult = await pool
-        .request()
-        .input("email", email)
-        .query("SELECT username, password, verification_token, expires_at FROM PendingAccounts WHERE email = @email")
+      let pendingAccount = null
+      let email = ""
 
-      console.log("[RESEND] Resultado búsqueda pendiente:", pendingResult.recordset.length, "registros")
+      if (isEmail) {
+        // Buscar por email - puede haber múltiples cuentas pendientes
+        const pendingResult = await pool
+          .request()
+          .input("email", identifier)
+          .query("SELECT username, password, verification_token, expires_at, email FROM PendingAccounts WHERE email = @email ORDER BY created_at DESC")
 
-      // SEGUNDO: Verificar si ya está registrado en MEMB_INFO
-      const existingResult = await pool
-        .request()
-        .input("email", email)
-        .query("SELECT memb___id FROM MEMB_INFO WHERE mail_addr = @email")
+        console.log("[RESEND] Búsqueda por email:", pendingResult.recordset.length, "registros encontrados")
 
-      console.log("[RESEND] Resultado búsqueda existente:", existingResult.recordset.length, "registros")
+        if (pendingResult.recordset.length === 0) {
+          throw new Error("EMAIL_NOT_FOUND")
+        }
 
-      // ANÁLISIS DE CASOS:
-      if (existingResult.recordset.length > 0) {
-        // Caso 1: Email ya verificado y registrado
-        console.log("[RESEND] Email ya verificado en MEMB_INFO")
-        throw new Error("EMAIL_ALREADY_VERIFIED")
+        // Tomar la más reciente si hay múltiples
+        pendingAccount = pendingResult.recordset[0]
+        email = pendingAccount.email
+        
+        console.log("[RESEND] Cuenta pendiente por email (más reciente):", pendingAccount.username)
+      } else {
+        // Buscar por username específico
+        const pendingResult = await pool
+          .request()
+          .input("username", identifier)
+          .query("SELECT username, password, verification_token, expires_at, email FROM PendingAccounts WHERE username = @username")
+
+        console.log("[RESEND] Búsqueda por username:", pendingResult.recordset.length, "registros encontrados")
+
+        if (pendingResult.recordset.length === 0) {
+          throw new Error("USERNAME_NOT_FOUND")
+        }
+
+        pendingAccount = pendingResult.recordset[0]
+        email = pendingAccount.email
+        
+        console.log("[RESEND] Cuenta pendiente por username:", pendingAccount.username)
       }
-
-      if (pendingResult.recordset.length === 0) {
-        // Caso 2: No hay cuenta pendiente NI verificada
-        console.log("[RESEND] No hay cuenta pendiente ni verificada para este email")
-        throw new Error("EMAIL_NOT_FOUND")
-      }
-
-      // Caso 3: Hay cuenta pendiente, proceder con reenvío
-      const pendingAccount = pendingResult.recordset[0]
-      console.log("[RESEND] Cuenta pendiente encontrada:", pendingAccount.username)
 
       // Verificar si el token actual ha expirado
-      const now = new Date()
+      const currentTime = new Date()
       const expiresAt = new Date(pendingAccount.expires_at)
-      console.log("[RESEND] Verificando expiración. Ahora:", now, "Expira:", expiresAt)
+      console.log("[RESEND] Verificando expiración. Ahora:", currentTime, "Expira:", expiresAt)
 
-      if (now > expiresAt) {
+      if (currentTime > expiresAt) {
         console.log("[RESEND] Token expirado, generando nuevo...")
         
         // Token expirado, generar uno nuevo
@@ -115,13 +129,13 @@ export async function POST(req: Request) {
 
         await pool
           .request()
-          .input("email", email)
+          .input("username", pendingAccount.username)
           .input("newToken", newToken)
           .input("newExpiresAt", newExpiresAt)
           .query(`
             UPDATE PendingAccounts 
             SET verification_token = @newToken, expires_at = @newExpiresAt 
-            WHERE email = @email
+            WHERE username = @username
           `)
 
         console.log("[RESEND] BD actualizada con nuevo token")
@@ -129,7 +143,8 @@ export async function POST(req: Request) {
         return {
           username: pendingAccount.username,
           email: email,
-          verificationToken: newToken
+          verificationToken: newToken,
+          isEmail
         }
       } else {
         console.log("[RESEND] Token aún válido, usando existente")
@@ -138,7 +153,8 @@ export async function POST(req: Request) {
         return {
           username: pendingAccount.username,
           email: email,
-          verificationToken: pendingAccount.verification_token
+          verificationToken: pendingAccount.verification_token,
+          isEmail
         }
       }
     })
@@ -146,7 +162,7 @@ export async function POST(req: Request) {
     console.log("[RESEND] Consulta BD completada, resultado:", result.username)
 
     // Marcar como reenviado para prevenir spam
-    recentResends.set(emailKey, now)
+    recentResends.set(cacheKey, now)
 
     console.log("[RESEND] Preparando envío de email...")
 
@@ -231,10 +247,20 @@ export async function POST(req: Request) {
     console.log(`[RESEND] ✅ Email reenviado exitosamente a: ${result.email}`)
     console.log("[RESEND] === FIN EXITOSO ===")
 
-    return NextResponse.json({ 
+    // Preparar respuesta con información adicional si se usó username
+    const response: any = { 
       success: true,
       message: "Email de verificación reenviado exitosamente. Revisa tu bandeja de entrada." 
-    })
+    }
+
+    // Si se usó username, incluir pista del email (como en recuperación)
+    if (!result.isEmail) {
+      const emailHint = createEmailHint(result.email)
+      response.message = `Email de verificación reenviado exitosamente a ${emailHint}. Revisa tu bandeja de entrada.`
+      response.emailHint = emailHint
+    }
+
+    return NextResponse.json(response)
 
   } catch (err: any) {
     console.error("[RESEND] ❌ ERROR CAPTURADO:", err)
@@ -245,7 +271,15 @@ export async function POST(req: Request) {
       console.log("[RESEND] Error específico: EMAIL_NOT_FOUND")
       return NextResponse.json({ 
         success: false,
-        error: "No se encontró ningún registro pendiente para este email. Asegúrate de haberte registrado primero o intenta registrarte nuevamente." 
+        error: "No se encontró ningún registro pendiente para este email. Asegúrate de haberte registrado primero." 
+      }, { status: 404 })
+    }
+
+    if (err.message === "USERNAME_NOT_FOUND") {
+      console.log("[RESEND] Error específico: USERNAME_NOT_FOUND")
+      return NextResponse.json({ 
+        success: false,
+        error: "No se encontró ningún registro pendiente para este nombre de usuario. Asegúrate de haberte registrado primero." 
       }, { status: 404 })
     }
 
@@ -280,4 +314,23 @@ export async function POST(req: Request) {
       details: err.message,
     }, { status: 500 })
   }
+}
+
+// Función para crear pista del email (igual que en recuperación)
+function createEmailHint(email: string): string {
+  const [localPart, domain] = email.split('@')
+  if (!localPart || !domain) return email
+  
+  const [domainName, extension] = domain.split('.')
+  if (!domainName || !extension) return email
+  
+  const hiddenLocal = localPart.length > 2 
+    ? localPart[0] + '*'.repeat(localPart.length - 2) + localPart[localPart.length - 1]
+    : localPart[0] + '*'.repeat(Math.max(1, localPart.length - 1))
+    
+  const hiddenDomain = domainName.length > 2
+    ? domainName[0] + '*'.repeat(domainName.length - 2) + domainName[domainName.length - 1]
+    : domainName[0] + '*'.repeat(Math.max(1, domainName.length - 1))
+    
+  return `${hiddenLocal}@${hiddenDomain}.${extension}`
 } 

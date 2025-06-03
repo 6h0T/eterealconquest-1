@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { Mail, AlertCircle, CheckCircle, ArrowLeft, Send } from "lucide-react"
+import { Mail, AlertCircle, CheckCircle, ArrowLeft, Send, User } from "lucide-react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 
@@ -14,18 +14,24 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ImageBackground } from "@/components/image-background"
 
-// Esquema de validación
+// Esquema de validación actualizado
 const formSchema = z.object({
-  email: z.string().email("Email inválido").max(50, "Email muy largo"),
+  identifier: z.string().min(1, "Email o nombre de usuario requerido").max(50, "Muy largo"),
 })
 
 type FormData = z.infer<typeof formSchema>
 
+// Función para detectar si es email o username
+function isEmailFormat(input: string): boolean {
+  return input.includes('@')
+}
+
 interface ResendTexts {
   title: string
   subtitle: string
-  email: string
-  emailPlaceholder: string
+  identifier: string
+  identifierPlaceholder: string
+  identifierHelper: string
   resend: string
   resending: string
   success: string
@@ -33,8 +39,7 @@ interface ResendTexts {
   error: string
   backToRegister: string
   backToLogin: string
-  emailRequired: string
-  emailInvalid: string
+  identifierRequired: string
   cooldownMessage: string
   notFoundMessage: string
   alreadyVerifiedMessage: string
@@ -43,9 +48,10 @@ interface ResendTexts {
 const texts: Record<string, ResendTexts> = {
   es: {
     title: "Reenviar Verificación",
-    subtitle: "Ingresa tu email para recibir un nuevo enlace de verificación",
-    email: "Correo electrónico",
-    emailPlaceholder: "Ingresa tu correo electrónico",
+    subtitle: "Ingresa tu email o nombre de usuario para recibir un nuevo enlace de verificación",
+    identifier: "Email o Usuario",
+    identifierPlaceholder: "Ingresa tu correo electrónico o nombre de usuario",
+    identifierHelper: "Puedes usar tu correo electrónico o tu nombre de usuario (ID de cuenta)",
     resend: "Reenviar Verificación",
     resending: "Reenviando...",
     success: "¡Email Reenviado!",
@@ -53,17 +59,17 @@ const texts: Record<string, ResendTexts> = {
     error: "Error al reenviar",
     backToRegister: "Volver al Registro",
     backToLogin: "Ir al Inicio de Sesión",
-    emailRequired: "El email es requerido",
-    emailInvalid: "Email inválido",
+    identifierRequired: "El email o nombre de usuario es requerido",
     cooldownMessage: "Debes esperar antes de reenviar nuevamente",
-    notFoundMessage: "No se encontró registro pendiente para este email",
+    notFoundMessage: "No se encontró registro pendiente",
     alreadyVerifiedMessage: "Esta cuenta ya ha sido verificada"
   },
   en: {
     title: "Resend Verification",
-    subtitle: "Enter your email to receive a new verification link",
-    email: "Email address",
-    emailPlaceholder: "Enter your email address",
+    subtitle: "Enter your email or username to receive a new verification link",
+    identifier: "Email or Username",
+    identifierPlaceholder: "Enter your email address or username",
+    identifierHelper: "You can use your email address or your username (account ID)",
     resend: "Resend Verification",
     resending: "Resending...",
     success: "Email Resent!",
@@ -71,10 +77,9 @@ const texts: Record<string, ResendTexts> = {
     error: "Error resending",
     backToRegister: "Back to Registration",
     backToLogin: "Go to Login",
-    emailRequired: "Email is required",
-    emailInvalid: "Invalid email",
+    identifierRequired: "Email or username is required",
     cooldownMessage: "You must wait before resending again",
-    notFoundMessage: "No pending registration found for this email",
+    notFoundMessage: "No pending registration found",
     alreadyVerifiedMessage: "This account has already been verified"
   }
 }
@@ -83,6 +88,7 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState("")
+  const [successMessage, setSuccessMessage] = useState("")
   const router = useRouter()
   
   const { lang } = use(params)
@@ -91,17 +97,21 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
   })
+
+  const identifier = watch("identifier", "")
+  const isEmail = isEmailFormat(identifier)
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true)
     setSubmitError("")
 
     try {
-      console.log("[RESEND-PAGE] Enviando solicitud para:", data.email)
+      console.log("[RESEND-PAGE] Enviando solicitud para:", data.identifier, "Es email:", isEmail)
 
       const response = await fetch("/api/resend-verification", {
         method: "POST",
@@ -111,7 +121,10 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
           "Accept": "application/json",
           "Cache-Control": "no-cache",
         },
-        body: JSON.stringify({ email: data.email }),
+        body: JSON.stringify({ 
+          identifier: data.identifier,
+          isEmail: isEmail
+        }),
       })
 
       console.log("[RESEND-PAGE] Respuesta recibida:", response.status, response.statusText)
@@ -144,6 +157,7 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
 
       // Éxito
       setSubmitSuccess(true)
+      setSuccessMessage(result.message || t.successDescription)
       console.log("[RESEND-PAGE] Email reenviado exitosamente")
 
     } catch (error: any) {
@@ -162,64 +176,66 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
   }
 
   return (
-    <div className="pt-20 pb-16 relative overflow-visible min-h-screen">
-      {/* Fondo con imagen */}
+    <div className="min-h-screen flex items-center justify-center p-4">
       <ImageBackground imagePath="https://i.imgur.com/MrDWSAr.jpeg" overlayOpacity={0.3} />
       
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-20 flex items-center justify-center min-h-screen">
+      <div className="w-full max-w-md space-y-6 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="text-center"
+        >
+          <h1 className="text-3xl font-bold text-gold-200 mb-2">
+            {t.title}
+          </h1>
+          <p className="text-gold-100/70">
+            {t.subtitle}
+          </p>
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
+          transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <Card className="bg-bunker-800/90 backdrop-blur-sm border border-gold-700/30 shadow-xl">
-            <CardHeader className="text-center">
-              <div className="flex justify-center mb-4">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                  className="p-3 bg-gold-500/20 rounded-full"
-                >
-                  <Mail className="h-8 w-8 text-gold-500" />
-                </motion.div>
-              </div>
-              <CardTitle className="text-2xl font-bold text-gold-300 font-trade-winds">
+          <Card className="bg-bunker-900/90 backdrop-blur-sm border-gold-500/20">
+            <CardHeader className="text-center pb-4">
+              <CardTitle className="text-gold-200">
                 {t.title}
               </CardTitle>
-              <p className="text-gold-200/80 mt-2">
-                {t.subtitle}
-              </p>
             </CardHeader>
             
             <CardContent>
               {!submitSuccess ? (
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                  {/* Campo de email */}
+                  {/* Campo de identificador */}
                   <div className="space-y-1">
-                    <Label htmlFor="email" className="text-gold-300">
-                      {t.email}
+                    <Label htmlFor="identifier" className="text-gold-300">
+                      {t.identifier}
                     </Label>
                     <div className="relative">
                       <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gold-500/70">
-                        <Mail className="h-5 w-5" />
+                        {isEmail ? <Mail className="h-5 w-5" /> : <User className="h-5 w-5" />}
                       </div>
                       <Input
-                        id="email"
-                        type="email"
-                        placeholder={t.emailPlaceholder}
-                        {...register("email")}
+                        id="identifier"
+                        type="text"
+                        placeholder={t.identifierPlaceholder}
+                        {...register("identifier")}
                         className={`bg-bunker-900/80 border-gold-700/30 text-gold-100 placeholder:text-gold-500/50 focus:border-gold-500 pl-10 ${
-                          errors.email ? "border-red-500" : ""
+                          errors.identifier ? "border-red-500" : ""
                         }`}
                         disabled={isSubmitting}
                       />
                     </div>
-                    {errors.email && (
+                    <p className="text-xs text-gold-400/70">
+                      {t.identifierHelper}
+                    </p>
+                    {errors.identifier && (
                       <p className="text-red-500 text-sm mt-1 flex items-center">
                         <AlertCircle className="h-4 w-4 mr-1" />
-                        {errors.email.message}
+                        {errors.identifier.message}
                       </p>
                     )}
                   </div>
@@ -272,27 +288,30 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
                       {t.success}
                     </h3>
                     <p className="text-gold-200">
-                      {t.successDescription}
+                      {successMessage}
                     </p>
                   </div>
                 </motion.div>
               )}
 
               {/* Enlaces de navegación */}
-              <div className="flex flex-col space-y-2 mt-6 pt-4 border-t border-gold-700/30">
-                <Link
-                  href={`/${lang}/registro`}
-                  className="flex items-center justify-center text-gold-400 hover:text-gold-300 transition-colors"
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  {t.backToRegister}
-                </Link>
-                <Link
-                  href={`/${lang}/inicio-sesion`}
-                  className="text-center text-gold-500 hover:text-gold-400 transition-colors"
-                >
-                  {t.backToLogin}
-                </Link>
+              <div className="mt-6 pt-4 border-t border-gold-700/30 space-y-2">
+                <div className="flex flex-col sm:flex-row justify-center gap-2 text-sm">
+                  <Link
+                    href={`/${lang}/registro`}
+                    className="inline-flex items-center justify-center text-gold-400 hover:text-gold-300 transition-colors"
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-1" />
+                    {t.backToRegister}
+                  </Link>
+                  <span className="text-gold-600 hidden sm:inline">|</span>
+                  <Link
+                    href={`/${lang}/inicio-sesion`}
+                    className="text-gold-400 hover:text-gold-300 transition-colors"
+                  >
+                    {t.backToLogin}
+                  </Link>
+                </div>
               </div>
             </CardContent>
           </Card>
