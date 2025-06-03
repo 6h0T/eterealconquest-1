@@ -77,7 +77,7 @@ export function DiscordFloatButton({ lang }: DiscordFloatButtonProps) {
       }}
     >
       <motion.a
-        href="https://discord.com/invite/2pF7h7uvRU"
+        href="https://discord.gg/2NTgd7837a"
         target="_blank"
         rel="noopener noreferrer"
         className="group relative flex flex-col items-center gap-2"
