@@ -8,6 +8,7 @@ import crypto from "crypto"
 const schema = z.object({
   identifier: z.string().min(1, "Email o nombre de usuario requerido").max(50),
   isEmail: z.boolean().optional(),
+  specificUsername: z.string().optional(), // Nuevo: para seleccionar cuenta específica
 })
 
 // Cache para prevenir spam de reenvíos
@@ -46,13 +47,13 @@ export async function POST(req: Request) {
       }, { status: 400 })
     }
 
-    const { identifier } = parsed.data
+    const { identifier, specificUsername } = parsed.data
     const isEmail = data.isEmail ?? isEmailFormat(identifier)
     const keyIdentifier = isEmail ? identifier.toLowerCase() : identifier
-    const cacheKey = `resend_${keyIdentifier}`
+    const cacheKey = `resend_${keyIdentifier}${specificUsername ? '_' + specificUsername : ''}`
     const now = Date.now()
 
-    console.log("[RESEND] Identificador:", identifier, "Es email:", isEmail)
+    console.log("[RESEND] Identificador:", identifier, "Es email:", isEmail, "Username específico:", specificUsername)
     console.log("[RESEND] Verificando cooldown...")
 
     // Verificar cooldown
@@ -75,13 +76,14 @@ export async function POST(req: Request) {
       
       let pendingAccount = null
       let email = ""
+      let multipleAccounts = []
 
       if (isEmail) {
         // Buscar por email - puede haber múltiples cuentas pendientes
         const pendingResult = await pool
           .request()
           .input("email", identifier)
-          .query("SELECT username, password, verification_token, expires_at, email FROM PendingAccounts WHERE email = @email ORDER BY created_at DESC")
+          .query("SELECT username, password, verification_token, expires_at, email, created_at FROM PendingAccounts WHERE email = @email ORDER BY created_at DESC")
 
         console.log("[RESEND] Búsqueda por email:", pendingResult.recordset.length, "registros encontrados")
 
@@ -89,11 +91,36 @@ export async function POST(req: Request) {
           throw new Error("EMAIL_NOT_FOUND")
         }
 
-        // Tomar la más reciente si hay múltiples
-        pendingAccount = pendingResult.recordset[0]
+        multipleAccounts = pendingResult.recordset
+
+        if (specificUsername) {
+          // Buscar username específico dentro de las cuentas con este email
+          pendingAccount = multipleAccounts.find(acc => acc.username === specificUsername)
+          if (!pendingAccount) {
+            throw new Error("USERNAME_NOT_FOUND_FOR_EMAIL")
+          }
+          console.log("[RESEND] Cuenta pendiente específica encontrada:", pendingAccount.username)
+        } else if (multipleAccounts.length === 1) {
+          // Solo una cuenta pendiente con este email
+          pendingAccount = multipleAccounts[0]
+          console.log("[RESEND] Única cuenta pendiente por email:", pendingAccount.username)
+        } else {
+          // Múltiples cuentas pendientes - devolver lista para que el usuario elija
+          console.log("[RESEND] Múltiples cuentas pendientes encontradas:", multipleAccounts.length)
+          const accountsList = multipleAccounts.map(acc => ({
+            username: acc.username,
+            createdAt: acc.created_at,
+            isExpired: new Date() > new Date(acc.expires_at)
+          }))
+          
+          throw new Error(JSON.stringify({
+            type: "MULTIPLE_ACCOUNTS",
+            accounts: accountsList,
+            email: identifier
+          }))
+        }
+
         email = pendingAccount.email
-        
-        console.log("[RESEND] Cuenta pendiente por email (más reciente):", pendingAccount.username)
       } else {
         // Buscar por username específico
         const pendingResult = await pool
@@ -144,7 +171,8 @@ export async function POST(req: Request) {
           username: pendingAccount.username,
           email: email,
           verificationToken: newToken,
-          isEmail
+          isEmail,
+          isTokenRenewed: true
         }
       } else {
         console.log("[RESEND] Token aún válido, usando existente")
@@ -154,7 +182,8 @@ export async function POST(req: Request) {
           username: pendingAccount.username,
           email: email,
           verificationToken: pendingAccount.verification_token,
-          isEmail
+          isEmail,
+          isTokenRenewed: false
         }
       }
     })
@@ -181,9 +210,13 @@ export async function POST(req: Request) {
     const verificationUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/es/verificar-email?token=${result.verificationToken}`
     console.log("[RESEND] URL de verificación:", verificationUrl)
 
+    const emailSubject = result.isTokenRenewed 
+      ? "Nuevo enlace de verificación - ETEREAL CONQUEST"
+      : "Reenvío de verificación - ETEREAL CONQUEST"
+
     const emailResult = await sendEmail({
       to: result.email,
-      subject: "Verifica tu cuenta - ETEREAL CONQUEST",
+      subject: emailSubject,
       html: `
 <!DOCTYPE html>
 <html>
@@ -197,6 +230,7 @@ export async function POST(req: Request) {
     .link { color: #FFD700; word-break: break-all; }
     .warning-text { color: #ffffff; margin-top: 20px; }
     .warning-icon { margin-right: 10px; }
+    .renewed-badge { background-color: #28a745; color: white; padding: 3px 8px; border-radius: 3px; font-size: 12px; }
     p, span, div { color: #ffffff; }
   </style>
 </head>
@@ -205,7 +239,8 @@ export async function POST(req: Request) {
     <div class="content">
       <h2 style="color: #FFD700;">¡Bienvenido a ETEREAL CONQUEST!</h2>
       <p>Hola <span class="username">${result.username}</span>,</p>
-      <p>Has solicitado reenviar el enlace de verificación para tu cuenta.</p>
+      <p>Has solicitado ${result.isTokenRenewed ? 'un nuevo' : 'reenviar el'} enlace de verificación para tu cuenta.</p>
+      ${result.isTokenRenewed ? '<p><span class="renewed-badge">NUEVO TOKEN</span> Se ha generado un nuevo enlace de verificación.</p>' : ''}
       <p>Para completar tu registro, haz clic en el siguiente botón:</p>
       
       <div style="text-align: center;">
@@ -223,6 +258,11 @@ export async function POST(req: Request) {
       <div style="margin-top: 20px;">
         <span class="warning-icon">🔒</span>
         <span>Si no solicitaste este reenvío, puedes ignorar este mensaje.</span>
+      </div>
+      
+      <div style="margin-top: 20px; font-size: 12px; color: #888;">
+        <span class="warning-icon">📧</span>
+        <span>Cuenta: ${result.username} | Email: ${createEmailHint(result.email)}</span>
       </div>
     </div>
   </div>
@@ -247,17 +287,19 @@ export async function POST(req: Request) {
     console.log(`[RESEND] ✅ Email reenviado exitosamente a: ${result.email}`)
     console.log("[RESEND] === FIN EXITOSO ===")
 
-    // Preparar respuesta con información adicional si se usó username
+    // Preparar respuesta con información adicional
     const response: any = { 
       success: true,
-      message: "Email de verificación reenviado exitosamente. Revisa tu bandeja de entrada." 
+      message: `Email de verificación ${result.isTokenRenewed ? 'renovado y ' : ''}reenviado exitosamente para la cuenta ${result.username}. Revisa tu bandeja de entrada.`,
+      account: result.username,
+      tokenRenewed: result.isTokenRenewed
     }
 
-    // Si se usó username, incluir pista del email (como en recuperación)
+    // Si se usó username, incluir pista del email
     if (!result.isEmail) {
       const emailHint = createEmailHint(result.email)
-      response.message = `Email de verificación reenviado exitosamente a ${emailHint}. Revisa tu bandeja de entrada.`
       response.emailHint = emailHint
+      response.message = `Email de verificación ${result.isTokenRenewed ? 'renovado y ' : ''}reenviado exitosamente para la cuenta ${result.username} a ${emailHint}. Revisa tu bandeja de entrada.`
     }
 
     return NextResponse.json(response)
@@ -265,6 +307,23 @@ export async function POST(req: Request) {
   } catch (err: any) {
     console.error("[RESEND] ❌ ERROR CAPTURADO:", err)
     console.error("[RESEND] Stack trace:", err.stack)
+
+    // Manejo específico para múltiples cuentas
+    try {
+      const errorData = JSON.parse(err.message)
+      if (errorData.type === "MULTIPLE_ACCOUNTS") {
+        console.log("[RESEND] Múltiples cuentas encontradas, devolviendo lista")
+        return NextResponse.json({ 
+          success: false,
+          error: "MULTIPLE_ACCOUNTS",
+          message: "Se encontraron múltiples cuentas pendientes con este email. Por favor, selecciona cuál deseas verificar.",
+          accounts: errorData.accounts,
+          email: errorData.email
+        }, { status: 409 }) // 409 Conflict
+      }
+    } catch (parseError) {
+      // No es un error de múltiples cuentas, continuar con manejo normal
+    }
 
     // Manejo específico de errores
     if (err.message === "EMAIL_NOT_FOUND") {
@@ -280,6 +339,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ 
         success: false,
         error: "No se encontró ningún registro pendiente para este nombre de usuario. Asegúrate de haberte registrado primero." 
+      }, { status: 404 })
+    }
+
+    if (err.message === "USERNAME_NOT_FOUND_FOR_EMAIL") {
+      console.log("[RESEND] Error específico: USERNAME_NOT_FOUND_FOR_EMAIL")
+      return NextResponse.json({ 
+        success: false,
+        error: "No se encontró esa cuenta específica pendiente para este email." 
       }, { status: 404 })
     }
 

@@ -43,6 +43,13 @@ interface ResendTexts {
   cooldownMessage: string
   notFoundMessage: string
   alreadyVerifiedMessage: string
+  multipleAccountsTitle: string
+  multipleAccountsMessage: string
+  selectAccount: string
+  accountExpired: string
+  accountValid: string
+  sendToAccount: string
+  backToForm: string
 }
 
 const texts: Record<string, ResendTexts> = {
@@ -62,7 +69,14 @@ const texts: Record<string, ResendTexts> = {
     identifierRequired: "El email o nombre de usuario es requerido",
     cooldownMessage: "Debes esperar antes de reenviar nuevamente",
     notFoundMessage: "No se encontró registro pendiente",
-    alreadyVerifiedMessage: "Esta cuenta ya ha sido verificada"
+    alreadyVerifiedMessage: "Esta cuenta ya ha sido verificada",
+    multipleAccountsTitle: "Múltiples Cuentas Encontradas",
+    multipleAccountsMessage: "Se encontraron múltiples cuentas pendientes con este email. Selecciona cuál deseas verificar:",
+    selectAccount: "Seleccionar Cuenta",
+    accountExpired: "Token Expirado",
+    accountValid: "Token Válido",
+    sendToAccount: "Enviar a esta cuenta",
+    backToForm: "Volver al formulario"
   },
   en: {
     title: "Resend Verification",
@@ -80,7 +94,14 @@ const texts: Record<string, ResendTexts> = {
     identifierRequired: "Email or username is required",
     cooldownMessage: "You must wait before resending again",
     notFoundMessage: "No pending registration found",
-    alreadyVerifiedMessage: "This account has already been verified"
+    alreadyVerifiedMessage: "This account has already been verified",
+    multipleAccountsTitle: "Multiple Accounts Found",
+    multipleAccountsMessage: "Multiple pending accounts found with this email. Select which one you want to verify:",
+    selectAccount: "Select Account",
+    accountExpired: "Token Expired",
+    accountValid: "Token Valid",
+    sendToAccount: "Send to this account",
+    backToForm: "Back to form"
   }
 }
 
@@ -89,6 +110,12 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
+  const [multipleAccounts, setMultipleAccounts] = useState<Array<{
+    username: string
+    createdAt: string
+    isExpired: boolean
+  }> | null>(null)
+  const [selectedEmail, setSelectedEmail] = useState("")
   const router = useRouter()
   
   const { lang } = use(params)
@@ -106,9 +133,73 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
   const identifier = watch("identifier", "")
   const isEmail = isEmailFormat(identifier)
 
+  const resetToForm = () => {
+    setMultipleAccounts(null)
+    setSelectedEmail("")
+    setSubmitError("")
+    setSubmitSuccess(false)
+  }
+
+  const handleAccountSelection = async (username: string) => {
+    setIsSubmitting(true)
+    setSubmitError("")
+
+    try {
+      console.log("[RESEND-PAGE] Enviando solicitud para cuenta específica:", username, "Email:", selectedEmail)
+
+      const response = await fetch("/api/resend-verification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          "Accept": "application/json",
+          "Cache-Control": "no-cache",
+        },
+        body: JSON.stringify({ 
+          identifier: selectedEmail,
+          isEmail: true,
+          specificUsername: username
+        }),
+      })
+
+      const contentType = response.headers.get("content-type")
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text()
+        console.error("[RESEND-PAGE] Respuesta no es JSON:", text.substring(0, 200))
+        throw new Error("Respuesta del servidor no válida")
+      }
+
+      const result = await response.json()
+      console.log("[RESEND-PAGE] JSON parseado:", result)
+
+      if (!response.ok) {
+        setSubmitError(result.error || t.error)
+        return
+      }
+
+      // Éxito
+      setSubmitSuccess(true)
+      setSuccessMessage(result.message || t.successDescription)
+      setMultipleAccounts(null)
+      console.log("[RESEND-PAGE] Email reenviado exitosamente para:", username)
+
+    } catch (error: any) {
+      console.error("[RESEND-PAGE] Error capturado:", error)
+      
+      if (error.message.includes("JSON")) {
+        setSubmitError("Error de comunicación con el servidor. Inténtalo más tarde.")
+      } else {
+        setSubmitError(error.message || "Error de conexión. Inténtalo más tarde.")
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true)
     setSubmitError("")
+    setMultipleAccounts(null)
 
     try {
       console.log("[RESEND-PAGE] Enviando solicitud para:", data.identifier, "Es email:", isEmail)
@@ -142,7 +233,15 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
       console.log("[RESEND-PAGE] JSON parseado:", result)
 
       if (!response.ok) {
-        // Manejar diferentes tipos de errores
+        // Manejar caso especial de múltiples cuentas
+        if (response.status === 409 && result.error === "MULTIPLE_ACCOUNTS") {
+          console.log("[RESEND-PAGE] Múltiples cuentas encontradas:", result.accounts)
+          setMultipleAccounts(result.accounts)
+          setSelectedEmail(result.email)
+          return
+        }
+        
+        // Manejar otros errores
         if (result.error?.includes("esperar")) {
           setSubmitError(t.cooldownMessage)
         } else if (result.error?.includes("no se encontró") || result.error?.includes("not found")) {
@@ -175,6 +274,16 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
     }
   }
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString(lang === 'es' ? 'es-ES' : 'en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <ImageBackground imagePath="https://i.imgur.com/MrDWSAr.jpeg" overlayOpacity={0.3} />
@@ -187,10 +296,10 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
           className="text-center"
         >
           <h1 className="text-3xl font-bold text-gold-200 mb-2">
-            {t.title}
+            {multipleAccounts ? t.multipleAccountsTitle : t.title}
           </h1>
           <p className="text-gold-100/70">
-            {t.subtitle}
+            {multipleAccounts ? t.multipleAccountsMessage : t.subtitle}
           </p>
         </motion.div>
 
@@ -202,12 +311,64 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
           <Card className="bg-bunker-900/90 backdrop-blur-sm border-gold-500/20">
             <CardHeader className="text-center pb-4">
               <CardTitle className="text-gold-200">
-                {t.title}
+                {multipleAccounts ? t.selectAccount : t.title}
               </CardTitle>
             </CardHeader>
             
             <CardContent>
-              {!submitSuccess ? (
+              {multipleAccounts ? (
+                /* Lista de múltiples cuentas */
+                <div className="space-y-4">
+                  {multipleAccounts.map((account, index) => (
+                    <motion.div
+                      key={account.username}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className={`p-4 rounded-lg border transition-all hover:border-gold-500/50 cursor-pointer ${
+                        account.isExpired 
+                          ? "bg-red-900/20 border-red-500/30" 
+                          : "bg-green-900/20 border-green-500/30"
+                      }`}
+                      onClick={() => !isSubmitting && handleAccountSelection(account.username)}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h3 className="font-bold text-gold-200">{account.username}</h3>
+                          <p className="text-sm text-gold-400">
+                            Creada: {formatDate(account.createdAt)}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            account.isExpired 
+                              ? "bg-red-500/20 text-red-300" 
+                              : "bg-green-500/20 text-green-300"
+                          }`}>
+                            {account.isExpired ? t.accountExpired : t.accountValid}
+                          </span>
+                          <div className="mt-1">
+                            <button
+                              disabled={isSubmitting}
+                              className="text-xs px-3 py-1 bg-gold-600 hover:bg-gold-700 text-black rounded transition-colors disabled:opacity-50"
+                            >
+                              {isSubmitting ? t.resending : t.sendToAccount}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                  
+                  <button
+                    onClick={resetToForm}
+                    className="w-full mt-4 px-4 py-2 text-gold-300 border border-gold-500/30 rounded hover:bg-gold-500/10 transition-colors"
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-2 inline" />
+                    {t.backToForm}
+                  </button>
+                </div>
+              ) : !submitSuccess ? (
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                   {/* Campo de identificador */}
                   <div className="space-y-1">
@@ -287,32 +448,26 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
                     <h3 className="text-xl font-bold text-green-400 mb-2">
                       {t.success}
                     </h3>
-                    <p className="text-gold-200">
+                    <p className="text-gold-100/80 mb-4">
                       {successMessage}
                     </p>
                   </div>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Link 
+                      href={`/${lang}/registro`}
+                      className="flex-1 px-4 py-2 text-center bg-transparent border border-gold-500/30 text-gold-300 rounded hover:bg-gold-500/10 transition-colors"
+                    >
+                      {t.backToRegister}
+                    </Link>
+                    <Link 
+                      href={`/${lang}/inicio-sesion`}
+                      className="flex-1 px-4 py-2 text-center bg-gold-600 hover:bg-gold-700 text-black rounded transition-colors font-medium"
+                    >
+                      {t.backToLogin}
+                    </Link>
+                  </div>
                 </motion.div>
               )}
-
-              {/* Enlaces de navegación */}
-              <div className="mt-6 pt-4 border-t border-gold-700/30 space-y-2">
-                <div className="flex flex-col sm:flex-row justify-center gap-2 text-sm">
-                  <Link
-                    href={`/${lang}/registro`}
-                    className="inline-flex items-center justify-center text-gold-400 hover:text-gold-300 transition-colors"
-                  >
-                    <ArrowLeft className="h-4 w-4 mr-1" />
-                    {t.backToRegister}
-                  </Link>
-                  <span className="text-gold-600 hidden sm:inline">|</span>
-                  <Link
-                    href={`/${lang}/inicio-sesion`}
-                    className="text-gold-400 hover:text-gold-300 transition-colors"
-                  >
-                    {t.backToLogin}
-                  </Link>
-                </div>
-              </div>
             </CardContent>
           </Card>
         </motion.div>
