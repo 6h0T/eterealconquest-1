@@ -241,17 +241,20 @@
   },
   "recuperacion": {
     "title": "Password Recovery",
-    "subtitle": "Enter your email to recover your account",
-    "email": "Email address",
-    "emailPlaceholder": "Enter your email address",
+    "subtitle": "Enter your email or username to recover your account",
+    "email": "Email address or Username",
+    "emailPlaceholder": "Enter your email address or username",
     "recover": "Recover Password",
     "recovering": "Processing...",
     "success": "Instructions sent! Check your email.",
+    "successWithHint": "A recovery link has been sent to",
     "error": "Error processing request. Please try again.",
-    "emailRequired": "Email is required",
+    "emailRequired": "Email or username is required",
     "emailInvalid": "Email is invalid",
     "backToLogin": "Back to Sign In",
-    "instructions": "We'll send you a link to reset your password."
+    "instructions": "We'll send you a link to reset your password.",
+    "identifierLabel": "Email or Username",
+    "identifierHelper": "You can use your email address or your username (account ID)"
   },
   "donate": {
     "title": "Donations",

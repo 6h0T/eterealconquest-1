@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import Image from "next/image"
-import { ChevronUp, ChevronDown, Play, Pause } from "lucide-react"
+import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Play, Pause } from "lucide-react"
 import { getDictionary } from "@/i18n/config"
 import type { Locale } from "@/i18n/config"
 import { motion, AnimatePresence } from "framer-motion"
@@ -704,7 +704,6 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
                           className={`relative cursor-pointer transition-all duration-300 ${isAnimating ? "pointer-events-none" : ""}`}
                           onClick={() => changeClass(i)}
                         >
-                          {/* Contenedor exterior para el borde y la sombra */}
                           <div
                             className={`w-14 h-14 rounded-full overflow-hidden border-2 transition-all duration-300 ${
                               i === activeIndex
@@ -712,17 +711,13 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
                                 : "border-transparent hover:border-gold-500/50"
                             }`}
                           >
-                            {/* Contenedor intermedio para centrar la imagen */}
-                            <div className="w-full h-full flex items-center justify-center">
-                              {/* Imagen con escala independiente */}
-                              <Image
-                                src={char.img || "/placeholder.svg"}
-                                alt={char.name}
-                                width={56}
-                                height={56}
-                                className={`object-contain transition-transform duration-300 ${i === activeIndex ? "scale-125" : ""}`}
-                              />
-                            </div>
+                            <Image
+                              src={char.img || "/placeholder.svg"}
+                              alt={char.name}
+                              width={56}
+                              height={56}
+                              className={`object-contain transition-transform duration-300 ${i === activeIndex ? "scale-125" : ""}`}
+                            />
                           </div>
                         </div>
                       ))}
@@ -755,17 +750,17 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
                         animate="visible"
                         exit="exit"
                       >
-                        <div className="flex items-center justify-center space-x-2 bg-bunker-800/90 backdrop-blur-sm rounded-lg p-3 border border-gold-700/30">
+                        <div className="flex items-center justify-center space-x-3 bg-black/20 backdrop-blur-lg rounded-2xl p-4 border border-gold-500/20 shadow-2xl shadow-gold-500/10">
                           <button
                             onClick={moveUp}
-                            className="w-8 h-8 rounded-full bg-bunker-700/80 flex items-center justify-center text-gold-400 hover:bg-bunker-600 hover:text-gold-300 transition-colors flex-shrink-0"
+                            className="w-10 h-10 rounded-xl bg-black/30 backdrop-blur-sm flex items-center justify-center text-gold-400 hover:bg-gold-500/20 hover:text-gold-300 transition-all duration-300 border border-gold-500/30 shadow-lg shadow-gold-500/20 flex-shrink-0"
                             aria-label="Personaje anterior"
                             disabled={isAnimating}
                           >
-                            <ChevronUp size={16} />
+                            <ChevronLeft size={18} />
                           </button>
 
-                          <div className="flex space-x-2 overflow-x-auto scrollbar-hide">
+                          <div className="flex space-x-3 overflow-x-auto scrollbar-hide px-2">
                             {characters.map((char, i) => (
                               <div
                                 key={i}
@@ -773,19 +768,19 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
                                 onClick={() => changeClass(i)}
                               >
                                 <div
-                                  className={`w-10 h-10 rounded-full overflow-hidden border-2 transition-all duration-300 ${
+                                  className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all duration-300 backdrop-blur-sm ${
                                     i === activeIndex
-                                      ? "border-gold-500 shadow-lg shadow-gold-500/30"
-                                      : "border-transparent hover:border-gold-500/50"
+                                      ? "border-gold-400 shadow-xl shadow-gold-500/40 bg-gold-500/10"
+                                      : "border-white/20 hover:border-gold-500/50 bg-black/20"
                                   }`}
                                 >
                                   <div className="w-full h-full flex items-center justify-center">
                                     <Image
                                       src={char.img || "/placeholder.svg"}
                                       alt={char.name}
-                                      width={40}
-                                      height={40}
-                                      className={`object-contain transition-transform duration-300 ${i === activeIndex ? "scale-110" : ""}`}
+                                      width={48}
+                                      height={48}
+                                      className={`object-contain transition-transform duration-300 ${i === activeIndex ? "scale-110" : "scale-95"}`}
                                     />
                                   </div>
                                 </div>
@@ -795,11 +790,11 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
 
                           <button
                             onClick={moveDown}
-                            className="w-8 h-8 rounded-full bg-bunker-700/80 flex items-center justify-center text-gold-400 hover:bg-bunker-600 hover:text-gold-300 transition-colors flex-shrink-0"
+                            className="w-10 h-10 rounded-xl bg-black/30 backdrop-blur-sm flex items-center justify-center text-gold-400 hover:bg-gold-500/20 hover:text-gold-300 transition-all duration-300 border border-gold-500/30 shadow-lg shadow-gold-500/20 flex-shrink-0"
                             aria-label="Siguiente personaje"
                             disabled={isAnimating}
                           >
-                            <ChevronDown size={16} />
+                            <ChevronRight size={18} />
                           </button>
                         </div>
                       </motion.div>
@@ -833,7 +828,7 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
                     <div className="w-full md:w-2/3 mt-20 md:mt-0 flex flex-col items-center">
                       {/* Título de la clase para móvil */}
                       <motion.h1
-                        className="md:hidden text-center text-2xl font-bold gold-gradient-text mb-4"
+                        className="md:hidden text-center text-2xl font-bold gold-gradient-text mb-4 mt-[120px]"
                         variants={headerVariants}
                         initial="initial"
                         animate="animate"

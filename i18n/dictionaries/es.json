@@ -243,17 +243,20 @@
   },
   "recuperacion": {
     "title": "Recuperación de Contraseña",
-    "subtitle": "Ingresa tu correo electrónico para recuperar tu cuenta",
-    "email": "Correo electrónico",
-    "emailPlaceholder": "Ingresa tu correo electrónico",
+    "subtitle": "Ingresa tu correo electrónico o nombre de usuario para recuperar tu cuenta",
+    "email": "Correo electrónico o Usuario",
+    "emailPlaceholder": "Ingresa tu correo electrónico o nombre de usuario",
     "recover": "Recuperar Contraseña",
     "recovering": "Procesando...",
     "success": "¡Instrucciones enviadas! Revisa tu correo electrónico.",
+    "successWithHint": "Se ha enviado un enlace de recuperación a",
     "error": "Error al procesar la solicitud. Por favor, intenta nuevamente.",
-    "emailRequired": "El correo electrónico es requerido",
+    "emailRequired": "El correo electrónico o usuario es requerido",
     "emailInvalid": "El correo electrónico no es válido",
     "backToLogin": "Volver a Iniciar Sesión",
-    "instructions": "Te enviaremos un enlace para restablecer tu contraseña."
+    "instructions": "Te enviaremos un enlace para restablecer tu contraseña.",
+    "identifierLabel": "Email o Usuario",
+    "identifierHelper": "Puedes usar tu correo electrónico o tu nombre de usuario (ID de cuenta)"
   },
   "donate": {
     "title": "Donaciones",

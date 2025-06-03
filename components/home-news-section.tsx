@@ -11,15 +11,15 @@ interface HomeNewsSectionProps {
 }
 
 export default function HomeNewsSection({ lang, translations }: HomeNewsSectionProps) {
-  const { getFeaturedNews } = useNews()
-  const [news, setNews] = useState<any[]>([])
+  const { news, getFeaturedNews } = useNews()
+  const [displayNews, setDisplayNews] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const featuredNews = getFeaturedNews(lang)
-    setNews(featuredNews.slice(0, 3)) // Mostrar solo las 3 primeras noticias destacadas
+    setDisplayNews(featuredNews.slice(0, 3)) // Mostrar solo las 3 primeras noticias destacadas
     setLoading(false)
-  }, [lang, getFeaturedNews])
+  }, [lang, news, getFeaturedNews])
 
   // Formatear fecha
   const formatDate = (dateString: string) => {
@@ -59,7 +59,7 @@ export default function HomeNewsSection({ lang, translations }: HomeNewsSectionP
     )
   }
 
-  if (news.length === 0) {
+  if (displayNews.length === 0) {
     return null // No mostrar la sección si no hay noticias destacadas
   }
 
@@ -74,7 +74,7 @@ export default function HomeNewsSection({ lang, translations }: HomeNewsSectionP
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {news.map((item) => (
+          {displayNews.map((item) => (
             <div
               key={item.id}
               className="bg-bunker-800 border border-bunker-700 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200"

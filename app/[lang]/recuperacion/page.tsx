@@ -29,22 +29,6 @@ export default function RecuperacionPage({ params }: { params: { lang: Locale } 
     loadDictionary()
   }, [lang])
 
-  // Traducciones específicas para la página de recuperación
-  const translations = {
-    es: {
-      title: "Recuperación de Contraseña",
-      subtitle: "Ingresa tu correo electrónico para recuperar tu cuenta",
-    },
-    en: {
-      title: "Password Recovery",
-      subtitle: "Enter your email to recover your account",
-    },
-    pt: {
-      title: "Recuperação de Senha",
-      subtitle: "Digite seu email para recuperar sua conta",
-    },
-  }
-
   if (isLoading) {
     return (
       <div className="pt-32 pb-8 relative overflow-hidden">
@@ -80,9 +64,14 @@ export default function RecuperacionPage({ params }: { params: { lang: Locale } 
         >
           <div className="text-center mb-6">
             <h1 className="text-3xl md:text-4xl font-bold gold-gradient-text mb-2">
-              {translations[lang as keyof typeof translations].title}
+              {dictionary.recuperacion?.title || "Recuperación de Contraseña"}
             </h1>
-            <p className="text-lg text-gold-100">{translations[lang as keyof typeof translations].subtitle}</p>
+            <p className="text-lg text-gold-100">
+              {dictionary.recuperacion?.subtitle || "Ingresa tu correo electrónico o nombre de usuario para recuperar tu cuenta"}
+            </p>
+            <p className="text-sm text-gold-400/70 mt-2">
+              {dictionary.recuperacion?.instructions || "Te enviaremos un enlace para restablecer tu contraseña."}
+            </p>
           </div>
 
           {/* Formulario de recuperación */}

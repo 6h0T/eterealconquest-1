@@ -9,31 +9,78 @@ function generateToken() {
   return crypto.randomBytes(32).toString("hex")
 }
 
+// Función para crear una pista del email (ej: e****@g****.com)
+function createEmailHint(email: string): string {
+  const [localPart, domain] = email.split('@')
+  if (!localPart || !domain) return email
+  
+  const [domainName, extension] = domain.split('.')
+  if (!domainName || !extension) return email
+  
+  const hiddenLocal = localPart.length > 2 
+    ? localPart[0] + '*'.repeat(localPart.length - 2) + localPart[localPart.length - 1]
+    : localPart[0] + '*'.repeat(Math.max(1, localPart.length - 1))
+    
+  const hiddenDomain = domainName.length > 2
+    ? domainName[0] + '*'.repeat(domainName.length - 2) + domainName[domainName.length - 1]
+    : domainName[0] + '*'.repeat(Math.max(1, domainName.length - 1))
+    
+  return `${hiddenLocal}@${hiddenDomain}.${extension}`
+}
+
 export async function POST(req: Request) {
   try {
-    const { email } = await req.json()
+    const { identifier, isEmail } = await req.json()
 
-    if (!email) {
-      return NextResponse.json({ success: false, error: "Falta el email" }, { status: 400 })
+    if (!identifier) {
+      return NextResponse.json({ success: false, error: "Falta el email o nombre de usuario" }, { status: 400 })
     }
 
     const pool = await connectToDB()
-    const result = await pool
-      .request()
-      .input("email", email)
-      .query(`
-        SELECT memb___id FROM MEMB_INFO WHERE mail_addr = @email
-      `)
+    let result
+    let email: string
+    let userId: string
 
-    if (result.recordset.length === 0) {
-      return NextResponse.json({ success: false, error: "No se encontró ese correo" }, { status: 404 })
+    if (isEmail) {
+      // Buscar por email
+      result = await pool
+        .request()
+        .input("email", identifier)
+        .query(`
+          SELECT memb___id, mail_addr FROM MEMB_INFO WHERE mail_addr = @email
+        `)
+      
+      if (result.recordset.length === 0) {
+        return NextResponse.json({ success: false, error: "No se encontró ese correo electrónico" }, { status: 404 })
+      }
+      
+      userId = result.recordset[0].memb___id
+      email = result.recordset[0].mail_addr
+    } else {
+      // Buscar por username (memb___id)
+      result = await pool
+        .request()
+        .input("username", identifier)
+        .query(`
+          SELECT memb___id, mail_addr FROM MEMB_INFO WHERE memb___id = @username
+        `)
+      
+      if (result.recordset.length === 0) {
+        return NextResponse.json({ success: false, error: "No se encontró ese nombre de usuario" }, { status: 404 })
+      }
+      
+      userId = result.recordset[0].memb___id
+      email = result.recordset[0].mail_addr
+      
+      if (!email) {
+        return NextResponse.json({ success: false, error: "Esta cuenta no tiene un correo electrónico asociado" }, { status: 400 })
+      }
     }
 
-    const userId = result.recordset[0].memb___id
     const token = generateToken()
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000) // 1 hora
 
-    // Corregido: Ahora apunta a PasswordRecovery2 con la estructura correcta
+    // Insertar el token en la base de datos
     await pool
       .request()
       .input("email", email)
@@ -45,11 +92,12 @@ export async function POST(req: Request) {
         VALUES (@email, @token, @memb___id, @expires)
       `)
 
-    // Generar el enlace de restablecimiento sin [lang]
+    // Generar el enlace de restablecimiento
     const resetLink = `/restablecer?token=${token}`
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || ""
     const fullResetLink = baseUrl + resetLink
 
+    // Enviar el email
     await resend.emails.send({
       from: "no-reply@eterealconquest.com",
       to: email,
@@ -100,7 +148,18 @@ export async function POST(req: Request) {
       `,
     })
 
-    return NextResponse.json({ success: true, message: "Correo de recuperación enviado" })
+    // Preparar la respuesta
+    const response: any = { 
+      success: true, 
+      message: "Correo de recuperación enviado" 
+    }
+
+    // Si se usó username, agregar pista del email
+    if (!isEmail) {
+      response.emailHint = createEmailHint(email)
+    }
+
+    return NextResponse.json(response)
   } catch (error) {
     console.error("[RECOVER PASSWORD ERROR]", error)
     return NextResponse.json({ success: false, error: "Error interno del servidor" }, { status: 500 })
