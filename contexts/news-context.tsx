@@ -17,21 +17,21 @@ export interface News {
 
 interface NewsContextType {
   news: News[]
+  loading: boolean
+  error: string | null
   addNews: (news: Omit<News, "id" | "created_at" | "updated_at">) => void
   updateNews: (id: number, news: Partial<News>) => void
   deleteNews: (id: number) => void
   getNewsByLanguage: (lang: string) => News[]
   getNewsById: (id: number) => News | undefined
   getFeaturedNews: (lang: string) => News[]
+  refreshNews: () => Promise<void>
 }
 
 const NewsContext = createContext<NewsContextType | undefined>(undefined)
 
-// Clave para almacenar noticias en localStorage
-const NEWS_STORAGE_KEY = "eterealconquest_news"
-
-// Noticias de ejemplo iniciales
-const initialNews: News[] = [
+// Noticias de ejemplo como fallback
+const fallbackNews: News[] = [
   {
     id: 1,
     title: "¡Bienvenidos a ETEREALCONQUEST!",
@@ -41,35 +41,11 @@ const initialNews: News[] = [
     language: "es",
     status: "active",
     featured: true,
-    created_at: new Date(Date.now() - 86400000 * 2).toISOString(), // 2 días atrás
+    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
     updated_at: new Date(Date.now() - 86400000 * 2).toISOString(),
   },
   {
     id: 2,
-    title: "Nuevo evento: La Caída de los Dragones",
-    content:
-      "<p>¡Atención guerreros! Un nuevo evento ha comenzado en el mundo de MU. Los dragones ancestrales han despertado y amenazan con destruir el reino.</p><p>Únete a otros jugadores para enfrentar esta amenaza y obtén recompensas exclusivas como sets legendarios y armas únicas.</p>",
-    image_url: "/placeholder.svg?height=600&width=800&text=Evento Dragones",
-    language: "es",
-    status: "active",
-    featured: true,
-    created_at: new Date(Date.now() - 86400000).toISOString(), // 1 día atrás
-    updated_at: new Date(Date.now() - 86400000).toISOString(),
-  },
-  {
-    id: 3,
-    title: "Guía para nuevos jugadores",
-    content:
-      "<p>¿Eres nuevo en ETEREALCONQUEST? No te preocupes, hemos preparado una guía completa para ayudarte a dar tus primeros pasos en este vasto mundo.</p><p>Aprende sobre las diferentes clases, cómo subir de nivel eficientemente y los mejores lugares para farmear.</p>",
-    image_url: "/placeholder.svg?height=600&width=800&text=Guía para Novatos",
-    language: "es",
-    status: "active",
-    featured: false,
-    created_at: new Date(Date.now() - 86400000 * 0.5).toISOString(), // 12 horas atrás
-    updated_at: new Date(Date.now() - 86400000 * 0.5).toISOString(),
-  },
-  {
-    id: 4,
     title: "Welcome to ETEREALCONQUEST!",
     content:
       "<p>We are pleased to announce the official launch of ETEREALCONQUEST, the new MU Online experience you've been waiting for!</p><p>Get ready to immerse yourself in a world of fantasy, magic, and epic adventures. Our servers are optimized to offer you the best gaming experience.</p>",
@@ -81,7 +57,7 @@ const initialNews: News[] = [
     updated_at: new Date(Date.now() - 86400000 * 2).toISOString(),
   },
   {
-    id: 5,
+    id: 3,
     title: "Bem-vindo ao ETEREALCONQUEST!",
     content:
       "<p>Temos o prazer de anunciar o lançamento oficial do ETEREALCONQUEST, a nova experiência MU Online que você estava esperando!</p><p>Prepare-se para mergulhar em um mundo de fantasia, magia e aventuras épicas. Nossos servidores estão otimizados para oferecer a melhor experiência de jogo.</p>",
@@ -96,27 +72,70 @@ const initialNews: News[] = [
 
 export const NewsProvider = ({ children }: { children: ReactNode }) => {
   const [news, setNews] = useState<News[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Cargar noticias del localStorage al iniciar
-  useEffect(() => {
-    const storedNews = localStorage.getItem(NEWS_STORAGE_KEY)
-    if (storedNews) {
-      setNews(JSON.parse(storedNews))
-    } else {
-      // Si no hay noticias almacenadas, usar las iniciales
-      setNews(initialNews)
-      localStorage.setItem(NEWS_STORAGE_KEY, JSON.stringify(initialNews))
+  // Función para cargar noticias desde la API
+  const fetchNews = async (): Promise<News[]> => {
+    try {
+      console.log('[NEWS-CONTEXT] Cargando noticias desde API...')
+      
+      const response = await fetch('/api/news', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store' // Asegurar datos frescos
+      })
+
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`)
+      }
+
+      const data = await response.json()
+      console.log('[NEWS-CONTEXT] Noticias cargadas:', data.length || 0)
+      
+      return Array.isArray(data) ? data : []
+    } catch (error) {
+      console.error('[NEWS-CONTEXT] Error cargando noticias:', error)
+      throw error
     }
+  }
+
+  // Función para refrescar noticias
+  const refreshNews = async () => {
+    setLoading(true)
+    setError(null)
+    
+    try {
+      const fetchedNews = await fetchNews()
+      
+      if (fetchedNews.length > 0) {
+        setNews(fetchedNews)
+        console.log('[NEWS-CONTEXT] Noticias actualizadas desde API')
+      } else {
+        // Si no hay noticias en la BD, usar fallback
+        setNews(fallbackNews)
+        console.log('[NEWS-CONTEXT] Usando noticias de fallback')
+      }
+    } catch (error) {
+      console.error('[NEWS-CONTEXT] Error al refrescar noticias:', error)
+      setError(error instanceof Error ? error.message : 'Error desconocido')
+      
+      // En caso de error, usar noticias de fallback
+      setNews(fallbackNews)
+      console.log('[NEWS-CONTEXT] Usando noticias de fallback por error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Cargar noticias al inicializar
+  useEffect(() => {
+    refreshNews()
   }, [])
 
-  // Guardar noticias en localStorage cuando cambien
-  useEffect(() => {
-    if (news.length > 0) {
-      localStorage.setItem(NEWS_STORAGE_KEY, JSON.stringify(news))
-    }
-  }, [news])
-
-  // Añadir una nueva noticia
+  // Añadir una nueva noticia (solo para admin, actualizar en tiempo real)
   const addNews = (newNews: Omit<News, "id" | "created_at" | "updated_at">) => {
     const now = new Date().toISOString()
     const id = news.length > 0 ? Math.max(...news.map((n) => n.id)) + 1 : 1
@@ -129,6 +148,7 @@ export const NewsProvider = ({ children }: { children: ReactNode }) => {
     }
 
     setNews((prevNews) => [newsItem, ...prevNews])
+    console.log('[NEWS-CONTEXT] Noticia añadida localmente:', newsItem.title)
   }
 
   // Actualizar una noticia existente
@@ -138,11 +158,13 @@ export const NewsProvider = ({ children }: { children: ReactNode }) => {
         item.id === id ? { ...item, ...updatedNews, updated_at: new Date().toISOString() } : item,
       ),
     )
+    console.log('[NEWS-CONTEXT] Noticia actualizada localmente:', id)
   }
 
   // Eliminar una noticia
   const deleteNews = (id: number) => {
     setNews((prevNews) => prevNews.filter((item) => item.id !== id))
+    console.log('[NEWS-CONTEXT] Noticia eliminada localmente:', id)
   }
 
   // Obtener noticias por idioma
@@ -164,12 +186,15 @@ export const NewsProvider = ({ children }: { children: ReactNode }) => {
     <NewsContext.Provider
       value={{
         news,
+        loading,
+        error,
         addNews,
         updateNews,
         deleteNews,
         getNewsByLanguage,
         getNewsById,
         getFeaturedNews,
+        refreshNews,
       }}
     >
       {children}

@@ -2,22 +2,17 @@
 
 import { useState, useEffect } from "react"
 import { FileText } from "lucide-react"
-import { useNews } from "@/contexts/news-context"
+import { useAdminNews } from "@/contexts/admin-news-context"
 
 export function TotalNews() {
-  const { news } = useNews()
+  const { news, loading } = useAdminNews()
   const [total, setTotal] = useState<number | null>(null)
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Breve retraso para simular carga y mostrar el efecto de pulso
-    const timer = setTimeout(() => {
+    if (!loading) {
       setTotal(news.length)
-      setLoading(false)
-    }, 800)
-
-    return () => clearTimeout(timer)
-  }, [news])
+    }
+  }, [news, loading])
 
   return (
     <div
@@ -34,7 +29,7 @@ export function TotalNews() {
         <FileText className="h-5 w-5 text-gold-500" />
       </div>
       <div className="mt-2">
-        {loading ? (
+        {loading || total === null ? (
           <div className="animate-pulse h-6 bg-bunker-700 rounded-full w-24"></div>
         ) : (
           <div

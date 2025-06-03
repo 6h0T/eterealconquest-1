@@ -1,25 +1,25 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useNews } from "@/contexts/news-context"
 import Link from "next/link"
 import { Calendar, ChevronRight } from "lucide-react"
+import { useNews } from "@/contexts/news-context"
 
 interface HomeNewsSectionProps {
   lang: string
-  translations?: any
+  translations: any
 }
 
 export default function HomeNewsSection({ lang, translations }: HomeNewsSectionProps) {
-  const { news, getFeaturedNews } = useNews()
+  const { news, loading, error, getFeaturedNews } = useNews()
   const [displayNews, setDisplayNews] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const featuredNews = getFeaturedNews(lang)
-    setDisplayNews(featuredNews.slice(0, 3)) // Mostrar solo las 3 primeras noticias destacadas
-    setLoading(false)
-  }, [lang, news, getFeaturedNews])
+    if (!loading) {
+      const featuredNews = getFeaturedNews(lang)
+      setDisplayNews(featuredNews.slice(0, 3)) // Mostrar solo las 3 primeras noticias destacadas
+    }
+  }, [lang, news, loading, getFeaturedNews])
 
   // Formatear fecha
   const formatDate = (dateString: string) => {
@@ -46,7 +46,7 @@ export default function HomeNewsSection({ lang, translations }: HomeNewsSectionP
 
   if (loading) {
     return (
-      <div className="py-8">
+      <section className="py-12 bg-bunker-900">
         <div className="container mx-auto px-4">
           <div className="h-8 w-48 bg-bunker-800 animate-pulse rounded-md mb-6"></div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -55,8 +55,13 @@ export default function HomeNewsSection({ lang, translations }: HomeNewsSectionP
             ))}
           </div>
         </div>
-      </div>
+      </section>
     )
+  }
+
+  if (error) {
+    console.warn('[HOME-NEWS-SECTION] Error cargando noticias:', error)
+    // Continuar mostrando noticias fallback sin mensaje de error visible
   }
 
   if (displayNews.length === 0) {
@@ -97,7 +102,7 @@ export default function HomeNewsSection({ lang, translations }: HomeNewsSectionP
               </div>
 
               {/* Contenido */}
-              <div className="p-6">
+              <div className="p-4">
                 <h3 className="text-lg font-bold mb-3 text-gray-100">{item.title}</h3>
 
                 <div className="flex items-center text-xs text-gray-400 mb-4">

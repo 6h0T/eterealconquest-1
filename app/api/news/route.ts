@@ -1,45 +1,60 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { connectToDB } from "@/lib/db"
+import { createClient } from "@supabase/supabase-js"
+
+// Configuración de Supabase
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseKey = process.env.SUPABASE_SERVICES_ROLE_KEY!
+
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+  },
+})
 
 // GET - Obtener todas las noticias públicas
 export async function GET(request: NextRequest) {
   try {
+    console.log('[NEWS-API] Obteniendo noticias desde Supabase...')
+    
     const url = new URL(request.url)
-
-    // Obtener parámetros de consulta
     const searchParams = url.searchParams
     const lang = searchParams.get("lang") || "es"
     const featured = searchParams.get("featured") === "true"
 
-    // Construir consulta SQL - solo noticias activas para el público
-    let sqlQuery = "SELECT * FROM News WHERE language = @lang AND status = 'active'"
-    const params: any = { lang }
+    // Construir query para Supabase
+    let query = supabase
+      .from('news')
+      .select('*')
+      .eq('language', lang)
+      .eq('status', 'active')
 
     if (featured) {
-      sqlQuery += " AND featured = 1"
+      query = query.eq('featured', true)
     }
 
-    sqlQuery += " ORDER BY featured DESC, created_at DESC"
+    // Ordenar por destacadas primero, luego por fecha
+    query = query.order('featured', { ascending: false })
+                 .order('created_at', { ascending: false })
 
-    const pool = await connectToDB()
-    let requestSql = pool.request()
+    const { data, error } = await query
 
-    // Añadir parámetros
-    Object.keys(params).forEach((key) => {
-      requestSql = requestSql.input(key, params[key])
-    })
+    if (error) {
+      console.error('[NEWS-API] Error obteniendo noticias:', error)
+      throw error
+    }
 
-    const result = await requestSql.query(sqlQuery)
+    console.log(`[NEWS-API] ${data?.length || 0} noticias obtenidas para idioma: ${lang}`)
 
-    return NextResponse.json(result.recordset || [])
+    return NextResponse.json(data || [])
   } catch (error) {
-    console.error("Error fetching news:", error)
+    console.error("[NEWS-API] Error fetching news:", error)
     return NextResponse.json(
       {
         message: "Error fetching news",
         error: error instanceof Error ? error.message : String(error),
       },
-      { status: 500 },
+      { status: 500 }
     )
   }
 }

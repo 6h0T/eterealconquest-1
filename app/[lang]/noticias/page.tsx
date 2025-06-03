@@ -5,21 +5,19 @@ import { useParams } from "next/navigation"
 import { useNews } from "@/contexts/news-context"
 import { NewsProvider } from "@/contexts/news-context"
 import Link from "next/link"
-import { Loader2, Calendar, ChevronRight } from "lucide-react"
+import { Loader2, Calendar, ChevronRight, AlertCircle, RefreshCw } from "lucide-react"
 
 export default function NewsPage() {
   const params = useParams()
-  const { getNewsByLanguage } = useNews()
+  const { getNewsByLanguage, loading, error, refreshNews } = useNews()
   const [news, setNews] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (params.lang) {
+    if (params.lang && !loading) {
       const newsItems = getNewsByLanguage(params.lang as string)
       setNews(newsItems)
-      setLoading(false)
     }
-  }, [params.lang, getNewsByLanguage])
+  }, [params.lang, getNewsByLanguage, loading])
 
   // Formatear fecha
   const formatDate = (dateString: string) => {
@@ -46,15 +44,44 @@ export default function NewsPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
+      <div className="container mx-auto px-4 py-12">
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-gold-500 mx-auto mb-4" />
+            <p className="text-gray-400">Cargando noticias...</p>
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">Noticias</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl md:text-4xl font-bold text-center">Noticias</h1>
+        
+        {/* Botón de refrescar solo visible si hay error */}
+        {error && (
+          <button
+            onClick={refreshNews}
+            className="flex items-center px-4 py-2 bg-gold-600 hover:bg-gold-700 text-bunker-950 rounded-md font-medium transition-colors"
+            title="Recargar noticias"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Recargar
+          </button>
+        )}
+      </div>
+
+      {/* Mostrar error si existe */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-900/20 border border-red-700/50 rounded-lg flex items-center">
+          <AlertCircle className="h-5 w-5 text-red-400 mr-2" />
+          <span className="text-red-300 text-sm">
+            Error cargando noticias desde el servidor. Mostrando noticias de respaldo.
+          </span>
+        </div>
+      )}
 
       {news.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -102,7 +129,10 @@ export default function NewsPage() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 text-gray-400">No hay noticias disponibles en este momento.</div>
+        <div className="text-center py-12 text-gray-400">
+          <p className="text-lg mb-4">No hay noticias disponibles en este idioma.</p>
+          <p className="text-sm">Las noticias aparecerán aquí cuando los administradores las publiquen.</p>
+        </div>
       )}
     </div>
   )
