@@ -21,10 +21,10 @@ export default async function DownloadPage({ params }: { params: { lang: Locale 
           </h1>
           <p className="text-xl text-gold-100 max-w-3xl mx-auto">
             {lang === "es"
-              ? "Descarga el cliente de ETEREALCONQUEST y comienza tu aventura ahora mismo."
+              ? "Descarga el cliente de ETEREAL MU y comienza tu aventura ahora mismo."
               : lang === "en"
-                ? "Download the ETEREALQUEST client and start your adventure right now."
-                : "Baixe o cliente ETEREALQUEST e comece sua aventura agora mesmo."}
+                ? "Download the ETEREAL MU client and start your adventure right now."
+                : "Baixe o cliente ETEREAL MU e comece sua aventura agora mesmo."}
           </p>
           {/* Eliminar la siguiente línea que contiene la línea dorada */}
           {/* <div className="w-24 h-1 bg-gold-500 mx-auto mt-6"></div> */}
