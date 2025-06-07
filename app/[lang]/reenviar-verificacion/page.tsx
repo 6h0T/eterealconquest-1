@@ -453,19 +453,19 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <Link 
-                      href={`/${lang}/registro`}
+                <Link
+                  href={`/${lang}/registro`}
                       className="flex-1 px-4 py-2 text-center bg-transparent border border-gold-500/30 text-gold-300 rounded hover:bg-gold-500/10 transition-colors"
-                    >
-                      {t.backToRegister}
-                    </Link>
-                    <Link 
-                      href={`/${lang}/inicio-sesion`}
+                >
+                  {t.backToRegister}
+                </Link>
+                <Link
+                  href={`/${lang}/inicio-sesion`}
                       className="flex-1 px-4 py-2 text-center bg-gold-600 hover:bg-gold-700 text-black rounded transition-colors font-medium"
-                    >
-                      {t.backToLogin}
-                    </Link>
-                  </div>
+                >
+                  {t.backToLogin}
+                </Link>
+              </div>
                 </motion.div>
               )}
             </CardContent>

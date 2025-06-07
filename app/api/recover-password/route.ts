@@ -59,16 +59,16 @@ export async function POST(req: Request) {
     } else {
       // Buscar por username (memb___id)
       result = await pool
-        .request()
+      .request()
         .input("username", identifier)
-        .query(`
+      .query(`
           SELECT memb___id, mail_addr FROM MEMB_INFO WHERE memb___id = @username
-        `)
-      
-      if (result.recordset.length === 0) {
+      `)
+
+    if (result.recordset.length === 0) {
         return NextResponse.json({ success: false, error: "No se encontró ese nombre de usuario" }, { status: 404 })
-      }
-      
+    }
+
       userId = result.recordset[0].memb___id
       email = result.recordset[0].mail_addr
       

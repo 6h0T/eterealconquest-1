@@ -85,16 +85,16 @@ export async function POST(req: Request) {
 
         // Registrar en el log (si la tabla existe)
         try {
-          await pool
-            .request()
-            .input("email", pendingAccount.email)
-            .input("username", pendingAccount.username)
-            .input("action", "expired")
-            .input("details", "Token de verificación expirado y eliminado")
-            .query(`
-              INSERT INTO EmailVerificationLog (email, username, action, details)
-              VALUES (@email, @username, @action, @details)
-            `)
+        await pool
+          .request()
+          .input("email", pendingAccount.email)
+          .input("username", pendingAccount.username)
+          .input("action", "expired")
+          .input("details", "Token de verificación expirado y eliminado")
+          .query(`
+            INSERT INTO EmailVerificationLog (email, username, action, details)
+            VALUES (@email, @username, @action, @details)
+          `)
         } catch (logError: any) {
           console.warn("Advertencia: No se pudo registrar en log:", logError.message)
         }
@@ -124,16 +124,16 @@ export async function POST(req: Request) {
       console.log("Creando cuenta en MEMB_INFO...")
       
       try {
-        await pool
-          .request()
-          .input("username", pendingAccount.username)
-          .input("password", pendingAccount.password)
-          .input("email", pendingAccount.email)
-          .query(`
-            INSERT INTO MEMB_INFO (memb___id, memb__pwd, mail_addr, memb_name, bloc_code, ctl1_code, sno__numb) 
-            VALUES (@username, @password, @email, @username, 0, 0, 'S1')
-          `)
-        
+      await pool
+        .request()
+        .input("username", pendingAccount.username)
+        .input("password", pendingAccount.password)
+        .input("email", pendingAccount.email)
+        .query(`
+          INSERT INTO MEMB_INFO (memb___id, memb__pwd, mail_addr, memb_name, bloc_code, ctl1_code, sno__numb) 
+          VALUES (@username, @password, @email, @username, 0, 0, 'S1')
+        `)
+
         console.log("✅ Cuenta creada exitosamente en MEMB_INFO")
 
       } catch (insertError: any) {
@@ -151,22 +151,22 @@ export async function POST(req: Request) {
 
       // 7. REGISTRAR LA VERIFICACIÓN EXITOSA EN EL LOG
       try {
-        const ipAddress = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown"
-        const userAgent = req.headers.get("user-agent") || "unknown"
+      const ipAddress = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown"
+      const userAgent = req.headers.get("user-agent") || "unknown"
 
-        await pool
-          .request()
-          .input("email", pendingAccount.email)
-          .input("username", pendingAccount.username)
-          .input("action", "verified")
-          .input("ipAddress", ipAddress)
-          .input("userAgent", userAgent)
-          .input("details", "Cuenta verificada y creada exitosamente")
-          .query(`
-            INSERT INTO EmailVerificationLog (email, username, action, ip_address, user_agent, details)
-            VALUES (@email, @username, @action, @ipAddress, @userAgent, @details)
-          `)
-        
+      await pool
+        .request()
+        .input("email", pendingAccount.email)
+        .input("username", pendingAccount.username)
+        .input("action", "verified")
+        .input("ipAddress", ipAddress)
+        .input("userAgent", userAgent)
+        .input("details", "Cuenta verificada y creada exitosamente")
+        .query(`
+          INSERT INTO EmailVerificationLog (email, username, action, ip_address, user_agent, details)
+          VALUES (@email, @username, @action, @ipAddress, @userAgent, @details)
+        `)
+
         console.log("✅ Verificación registrada en log")
 
       } catch (logError: any) {

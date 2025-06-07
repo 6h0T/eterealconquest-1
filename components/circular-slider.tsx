@@ -711,13 +711,13 @@ export default function CircularSlider({ lang }: CircularSliderProps) {
                                 : "border-transparent hover:border-gold-500/50"
                             }`}
                           >
-                            <Image
-                              src={char.img || "/placeholder.svg"}
-                              alt={char.name}
-                              width={56}
-                              height={56}
-                              className={`object-contain transition-transform duration-300 ${i === activeIndex ? "scale-125" : ""}`}
-                            />
+                              <Image
+                                src={char.img || "/placeholder.svg"}
+                                alt={char.name}
+                                width={56}
+                                height={56}
+                                className={`object-contain transition-transform duration-300 ${i === activeIndex ? "scale-125" : ""}`}
+                              />
                           </div>
                         </div>
                       ))}

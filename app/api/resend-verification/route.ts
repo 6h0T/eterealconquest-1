@@ -80,8 +80,8 @@ export async function POST(req: Request) {
 
       if (isEmail) {
         // Buscar por email - puede haber múltiples cuentas pendientes
-        const pendingResult = await pool
-          .request()
+      const pendingResult = await pool
+        .request()
           .input("email", identifier)
           .query("SELECT username, password, verification_token, expires_at, email, created_at FROM PendingAccounts WHERE email = @email ORDER BY created_at DESC")
 
@@ -124,15 +124,15 @@ export async function POST(req: Request) {
       } else {
         // Buscar por username específico
         const pendingResult = await pool
-          .request()
+        .request()
           .input("username", identifier)
           .query("SELECT username, password, verification_token, expires_at, email FROM PendingAccounts WHERE username = @username")
 
         console.log("[RESEND] Búsqueda por username:", pendingResult.recordset.length, "registros encontrados")
 
-        if (pendingResult.recordset.length === 0) {
+      if (pendingResult.recordset.length === 0) {
           throw new Error("USERNAME_NOT_FOUND")
-        }
+      }
 
         pendingAccount = pendingResult.recordset[0]
         email = pendingAccount.email

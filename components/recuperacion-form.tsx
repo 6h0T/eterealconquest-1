@@ -86,7 +86,7 @@ export function RecuperacionForm({ lang }: RecuperacionFormProps) {
         setEmailHint(data.emailHint)
         setMessage(`${t.successWithHint} ${data.emailHint}`)
       } else {
-        setMessage(t.successMessage)
+      setMessage(t.successMessage)
       }
       
       setIdentifier("")
@@ -113,15 +113,15 @@ export function RecuperacionForm({ lang }: RecuperacionFormProps) {
             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gold-500/70">
               {isEmail(identifier) ? <Mail className="h-5 w-5" /> : <User className="h-5 w-5" />}
             </div>
-            <Input
+          <Input
               id="identifier"
               type="text"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               placeholder={t.identifierPlaceholder}
-              required
+            required
               className="bg-bunker-800 border-gold-500/30 focus:border-gold-400 text-gold-100 placeholder:text-gold-100/50 pl-10"
-            />
+          />
           </div>
           <p className="text-xs text-gold-400/70">
             {t.identifierHelper}
