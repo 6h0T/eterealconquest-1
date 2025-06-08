@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { FileText, Home, Menu, X, Users, Ban, CreditCard, User, Tv } from "lucide-react"
+import { FileText, Home, Menu, X, Users, Ban, CreditCard, User, Tv, UserCheck } from "lucide-react"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
 export function AdminSidebar() {
@@ -50,6 +50,11 @@ export function AdminSidebar() {
       name: "Info de Cuenta",
       href: "/admin/accountinfo",
       icon: <User className="h-5 w-5" />,
+    },
+    {
+      name: "Cuentas Pendientes",
+      href: "/admin/pending-accounts",
+      icon: <UserCheck className="h-5 w-5" />,
     },
     {
       name: "Baneados",
