@@ -35,6 +35,10 @@ export function RegistroForm({ lang }: RegistroFormProps) {
     enabled: false,
     siteKey: "",
   })
+  const [registeredAccountData, setRegisteredAccountData] = useState<{
+    username: string;
+    email: string;
+  } | null>(null)
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [showTermsModal, setShowTermsModal] = useState(false)
   const [rulesAccepted, setRulesAccepted] = useState(false)
@@ -52,6 +56,19 @@ export function RegistroForm({ lang }: RegistroFormProps) {
         // Cargar configuración de reCAPTCHA
         const config = await getRecaptchaConfig()
         setRecaptchaConfig(config)
+
+        // Cargar datos de cuenta registrada desde localStorage
+        const savedAccountData = localStorage.getItem('pendingRegistration')
+        if (savedAccountData) {
+          try {
+            const parsedData = JSON.parse(savedAccountData)
+            setRegisteredAccountData(parsedData)
+            setRequiresVerification(true)
+          } catch (error) {
+            console.error("Error parsing saved account data:", error)
+            localStorage.removeItem('pendingRegistration')
+          }
+        }
       } catch (error) {
         console.error("Error loading data:", error)
       }
@@ -329,11 +346,22 @@ export function RegistroForm({ lang }: RegistroFormProps) {
 
       // Registro exitoso
       if (result.requiresVerification) {
+        // Guardar datos de la cuenta para futuros reenvíos
+        const accountData = {
+          username: data.username,
+          email: data.email,
+          registeredAt: new Date().toISOString(),
+          jobId: result.jobId
+        }
+        localStorage.setItem('pendingRegistration', JSON.stringify(accountData))
+        setRegisteredAccountData(accountData)
         setRequiresVerification(true)
         console.log("Registro iniciado, requiere verificación:", result.message)
       } else {
         setSubmitSuccess(true)
         console.log("Registro exitoso:", result.message)
+        // Limpiar datos guardados si no requiere verificación
+        localStorage.removeItem('pendingRegistration')
         // Redirigir después de un breve retraso
         setTimeout(() => {
           router.push(`/${lang}/inicio-sesion`)
@@ -568,12 +596,25 @@ export function RegistroForm({ lang }: RegistroFormProps) {
                   <span className="font-medium">{t.verificationSent}</span>
                 </div>
                 <p className="text-sm text-blue-200">{t.checkEmail}</p>
+                
+                {/* Mostrar información de la cuenta registrada */}
+                {registeredAccountData && (
+                  <div className="bg-blue-800/30 p-3 rounded-md border border-blue-600/30">
+                    <p className="text-xs text-blue-200/90 mb-1">
+                      <strong>Cuenta:</strong> {registeredAccountData.username}
+                    </p>
+                    <p className="text-xs text-blue-200/90">
+                      <strong>Email:</strong> {registeredAccountData.email}
+                    </p>
+                  </div>
+                )}
+                
                 <div className="pt-2 border-t border-blue-500/20">
                   <p className="text-xs text-blue-200/80 mb-2">
                     {dictionary?.registro?.resendNotReceived || "¿No recibiste el email?"}
                   </p>
                   <Link
-                    href={`/${lang}/reenviar-verificacion`}
+                    href={`/${lang}/reenviar-verificacion${registeredAccountData ? `?username=${registeredAccountData.username}` : ''}`}
                     className="inline-flex items-center text-sm text-blue-400 hover:text-blue-300 underline transition-colors"
                   >
                     <Mail className="h-4 w-4 mr-1" />

@@ -71,6 +71,23 @@ export async function POST(req: Request) {
 
     console.log("[RESEND] Cooldown OK, ejecutando consulta BD...")
 
+    // Verificar variables de entorno críticas antes de proceder
+    if (!process.env.NEXT_PUBLIC_BASE_URL) {
+      console.error("[RESEND] ERROR: NEXT_PUBLIC_BASE_URL no está configurada")
+      return NextResponse.json({ 
+        success: false,
+        error: "Error de configuración del servidor. Por favor, contacta al administrador." 
+      }, { status: 500 })
+    }
+
+    if (!process.env.RESEND_API_KEY) {
+      console.error("[RESEND] ERROR: RESEND_API_KEY no está configurada")
+      return NextResponse.json({ 
+        success: false,
+        error: "Servicio de email temporalmente no disponible. Por favor, inténtalo más tarde." 
+      }, { status: 500 })
+    }
+
     const result = await executeQueryWithRetry(async (pool) => {
       console.log("[RESEND] Conectado a BD, buscando cuenta pendiente...")
       
@@ -194,17 +211,6 @@ export async function POST(req: Request) {
     recentResends.set(cacheKey, now)
 
     console.log("[RESEND] Preparando envío de email...")
-
-    // Verificar variables de entorno
-    if (!process.env.NEXT_PUBLIC_BASE_URL) {
-      console.error("[RESEND] ERROR: NEXT_PUBLIC_BASE_URL no está configurada")
-      throw new Error("Configuración de servidor incompleta")
-    }
-
-    if (!process.env.RESEND_API_KEY) {
-      console.error("[RESEND] ERROR: RESEND_API_KEY no está configurada")
-      throw new Error("Servicio de email no configurado")
-    }
 
     // Enviar email de verificación
     const verificationUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/es/verificar-email?token=${result.verificationToken}`

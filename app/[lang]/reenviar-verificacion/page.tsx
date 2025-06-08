@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, use } from "react"
+import { useState, use, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -116,6 +116,7 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
     isExpired: boolean
   }> | null>(null)
   const [selectedEmail, setSelectedEmail] = useState("")
+  const [loadedFromStorage, setLoadedFromStorage] = useState(false)
   const router = useRouter()
   
   const { lang } = use(params)
@@ -125,10 +126,37 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
   })
+
+  // Cargar datos de localStorage al montar el componente
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedAccountData = localStorage.getItem('pendingRegistration')
+      if (savedAccountData && !loadedFromStorage) {
+        try {
+          const parsedData = JSON.parse(savedAccountData)
+          console.log('[RESEND-PAGE] Datos cargados desde localStorage:', parsedData)
+          setValue('identifier', parsedData.username)
+          setLoadedFromStorage(true)
+        } catch (error) {
+          console.error('[RESEND-PAGE] Error parsing saved data:', error)
+          localStorage.removeItem('pendingRegistration')
+        }
+      }
+      
+      // También verificar parámetros URL
+      const urlParams = new URLSearchParams(window.location.search)
+      const usernameParam = urlParams.get('username')
+      if (usernameParam && !loadedFromStorage) {
+        setValue('identifier', usernameParam)
+        setLoadedFromStorage(true)
+      }
+    }
+  }, [setValue, loadedFromStorage])
 
   const identifier = watch("identifier", "")
   const isEmail = isEmailFormat(identifier)
@@ -393,6 +421,16 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
                     <p className="text-xs text-gold-400/70">
                       {t.identifierHelper}
                     </p>
+                    
+                    {/* Mostrar información si se cargaron datos automáticamente */}
+                    {loadedFromStorage && identifier && (
+                      <div className="bg-blue-900/20 border border-blue-500/30 p-2 rounded-md">
+                        <p className="text-xs text-blue-300">
+                          💡 Se auto-completó con los datos de tu registro previo
+                        </p>
+                      </div>
+                    )}
+                    
                     {errors.identifier && (
                       <p className="text-red-500 text-sm mt-1 flex items-center">
                         <AlertCircle className="h-4 w-4 mr-1" />
@@ -406,10 +444,30 @@ export default function ReenviarVerificacionPage({ params }: { params: Promise<{
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-red-900/30 border border-red-500/30 text-red-300 p-3 rounded-md flex items-center"
+                      className="bg-red-900/30 border border-red-500/30 text-red-300 p-3 rounded-md"
                     >
-                      <AlertCircle className="h-5 w-5 mr-2" />
-                      {submitError}
+                      <div className="flex items-center mb-2">
+                        <AlertCircle className="h-5 w-5 mr-2" />
+                        <span className="font-medium">Error al reenviar</span>
+                      </div>
+                      <p className="text-sm">{submitError}</p>
+                      
+                      {/* Ayuda adicional según el tipo de error */}
+                      <div className="mt-3 p-2 bg-red-800/20 rounded border border-red-600/30">
+                        <p className="text-xs text-red-200/80">
+                          💡 <strong>Soluciones:</strong>
+                        </p>
+                        <ul className="text-xs text-red-200/70 mt-1 space-y-1 list-disc list-inside">
+                          <li>Verifica que el nombre de usuario o email sea correcto</li>
+                          <li>Asegúrate de haber registrado la cuenta previamente</li>
+                          {submitError.includes("interno") && (
+                            <li>Si el problema persiste, contacta al administrador</li>
+                          )}
+                          {submitError.includes("esperar") && (
+                            <li>Espera 1 minuto antes de intentar nuevamente</li>
+                          )}
+                        </ul>
+                      </div>
                     </motion.div>
                   )}
 
