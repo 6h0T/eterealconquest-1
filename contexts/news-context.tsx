@@ -80,22 +80,33 @@ export const NewsProvider = ({ children }: { children: ReactNode }) => {
     try {
       console.log('[NEWS-CONTEXT] Cargando noticias desde API...')
       
-      const response = await fetch('/api/news', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        cache: 'no-store' // Asegurar datos frescos
-      })
-
-      if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}`)
-      }
-
-      const data = await response.json()
-      console.log('[NEWS-CONTEXT] Noticias cargadas:', data.length || 0)
+      // Cargar noticias de todos los idiomas
+      const languages = ['es', 'en', 'pt']
+      const allNews: News[] = []
       
-      return Array.isArray(data) ? data : []
+      for (const lang of languages) {
+        try {
+          const response = await fetch(`/api/news?lang=${lang}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            cache: 'no-store' // Asegurar datos frescos
+          })
+
+          if (response.ok) {
+            const data = await response.json()
+            if (Array.isArray(data)) {
+              allNews.push(...data)
+            }
+          }
+        } catch (langError) {
+          console.warn(`[NEWS-CONTEXT] Error cargando noticias para idioma ${lang}:`, langError)
+        }
+      }
+      
+      console.log('[NEWS-CONTEXT] Noticias cargadas de todos los idiomas:', allNews.length)
+      return allNews
     } catch (error) {
       console.error('[NEWS-CONTEXT] Error cargando noticias:', error)
       throw error

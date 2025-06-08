@@ -215,8 +215,8 @@ export function DownloadModal({ isOpen, onClose, lang }: DownloadModalProps) {
 
                           <div className="grid grid-cols-3 gap-3 mb-4">
                             <a
-                              href="https://www.mediafire.com/file/q96ogj6gwyb1bmr/Etereal+Mu+Beta+.rar/file"
-                              className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white py-2 px-3 rounded-md transition-all duration-200 hover:shadow-lg"
+                              href="https://www.mediafire.com/file/a7kgfeilexwfc31/Etereal_Mu_Beta.rar/file"
+                              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-md transition-all duration-200 hover:shadow-lg"
                               target="_blank"
                               rel="noopener noreferrer"
                             >
@@ -225,8 +225,8 @@ export function DownloadModal({ isOpen, onClose, lang }: DownloadModalProps) {
                             </a>
 
                             <a
-                              href="https://mega.nz/file/J6AHxaDb#9OKcs1f1grcO54L-E2NeCOD35Rfzhk7Sm2y4piZmYq0"
-                              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-md transition-all duration-200 hover:shadow-lg"
+                              href="https://mega.nz/file/TZBVCRzJ#u9Viwe1k2s8tzTUohTA7MgYNgus05KN92bqc_yUIDJ0"
+                              className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white py-2 px-3 rounded-md transition-all duration-200 hover:shadow-lg"
                               target="_blank"
                               rel="noopener noreferrer"
                             >
@@ -235,7 +235,7 @@ export function DownloadModal({ isOpen, onClose, lang }: DownloadModalProps) {
                             </a>
 
                             <a
-                              href="https://drive.google.com/file/d/1x9QuFac95tuDf6dSL3BkMuAAq_K-3wdm/view?usp=sharing"
+                              href="https://drive.google.com/file/d/1x9QuFac95tuDf6dSL3BkMuAAq_K-3wdm/view"
                               className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-3 rounded-md transition-all duration-200 hover:shadow-lg"
                               target="_blank"
                               rel="noopener noreferrer"
