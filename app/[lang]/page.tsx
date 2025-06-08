@@ -33,28 +33,31 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
   // Traducciones para el componente de noticias
   const newsTranslations = {
     es: {
-      title: "Noticias",
+      title: "Últimas Noticias",
       readMore: "Leer más",
       viewAll: "Ver todas las noticias",
       publishedOn: "Publicado el",
       loading: "Cargando noticias...",
       noNews: "No hay noticias disponibles en este momento",
+      noImage: "Sin imagen",
     },
     en: {
-      title: "News",
+      title: "Latest News",
       readMore: "Read more",
       viewAll: "View all news",
       publishedOn: "Published on",
       loading: "Loading news...",
       noNews: "No news available at this time",
+      noImage: "No image",
     },
     pt: {
-      title: "Notícias",
+      title: "Últimas Notícias",
       readMore: "Ler mais",
       viewAll: "Ver todas as notícias",
       publishedOn: "Publicado em",
       loading: "Carregando notícias...",
       noNews: "Não há notícias disponíveis no momento",
+      noImage: "Sem imagem",
     },
   }
 

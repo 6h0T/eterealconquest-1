@@ -72,9 +72,9 @@ export default function HomeNewsSection({ lang, translations }: HomeNewsSectionP
     <section className="py-12 bg-bunker-900">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-gold-500">Últimas noticias</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-gold-500">{translations?.title || "Últimas noticias"}</h2>
           <Link href={`/${lang}/noticias`} className="text-gold-500 hover:text-gold-400 flex items-center">
-            Ver todas <ChevronRight className="h-4 w-4 ml-1" />
+            {translations?.viewAll || "Ver todas"} <ChevronRight className="h-4 w-4 ml-1" />
           </Link>
         </div>
 
@@ -97,7 +97,9 @@ export default function HomeNewsSection({ lang, translations }: HomeNewsSectionP
                     }}
                   />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-gray-500">Sin imagen</div>
+                  <div className="absolute inset-0 flex items-center justify-center text-gray-500">
+                    {translations?.noImage || "Sin imagen"}
+                  </div>
                 )}
               </div>
 
@@ -116,7 +118,7 @@ export default function HomeNewsSection({ lang, translations }: HomeNewsSectionP
                   href={`/${lang}/noticias/${item.id}`}
                   className="inline-flex items-center text-gold-500 hover:text-gold-400"
                 >
-                  Leer más <ChevronRight className="h-4 w-4 ml-1" />
+                  {translations?.readMore || "Leer más"} <ChevronRight className="h-4 w-4 ml-1" />
                 </Link>
               </div>
             </div>
